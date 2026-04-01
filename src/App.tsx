@@ -1,8 +1,32 @@
 import { useState, useRef } from "react";
 
 const LEVELS = ["All", "01 Context", "02 Capabilities", "03 Objects", "04 Interactions", "05 Alignment", "06 Build", "Utility"];
+const PROMPT_LEVELS = LEVELS.slice(1);
+const STORAGE_KEY = "ux-prompt-library";
 
-const PROMPTS = [
+interface Prompt {
+  id: string;
+  level: string;
+  code: string;
+  title: string;
+  description: string;
+  tags: string[];
+  body: string;
+  custom?: boolean;
+}
+
+interface PromptDraft {
+  level: string;
+  code: string;
+  title: string;
+  description: string;
+  tags: string;
+  body: string;
+}
+
+const EMPTY_DRAFT: PromptDraft = { level: "Utility", code: "", title: "", description: "", tags: "", body: "" };
+
+const DEFAULT_PROMPTS: Prompt[] = [
   {
     id: "global",
     level: "Utility",
@@ -613,6 +637,18 @@ Reply YES to confirm. This summary will be saved as the entry point for the next
   }
 ];
 
+function loadPrompts(): Prompt[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return DEFAULT_PROMPTS;
+}
+
+function savePrompts(prompts: Prompt[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(prompts));
+}
+
 const levelColors: Record<string, { bg: string; text: string }> = {
   "01 Context": { bg: "#E6F1FB", text: "#0C447C" },
   "02 Capabilities": { bg: "#E1F5EE", text: "#085041" },
@@ -658,7 +694,53 @@ function SearchIcon() {
   );
 }
 
+function PlusIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M8 3v10M3 8h10"/>
+    </svg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 2l3 3-8 8H3v-3l8-8z"/>
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-9"/>
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 10V2M5 5l3-3 3 3"/>
+      <path d="M3 13h10"/>
+    </svg>
+  );
+}
+
+const fieldStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  fontSize: "13px",
+  padding: "7px 10px",
+  border: "0.5px solid var(--color-border-secondary)",
+  borderRadius: "var(--border-radius-md)",
+  background: "var(--color-background-primary)",
+  color: "var(--color-text-primary)",
+  fontFamily: "var(--font-sans)",
+};
+
 export default function App() {
+  const [prompts, setPrompts] = useState<Prompt[]>(loadPrompts);
   const [activeLevel, setActiveLevel] = useState("All");
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState<Record<string, boolean>>({});
@@ -666,8 +748,21 @@ export default function App() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [exportMsg, setExportMsg] = useState("");
   const exportTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
+  const formTopRef = useRef<HTMLDivElement>(null);
 
-  const filtered = PROMPTS.filter(p => {
+  const [formState, setFormState] = useState<{
+    mode: "new" | "edit";
+    id?: string;
+    draft: PromptDraft;
+  } | null>(null);
+
+  function updatePrompts(next: Prompt[]) {
+    setPrompts(next);
+    savePrompts(next);
+  }
+
+  const filtered = prompts.filter(p => {
     const levelMatch = activeLevel === "All" || p.level === activeLevel;
     const q = search.toLowerCase();
     const searchMatch = !q || p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags.some(t => t.includes(q)) || p.code.toLowerCase().includes(q);
@@ -699,7 +794,7 @@ export default function App() {
   }
 
   function exportSelected(format: "md" | "txt") {
-    const items = PROMPTS.filter(p => selectedIds.includes(p.id));
+    const items = prompts.filter(p => selectedIds.includes(p.id));
     let content = "";
     let filename = "";
     let mime = "";
@@ -733,7 +828,7 @@ export default function App() {
   }
 
   function copyAllSelected() {
-    const items = PROMPTS.filter(p => selectedIds.includes(p.id));
+    const items = prompts.filter(p => selectedIds.includes(p.id));
     const text = items.map(p => `=== ${p.code} · ${p.title} ===\n\n${p.body}`).join("\n\n" + "─".repeat(60) + "\n\n");
     navigator.clipboard.writeText(text).then(() => {
       setExportMsg(`${items.length} prompt${items.length > 1 ? "s" : ""} copied`);
@@ -742,13 +837,134 @@ export default function App() {
     });
   }
 
+  function exportLibrary() {
+    const content = JSON.stringify(prompts, null, 2);
+    const blob = new Blob([content], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ux-prompt-library.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importLibrary(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (Array.isArray(data)) {
+          updatePrompts(data);
+          setSelected({});
+          setExpandedId(null);
+        }
+      } catch {
+        alert("Could not parse the JSON file. Make sure it was exported from this app.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
+  function openNew() {
+    setFormState({ mode: "new", draft: { ...EMPTY_DRAFT } });
+    setExpandedId(null);
+    setTimeout(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  }
+
+  function openEdit(p: Prompt) {
+    setFormState({
+      mode: "edit",
+      id: p.id,
+      draft: {
+        level: p.level,
+        code: p.code,
+        title: p.title,
+        description: p.description,
+        tags: p.tags.join(", "),
+        body: p.body,
+      },
+    });
+    setExpandedId(null);
+    setTimeout(() => formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  }
+
+  function updateDraft(field: keyof PromptDraft, value: string) {
+    setFormState(s => s ? { ...s, draft: { ...s.draft, [field]: value } } : s);
+  }
+
+  function saveForm() {
+    if (!formState) return;
+    const { draft, mode, id } = formState;
+    if (!draft.title.trim() || !draft.body.trim()) return;
+    const tags = draft.tags.split(",").map(t => t.trim()).filter(Boolean);
+
+    if (mode === "new") {
+      const newPrompt: Prompt = {
+        id: `custom-${Date.now()}`,
+        level: draft.level,
+        code: draft.code.trim(),
+        title: draft.title.trim(),
+        description: draft.description.trim(),
+        tags,
+        body: draft.body,
+        custom: true,
+      };
+      updatePrompts([...prompts, newPrompt]);
+    } else if (mode === "edit" && id) {
+      updatePrompts(prompts.map(p => p.id === id
+        ? { ...p, level: draft.level, code: draft.code.trim(), title: draft.title.trim(), description: draft.description.trim(), tags, body: draft.body }
+        : p
+      ));
+    }
+    setFormState(null);
+  }
+
+  function deletePrompt(id: string) {
+    if (!confirm("Delete this prompt? This cannot be undone.")) return;
+    updatePrompts(prompts.filter(p => p.id !== id));
+    setSelected(s => { const n = { ...s }; delete n[id]; return n; });
+    if (expandedId === id) setExpandedId(null);
+    if (formState?.id === id) setFormState(null);
+  }
+
+  const isFormValid = formState && formState.draft.title.trim() && formState.draft.body.trim();
+
   return (
     <div style={{ padding: "1.5rem 1rem", fontFamily: "var(--font-sans)", color: "var(--color-text-primary)" }}>
 
+      {/* Header */}
       <div style={{ marginBottom: "1.25rem" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "0.75rem" }}>
           <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 500 }}>UX prompt library</h2>
-          <span style={{ fontSize: "12px", color: "var(--color-text-secondary)", background: "var(--color-background-secondary)", padding: "3px 10px", borderRadius: "var(--border-radius-md)", border: "0.5px solid var(--color-border-tertiary)" }}>{PROMPTS.length} prompts</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "12px", color: "var(--color-text-secondary)", background: "var(--color-background-secondary)", padding: "3px 10px", borderRadius: "var(--border-radius-md)", border: "0.5px solid var(--color-border-tertiary)" }}>
+              {prompts.length} prompts
+            </span>
+            <button
+              onClick={exportLibrary}
+              title="Export full library as JSON"
+              style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", color: "var(--color-text-secondary)" }}
+            >
+              <DownloadIcon /> Export JSON
+            </button>
+            <button
+              onClick={() => importRef.current?.click()}
+              title="Import library from JSON"
+              style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", color: "var(--color-text-secondary)" }}
+            >
+              <UploadIcon /> Import JSON
+            </button>
+            <input ref={importRef} type="file" accept=".json" style={{ display: "none" }} onChange={importLibrary} />
+            <button
+              onClick={openNew}
+              style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", fontWeight: 500 }}
+            >
+              <PlusIcon /> New prompt
+            </button>
+          </div>
         </div>
 
         <div style={{ position: "relative", marginBottom: "0.75rem" }}>
@@ -786,6 +1002,113 @@ export default function App() {
         </div>
       </div>
 
+      {/* New / Edit form */}
+      <div ref={formTopRef} />
+      {formState && (
+        <div style={{
+          marginBottom: "1.25rem",
+          border: "0.5px solid var(--color-border-secondary)",
+          borderRadius: "var(--border-radius-lg)",
+          background: "var(--color-background-secondary)",
+          overflow: "hidden",
+        }}>
+          <div style={{ padding: "12px 14px", borderBottom: "0.5px solid var(--color-border-tertiary)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "13px", fontWeight: 500 }}>
+              {formState.mode === "new" ? "New prompt" : "Edit prompt"}
+            </span>
+            <button
+              onClick={() => setFormState(null)}
+              style={{ fontSize: "12px", padding: "3px 8px", color: "var(--color-text-secondary)", border: "none", background: "transparent", cursor: "pointer" }}
+            >
+              Cancel
+            </button>
+          </div>
+          <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Level</label>
+                <select
+                  value={formState.draft.level}
+                  onChange={e => updateDraft("level", e.target.value)}
+                  style={{ ...fieldStyle }}
+                >
+                  {PROMPT_LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Code</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 01-D"
+                  value={formState.draft.code}
+                  onChange={e => updateDraft("code", e.target.value)}
+                  style={{ ...fieldStyle }}
+                />
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Title <span style={{ color: "#c00" }}>*</span></label>
+              <input
+                type="text"
+                placeholder="Short, descriptive title"
+                value={formState.draft.title}
+                onChange={e => updateDraft("title", e.target.value)}
+                style={{ ...fieldStyle }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Description</label>
+              <input
+                type="text"
+                placeholder="One-line summary of what this prompt does"
+                value={formState.draft.description}
+                onChange={e => updateDraft("description", e.target.value)}
+                style={{ ...fieldStyle }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Tags <span style={{ color: "var(--color-text-tertiary)", fontWeight: 400 }}>(comma-separated)</span></label>
+              <input
+                type="text"
+                placeholder="e.g. research, synthesis, kickoff"
+                value={formState.draft.tags}
+                onChange={e => updateDraft("tags", e.target.value)}
+                style={{ ...fieldStyle }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Prompt body <span style={{ color: "#c00" }}>*</span></label>
+              <textarea
+                placeholder="Paste or write your prompt here…"
+                value={formState.draft.body}
+                onChange={e => updateDraft("body", e.target.value)}
+                style={{ ...fieldStyle, minHeight: "200px", resize: "vertical", lineHeight: 1.6, fontFamily: "var(--font-mono)", fontSize: "12px" }}
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", paddingTop: "2px" }}>
+              <button
+                onClick={() => setFormState(null)}
+                style={{ fontSize: "12px", padding: "6px 14px", color: "var(--color-text-secondary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveForm}
+                disabled={!isFormValid}
+                style={{
+                  fontSize: "12px", padding: "6px 14px", fontWeight: 500,
+                  opacity: isFormValid ? 1 : 0.45,
+                  cursor: isFormValid ? "pointer" : "default",
+                }}
+              >
+                {formState.mode === "new" ? "Add prompt" : "Save changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Selection toolbar */}
       {selectedCount > 0 && (
         <div style={{
           display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap",
@@ -816,7 +1139,7 @@ export default function App() {
 
       {filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: "2rem", color: "var(--color-text-tertiary)", fontSize: "14px" }}>
-          No prompts match "{search}"
+          {search ? `No prompts match "${search}"` : "No prompts in this level yet."}
         </div>
       )}
 
@@ -828,18 +1151,22 @@ export default function App() {
         </div>
       )}
 
+      {/* Cards */}
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(p => {
           const col = levelColors[p.level] || levelColors["Utility"];
           const isExpanded = expandedId === p.id;
           const isSelected = !!selected[p.id];
+          const isBeingEdited = formState?.mode === "edit" && formState.id === p.id;
 
           return (
             <div key={p.id} style={{
               background: "var(--color-background-primary)",
               border: isSelected
                 ? "2px solid var(--color-border-info)"
-                : "0.5px solid var(--color-border-tertiary)",
+                : isBeingEdited
+                  ? "2px solid var(--color-border-secondary)"
+                  : "0.5px solid var(--color-border-tertiary)",
               borderRadius: "var(--border-radius-lg)",
               overflow: "hidden",
               transition: "border 0.15s",
@@ -861,6 +1188,11 @@ export default function App() {
                         flexShrink: 0,
                       }}>{p.level}</span>
                       <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{p.code}</span>
+                      {p.custom && (
+                        <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "var(--border-radius-md)", background: "var(--color-background-tertiary)", color: "var(--color-text-tertiary)", border: "0.5px solid var(--color-border-tertiary)" }}>
+                          custom
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "3px" }}>{p.title}</div>
                     <div style={{ fontSize: "12px", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{p.description}</div>
@@ -889,6 +1221,20 @@ export default function App() {
                     >
                       {copied[p.id] ? <CheckIcon /> : <CopyIcon />}
                       {copied[p.id] ? "Copied" : "Copy"}
+                    </button>
+                    <button
+                      onClick={() => openEdit(p)}
+                      title="Edit prompt"
+                      style={{ display: "flex", alignItems: "center", padding: "5px 8px", color: "var(--color-text-secondary)" }}
+                    >
+                      <EditIcon />
+                    </button>
+                    <button
+                      onClick={() => deletePrompt(p.id)}
+                      title="Delete prompt"
+                      style={{ display: "flex", alignItems: "center", padding: "5px 8px", color: "var(--color-text-tertiary)" }}
+                    >
+                      <TrashIcon />
                     </button>
                   </div>
                 </div>
