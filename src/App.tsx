@@ -933,13 +933,13 @@ export default function App() {
   const isFormValid = formState && formState.draft.title.trim() && formState.draft.body.trim();
 
   return (
-    <div style={{ padding: "1.5rem 1rem", fontFamily: "var(--font-sans)", color: "var(--color-text-primary)" }}>
+    <div className="app-wrapper" style={{ fontFamily: "var(--font-sans)", color: "var(--color-text-primary)" }}>
 
       {/* Header */}
       <div style={{ marginBottom: "1.25rem" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "0.75rem" }}>
+        <div className="header-top">
           <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 500 }}>UX prompt library</h2>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+          <div className="header-controls">
             <span style={{ fontSize: "12px", color: "var(--color-text-secondary)", background: "var(--color-background-secondary)", padding: "3px 10px", borderRadius: "var(--border-radius-md)", border: "0.5px solid var(--color-border-tertiary)" }}>
               {prompts.length} prompts
             </span>
@@ -948,21 +948,21 @@ export default function App() {
               title="Export full library as JSON"
               style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", color: "var(--color-text-secondary)" }}
             >
-              <DownloadIcon /> Export JSON
+              <DownloadIcon /> <span className="btn-label">Export JSON</span>
             </button>
             <button
               onClick={() => importRef.current?.click()}
               title="Import library from JSON"
               style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", color: "var(--color-text-secondary)" }}
             >
-              <UploadIcon /> Import JSON
+              <UploadIcon /> <span className="btn-label">Import JSON</span>
             </button>
             <input ref={importRef} type="file" accept=".json" style={{ display: "none" }} onChange={importLibrary} />
             <button
               onClick={openNew}
               style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "4px 10px", fontWeight: 500 }}
             >
-              <PlusIcon /> New prompt
+              <PlusIcon /> <span className="btn-label">New prompt</span>
             </button>
           </div>
         </div>
@@ -1024,7 +1024,7 @@ export default function App() {
             </button>
           </div>
           <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: "8px" }}>
+            <div className="form-grid">
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <label style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Level</label>
                 <select
@@ -1208,19 +1208,20 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                  <div className="card-actions">
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : p.id)}
                       style={{ fontSize: "12px", padding: "5px 10px", color: "var(--color-text-secondary)" }}
                     >
-                      {isExpanded ? "Hide" : "View"}
+                      <span className="btn-label">{isExpanded ? "Hide" : "View"}</span>
+                      <span className="btn-icon-only" aria-hidden="true">{isExpanded ? "−" : "+"}</span>
                     </button>
                     <button
                       onClick={() => copyPrompt(p.id, p.body)}
                       style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", padding: "5px 10px" }}
                     >
                       {copied[p.id] ? <CheckIcon /> : <CopyIcon />}
-                      {copied[p.id] ? "Copied" : "Copy"}
+                      <span className="btn-label">{copied[p.id] ? "Copied" : "Copy"}</span>
                     </button>
                     <button
                       onClick={() => openEdit(p)}

@@ -49,6 +49,78 @@ body {
   margin: 0 auto;
 }
 
+/* ── Responsive layout ── */
+
+.app-wrapper {
+  padding: 1.5rem 1rem;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Hide button text labels on mobile, keep icons */
+.btn-label {
+  display: inline;
+}
+
+/* Shown only on mobile as icon-only fallback */
+.btn-icon-only {
+  display: none;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .app-wrapper {
+    padding: 1rem 0.75rem;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-label {
+    display: none;
+  }
+
+  .btn-icon-only {
+    display: inline;
+  }
+
+  .card-actions {
+    gap: 2px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 input[type="text"],
 input[type="search"] {
   font-family: var(--font-sans);
@@ -78,6 +150,8 @@ button {
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
   line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 button:hover {
