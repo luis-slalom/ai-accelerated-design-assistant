@@ -938,7 +938,7 @@ export default function App() {
       {/* Header */}
       <div style={{ marginBottom: "1.25rem" }}>
         <div className="header-top">
-          <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 500 }}>UX prompt library</h2>
+          <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 500 }}>AI-powered UX prompt library</h2>
           <div className="header-controls">
             <span style={{ fontSize: "12px", color: "var(--color-text-secondary)", background: "var(--color-background-secondary)", padding: "3px 10px", borderRadius: "var(--border-radius-md)", border: "0.5px solid var(--color-border-tertiary)" }}>
               {prompts.length} prompts
