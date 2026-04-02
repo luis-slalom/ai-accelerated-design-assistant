@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prompt, Project, ActivityState, ActivityStatus } from '../types';
 import type { ActivityDef } from '../data';
-import { PHASE_COLORS, ACTIVITY_DEFS } from '../data';
+import { PHASE_COLORS, ACTIVITY_DEFS, PHASE_DELIVERABLE_HINTS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
 
 const PHASE_STATUS_OPTIONS: { value: PhaseStatus; label: string }[] = [
@@ -180,7 +180,18 @@ export function PhaseView({
                 {showDeliverableForm ? 'Cancel' : '+ Add'}
               </button>
             </div>
-            <p className="section-subtitle">Link Figma files, docs, and other outputs.</p>
+            {/* Expected deliverables hint */}
+            {PHASE_DELIVERABLE_HINTS[phase.code]?.length > 0 && phase.deliverables.length === 0 && !showDeliverableForm && (
+              <div className="deliverable-hints">
+                <p className="deliverable-hints-label">Expected for this phase:</p>
+                {PHASE_DELIVERABLE_HINTS[phase.code].map((hint, i) => (
+                  <p key={i} className="deliverable-hint-item">→ {hint}</p>
+                ))}
+              </div>
+            )}
+            {PHASE_DELIVERABLE_HINTS[phase.code]?.length > 0 && phase.deliverables.length > 0 && (
+              <p className="section-subtitle">Link Figma files, docs, and other outputs.</p>
+            )}
 
             {showDeliverableForm && (
               <form className="deliverable-form" onSubmit={handleDeliverableSubmit}>

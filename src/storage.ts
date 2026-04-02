@@ -1,18 +1,25 @@
-import type { Project, ActivityStatus } from './types';
+import type { Project, ActivityStatus, ActivityState } from './types';
 import { ACTIVITY_DEFS } from './data';
 
 const PROJECTS_KEY = 'design-tracker-projects';
 const PROMPTS_KEY = 'design-tracker-prompts';
 
-// Migrate old phase objects that predate the activities field
+// Migrate phase activities: preserve matching states, add new defs as empty, drop obsolete ones
+function migratePhaseActivities(ph: any): ActivityState[] {
+  const currentDefs = ACTIVITY_DEFS.filter(d => d.phaseCode === ph.code);
+  const existing: ActivityState[] = ph.activities ?? [];
+  return currentDefs.map(d => {
+    const found = existing.find((a: ActivityState) => a.defId === d.id);
+    return found ?? { defId: d.id, status: 'empty' as ActivityStatus, content: '' };
+  });
+}
+
 function migrateProject(p: any): Project {
   return {
     ...p,
     phases: (p.phases || []).map((ph: any) => ({
       ...ph,
-      activities: ph.activities ?? ACTIVITY_DEFS
-        .filter(d => d.phaseCode === ph.code)
-        .map(d => ({ defId: d.id, status: 'empty' as ActivityStatus, content: '' })),
+      activities: migratePhaseActivities(ph),
       checkpoints: ph.checkpoints ?? [],
       deliverables: ph.deliverables ?? [],
       notes: ph.notes ?? '',

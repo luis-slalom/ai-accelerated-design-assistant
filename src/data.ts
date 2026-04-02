@@ -11,41 +11,56 @@ export interface ActivityDef {
 
 export const ACTIVITY_DEFS: ActivityDef[] = [
   // 01 Context — understand project, users, constraints
-  { id: 'ctx-brief',        code: '01-A', phaseCode: '01', title: 'Project brief',          description: 'Capture problem statement, users, success criteria, and timeline',   promptId: '01a' },
-  { id: 'ctx-stakeholders', code: '01-B', phaseCode: '01', title: 'Stakeholder map',         description: 'Map competing priorities, conflict points, and decision makers',       promptId: '01b' },
-  { id: 'ctx-constraints',  code: '01-C', phaseCode: '01', title: 'Constraints register',    description: 'Catalogue what is fixed, flexible, and assumed — with owners',        promptId: '01c' },
+  { id: 'ctx-kickoff',    code: '01-A', phaseCode: '01', title: 'Stakeholder kickoff',    description: 'Structured interview to capture goals, risks, non-negotiables, and definition of success', promptId: 'p-ctx-kickoff' },
+  { id: 'ctx-research',   code: '01-B', phaseCode: '01', title: 'User research digest',   description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief',       promptId: 'p-ctx-research' },
 
   // 02 Capabilities — define user outcomes, not features
-  { id: 'cap-outcomes',     code: '02-A', phaseCode: '02', title: 'User outcome mapping',    description: 'Reframe every requirement as a user outcome, flag vanity features',    promptId: '02a' },
-  { id: 'cap-gaps',         code: '02-B', phaseCode: '02', title: 'Capability gap analysis', description: 'Compare current state to desired outcomes, prioritise gaps',           promptId: '02b' },
-  { id: 'cap-personas',     code: '02-C', phaseCode: '02', title: 'Persona pressure-test',   description: 'Validate each capability against real user types and edge cases',      promptId: '02c' },
+  { id: 'cap-jtbd',       code: '02-A', phaseCode: '02', title: 'Jobs-to-be-done mapping',    description: 'For each user type: the job, desired outcome, current pain point, and definition of done', promptId: 'p-cap-jtbd' },
+  { id: 'cap-priority',   code: '02-B', phaseCode: '02', title: 'Outcome prioritisation',     description: 'MoSCoW or impact/effort sort with stakeholders; produces a ranked list of user outcomes',  promptId: 'p-cap-priority' },
 
   // 03 Objects — identify core entities and relationships
-  { id: 'obj-entities',     code: '03-A', phaseCode: '03', title: 'Entity inventory',        description: 'Name every core object, its attributes, relationships, and actions',   promptId: '03a' },
-  { id: 'obj-states',       code: '03-B', phaseCode: '03', title: 'Object state mapping',    description: 'Map the full lifecycle of each entity including null and error states', promptId: '03b' },
+  { id: 'obj-discovery',  code: '03-A', phaseCode: '03', title: 'Entity discovery workshop', description: 'Collaborative session to name core things the product creates, stores, or acts on',       promptId: 'p-obj-discovery' },
+  { id: 'obj-relations',  code: '03-B', phaseCode: '03', title: 'Relationship mapping',       description: 'Draw how entities relate — ownership, containment, reference; agree cardinality',         promptId: 'p-obj-relations' },
 
   // 04 Interactions — map flows, states, and edge cases
-  { id: 'int-flows',        code: '04-A', phaseCode: '04', title: 'User flows',              description: 'Generate end-to-end flows with critical path, branches, and errors',   promptId: '04a' },
-  { id: 'int-edge',         code: '04-B', phaseCode: '04', title: 'Edge case inventory',     description: 'Surface data, permission, system, and human edge cases systematically', promptId: '04b' },
+  { id: 'int-flows',      code: '04-A', phaseCode: '04', title: 'Flow mapping sessions',  description: 'Walk each capability end-to-end; map happy path then empty, error, permission, and loading states', promptId: 'p-int-flows' },
+  { id: 'int-states',     code: '04-B', phaseCode: '04', title: 'State audit',             description: 'For every key object and UI component, enumerate all possible states and stress test with edge cases', promptId: 'p-int-states' },
 
   // 05 Alignment — agree data contracts and API shapes
-  { id: 'aln-contracts',    code: '05-A', phaseCode: '05', title: 'Data contracts',          description: 'Define API shapes as the handshake between design and engineering',    promptId: '05a' },
-  { id: 'aln-criteria',     code: '05-B', phaseCode: '05', title: 'Acceptance criteria',     description: 'Translate design decisions into GIVEN/WHEN/THEN test criteria',        promptId: '05b' },
+  { id: 'aln-manifest',   code: '05-A', phaseCode: '05', title: 'Data contract review',  description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly', promptId: 'p-aln-manifest' },
+  { id: 'aln-api',        code: '05-B', phaseCode: '05', title: 'API shape agreement',    description: 'Co-design session to agree request/response shapes and pagination before any code is written',            promptId: 'p-aln-api' },
 
   // 06 Build — generate code only within defined scope
-  { id: 'bld-code',         code: '06-A', phaseCode: '06', title: 'Scoped code',             description: 'Generate implementation strictly within approved scope, no extras',    promptId: '06a' },
-  { id: 'bld-tests',        code: '06-B', phaseCode: '06', title: 'Test suite',              description: 'Generate unit, component, integration, and accessibility tests',       promptId: '06b' },
+  { id: 'bld-scope',      code: '06-A', phaseCode: '06', title: 'Scope boundary review',   description: 'Walk the spec and flag anything that exceeds what has been designed or contracted before build starts', promptId: 'p-bld-scope' },
+  { id: 'bld-qa',         code: '06-B', phaseCode: '06', title: 'Incremental design QA',   description: 'Design reviews implementation against spec at component level throughout build, not just at the end',   promptId: 'p-bld-qa' },
 ];
 
 export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
-  { code: '01', label: 'Context', description: 'Capture project brief, stakeholder landscape, and core constraints' },
-  { code: '02', label: 'Capabilities', description: 'Define user outcomes, identify gaps, validate against personas' },
-  { code: '03', label: 'Objects', description: 'Model core entities, relationships, states, and data structures' },
-  { code: '04', label: 'Interactions', description: 'Design user flows, edge cases, and interaction patterns' },
-  { code: '05', label: 'Alignment', description: 'Align engineering and design on data contracts and acceptance criteria' },
-  { code: '06', label: 'Build', description: 'Support build with scoped guidance, test specs, and handoff notes' },
-  { code: 'U', label: 'Utility', description: 'Cross-cutting: research synthesis, decisions, risks, retrospectives' },
+  { code: '01', label: 'Context',      description: 'Understand the project, its users, and its constraints before any design work begins' },
+  { code: '02', label: 'Capabilities', description: 'Define what users need to be able to do — in outcomes, not features' },
+  { code: '03', label: 'Objects',      description: 'Identify and agree the core entities the product creates, stores, and acts on' },
+  { code: '04', label: 'Interactions', description: 'Map user flows, component states, and edge cases end-to-end' },
+  { code: '05', label: 'Alignment',    description: 'Agree data contracts and API shapes between design and engineering before build' },
+  { code: '06', label: 'Build',        description: 'Generate and review code only within the scope that has been designed and contracted' },
+  { code: 'U',  label: 'Utility',      description: 'Cross-cutting: research synthesis, decision logs, risk register, retrospectives' },
 ];
+
+// Expected deliverables per phase — shown as hints in the sidebar
+export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
+  '01': ['Project brief — problem statement, target users, goals, constraints, open questions',
+         'Assumption register — what the team is taking on faith, ranked by risk'],
+  '02': ['Capability map — user outcome → enabling capability → success metric (no features)',
+         'Out-of-scope log — what the product will not do this iteration, and why'],
+  '03': ['Object model — canonical diagram and glossary of entities, attributes, relationships, states',
+         'Domain glossary — every entity and relationship defined in plain language'],
+  '04': ['Flow diagrams — one per major user journey, annotated with decision points and error branches',
+         'State inventory — component/object → all states → design treatment for each'],
+  '05': ['Screen data manifest — per screen: fields, source, loading behaviour, fallback',
+         'Contract spec — endpoint, method, payload, error responses; signed off by both sides'],
+  '06': ['Annotated design specs — handoff files with redlines, interaction notes, motion specs',
+         'Deviation log — any departure from agreed spec, with rationale and sign-off'],
+  'U':  [],
+};
 
 export const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   '01': { bg: '#E6F1FB', text: '#0C447C' },
@@ -57,9 +72,464 @@ export const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   'U':  { bg: '#F1EFE8', text: '#444441' },
 };
 
+
 export const DEFAULT_PROMPTS: Prompt[] = [
+
+  // ── 01 Context ─────────────────────────────────────────────────────────
+
   {
-    id: 'global',
+    id: 'p-ctx-kickoff',
+    level: '01 Context',
+    code: '01-A',
+    title: 'Stakeholder kickoff',
+    description: 'Structured interview to capture goals, risks, non-negotiables, and definition of success.',
+    tags: ['kickoff', 'stakeholders', 'discovery'],
+    body: `You are facilitating a structured stakeholder kickoff interview. Your goal is to surface goals, risks, non-negotiables, and what success looks like — before any design work begins.
+
+Ask these questions one group at a time. Wait for answers before continuing.
+
+GROUP 1 — Goals and context
+- What does success look like in 3 months? In 12 months?
+- What problem are we solving, and why does it matter now?
+- What has already been tried, and why didn't it work?
+
+GROUP 2 — Risks and non-negotiables
+- What would make this project a failure?
+- What decisions have already been made that we cannot reverse?
+- What are the hard constraints? (deadline, budget, technology, regulatory)
+
+GROUP 3 — Stakeholders and definition of done
+- Who has final sign-off on design decisions?
+- Who will object to this project, and what will they say?
+- How will we know when this phase is complete?
+
+After all answers, produce:
+
+## Stakeholder kickoff summary
+**Goals:** [what they want to achieve]
+**Non-negotiables:** [what cannot change]
+**Key risks:** [what could derail this]
+**Definition of success:** [how they'll measure it]
+**Open questions:** [what we still don't know]
+
+---
+⛔ CHECKPOINT 01-A
+Does this summary accurately reflect what was discussed?
+Reply YES to confirm, or correct anything before moving forward.`,
+  },
+
+  {
+    id: 'p-ctx-research',
+    level: '01 Context',
+    code: '01-B',
+    title: 'User research digest',
+    description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief.',
+    tags: ['research', 'synthesis', 'discovery'],
+    body: `Help me synthesise existing research or lightweight interview notes into a 1-page insight brief.
+
+Research type: [FILL — interviews / surveys / support tickets / analytics / usability test notes]
+Raw material: [FILL — paste notes, transcripts, or summaries]
+
+Produce the following:
+
+## 1-page insight brief
+
+**Who we're designing for:** [user types, brief description of each]
+
+**What they're trying to do:** [top 3–5 goals or jobs, in their words]
+
+**What's getting in the way:** [friction, workarounds, pain points — ranked by frequency]
+
+**What they value most:** [explicit and implicit priorities]
+
+**What would change their behaviour:** [triggers, motivators, or conditions for adoption]
+
+**Gaps in our knowledge:** [what we still don't know and need to find out]
+
+Keep this to one page. Cite evidence for every claim. Do not make design recommendations — synthesis only.
+
+---
+⛔ CHECKPOINT 01-B
+Does this brief accurately reflect what the research shows?
+Are there any misreadings or missing signals?
+Reply YES to confirm.`,
+  },
+
+  // ── 02 Capabilities ────────────────────────────────────────────────────
+
+  {
+    id: 'p-cap-jtbd',
+    level: '02 Capabilities',
+    code: '02-A',
+    title: 'Jobs-to-be-done mapping',
+    description: 'For each user type: the job, desired outcome, current pain point, and definition of done.',
+    tags: ['JTBD', 'outcomes', 'users'],
+    body: `For each key user type, help me articulate the job they are hiring this product to do.
+
+User types: [FILL — list the user types from your research digest]
+
+For each user type, produce:
+
+## [User type]
+**The job:** When [situation], I want to [motivation], so I can [desired outcome].
+**Current approach:** How do they do this today? (workarounds, tools, manual steps)
+**Pain points:** What is slow, unreliable, expensive, or frustrating about the current approach?
+**Definition of done:** How will they know the job is complete?
+**Unmet needs:** What do they want that nothing currently provides?
+
+After mapping all user types, identify:
+- Where jobs overlap across user types (shared needs)
+- Where jobs conflict (design tension points)
+- Which jobs are most urgent or highest value
+
+---
+⛔ CHECKPOINT 02-A
+Do these job statements reflect what users actually said or did — not what we assume?
+Reply YES to confirm, or adjust before moving to prioritisation.`,
+  },
+
+  {
+    id: 'p-cap-priority',
+    level: '02 Capabilities',
+    code: '02-B',
+    title: 'Outcome prioritisation',
+    description: 'MoSCoW or impact/effort sort with stakeholders; produces a ranked list of user outcomes.',
+    tags: ['prioritisation', 'MoSCoW', 'outcomes'],
+    body: `Help me run an outcome prioritisation with stakeholders.
+
+User outcomes to prioritise: [FILL — paste job statements from 02-A or list the outcomes]
+Prioritisation method: [FILL — MoSCoW / Impact × Effort / RICE / simple dot-voting]
+Stakeholders in the room: [FILL]
+
+For each outcome, assess:
+- Business value (high / medium / low)
+- User value (high / medium / low)
+- Implementation complexity (high / medium / low)
+- Risk if we skip it (high / medium / low)
+
+Produce:
+1. A ranked list of user outcomes with rationale
+2. Must-have outcomes for this iteration (non-negotiable)
+3. Should-have outcomes (strong value, still in scope)
+4. Could-have outcomes (defer if time is tight)
+5. Explicitly out-of-scope outcomes (important to document)
+
+---
+⛔ CHECKPOINT 02-B
+Has everyone with sign-off authority agreed to this prioritisation?
+Any outcomes that feel mis-ranked?
+Reply YES to confirm the list is locked, or adjust before we move to object modelling.`,
+  },
+
+  // ── 03 Objects ─────────────────────────────────────────────────────────
+
+  {
+    id: 'p-obj-discovery',
+    level: '03 Objects',
+    code: '03-A',
+    title: 'Entity discovery workshop',
+    description: 'Collaborative session to name core things the product creates, stores, or acts on.',
+    tags: ['entities', 'OOUX', 'modelling'],
+    body: `Facilitate a collaborative entity discovery session with design, engineering, and product.
+
+Context: [FILL — paste the project brief and capability map]
+
+Our goal is to name every core thing the product creates, stores, or acts on — before designing any screens.
+
+STEP 1 — Noun harvest
+List every noun that comes up when describing what the product does. Cast wide — include edge cases.
+Nouns identified: [FILL — paste brainstorm output]
+
+STEP 2 — Entity refinement
+For each candidate noun, classify it:
+- Core entity — has its own lifecycle and identity (keep)
+- Attribute — belongs to another entity (assign to parent)
+- Role or permission — a person in a context (flag separately)
+- Event or action — something that happens, not a thing (discard or model separately)
+
+For each confirmed entity, produce:
+- Entity name (singular noun, agreed by all)
+- One-line definition
+- Key attributes (3–5, not exhaustive)
+- Who creates it / who owns it
+
+STEP 3 — Gap check
+- Is anything missing from this list?
+- Is anything duplicated under different names?
+- Does engineering see any entities that design hasn't named?
+
+---
+⛔ CHECKPOINT 03-A
+Engineering and design must agree on entity names before proceeding.
+Reply YES when everyone in the room has confirmed this list.`,
+  },
+
+  {
+    id: 'p-obj-relations',
+    level: '03 Objects',
+    code: '03-B',
+    title: 'Relationship mapping',
+    description: 'Draw how entities relate — ownership, containment, reference; agree cardinality.',
+    tags: ['relationships', 'cardinality', 'modelling'],
+    body: `For each confirmed entity, map how it relates to every other entity.
+
+Entities to map: [FILL — paste entity list from 03-A]
+
+For each relationship, define:
+- Entity A → Entity B
+- Relationship type: ownership (A contains B) / reference (A points to B) / membership (A belongs to B)
+- Cardinality: one-to-one / one-to-many / many-to-many
+- Direction: who creates or controls the relationship?
+- Delete behaviour: what happens to B if A is deleted?
+
+Produce:
+1. A relationship table:
+   Entity A | Relationship | Entity B | Cardinality | Delete behaviour
+2. A plain-language description of the model — as if explaining it to a new team member
+3. A list of contested or unclear relationships that need a decision
+
+---
+⛔ CHECKPOINT 03-B
+Relationship mapping has direct implications for data modelling and UI architecture.
+Engineering must sign off on cardinality and delete behaviour before we proceed.
+Reply YES when both design and engineering agree.`,
+  },
+
+  // ── 04 Interactions ────────────────────────────────────────────────────
+
+  {
+    id: 'p-int-flows',
+    level: '04 Interactions',
+    code: '04-A',
+    title: 'Flow mapping sessions',
+    description: 'Walk each capability end-to-end; map happy path then empty, error, permission, and loading states.',
+    tags: ['flows', 'journeys', 'happy path'],
+    body: `Walk a capability end-to-end. Map the happy path first, then introduce failure modes.
+
+Capability to map: [FILL — e.g. "A user creates and submits a project brief for the first time"]
+User type: [FILL]
+Relevant entities: [FILL — paste from object model]
+
+STEP 1 — Happy path
+For each step:
+- What does the user want to accomplish?
+- What does the system do?
+- What does the user see? (name the screen state, not a visual design)
+- What decision does the user make next?
+
+STEP 2 — Failure modes
+For each step, add:
+- Empty state — user has no data yet
+- Loading state — system is working
+- Error state — something went wrong
+- Permission state — user cannot do this
+- Recovery path — how does the user get back on track?
+
+STEP 3 — Drop-off analysis
+Which steps are most likely to cause abandonment, confusion, or error — and why?
+
+Produce a flow table:
+Step | User action | System response | Screen state | Failure mode | Recovery
+
+---
+⛔ CHECKPOINT 04-A
+Happy path and failure modes confirmed?
+No steps missing or in the wrong order?
+Reply YES to confirm, or adjust.`,
+  },
+
+  {
+    id: 'p-int-states',
+    level: '04 Interactions',
+    code: '04-B',
+    title: 'State audit',
+    description: 'For every key object and UI component, enumerate all possible states and stress test with edge cases.',
+    tags: ['states', 'edge cases', 'components'],
+    body: `For every key object and UI component in this flow, enumerate all possible states.
+
+Objects and components to audit: [FILL — paste from flow map and object model]
+
+For each, produce a state table:
+
+## [Object or component name]
+
+| State | What triggers it | What the user sees | What the user can do |
+|-------|-----------------|-------------------|---------------------|
+| Empty | No data exists yet | | |
+| Loading | Request in flight | | |
+| Populated | Data available | | |
+| Error | Request failed | | |
+| Partial | Some data, not all | | |
+| Locked | No permission | | |
+| Archived / Deleted | Object removed | | |
+
+After completing all tables:
+- Flag any states that have no design treatment yet
+- Flag any states that are technically possible but have no UX decision
+- Flag any states that affect other components downstream
+
+---
+⛔ CHECKPOINT 04-B
+State audit is a joint design + engineering decision.
+Every state listed needs a design treatment before any ticket is written.
+Reply YES when both sides confirm completeness.`,
+  },
+
+  // ── 05 Alignment ───────────────────────────────────────────────────────
+
+  {
+    id: 'p-aln-manifest',
+    level: '05 Alignment',
+    code: '05-A',
+    title: 'Data contract review',
+    description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly.',
+    tags: ['data', 'API', 'alignment'],
+    body: `Design presents what the UI needs per screen. Engineering confirms what is available, what is missing, and what is expensive.
+
+Screen or flow to review: [FILL]
+Relevant entities: [FILL — paste from object model]
+
+For each screen, produce a screen data manifest:
+
+## [Screen name]
+
+| Field | Source (API / local / derived) | Required? | Loading behaviour | Fallback if missing |
+|-------|-------------------------------|-----------|-------------------|---------------------|
+
+After completing all screens:
+- Flag every field that engineering cannot currently provide
+- Flag every field that would require a new endpoint or schema change
+- Flag every field where the loading or error behaviour is undecided
+- List open questions for engineering
+
+---
+⛔ CHECKPOINT 05-A
+This manifest must be reviewed by engineering before any API work begins.
+Design must not assume a field exists until engineering confirms it.
+Reply YES when both sides have reviewed and agreed. Disagreements must be documented.`,
+  },
+
+  {
+    id: 'p-aln-api',
+    level: '05 Alignment',
+    code: '05-B',
+    title: 'API shape agreement',
+    description: 'Co-design session to agree request/response shapes and pagination before any code is written.',
+    tags: ['API', 'contracts', 'engineering'],
+    body: `Co-design the API request/response shapes before any code is written.
+
+Confirmed screens and data manifest: [FILL — paste from 05-A]
+Tech stack: [FILL]
+Authentication pattern: [FILL]
+
+For each endpoint, define:
+
+## [Action name — e.g. "Create project brief"]
+
+**Endpoint:** [METHOD /path]
+**Auth required:** [yes / no / conditional]
+**Request payload:** [fields, types, required / optional]
+**Success response:** [shape of data returned — fields and types]
+**Error responses:** [status code | message | what the UI should show]
+**Pagination:** [if applicable — pattern, default page size]
+**Open questions for engineering:** [anything unresolved]
+
+After all endpoints are defined:
+- Confirm no endpoint requires data that doesn't exist in the object model
+- Confirm response shapes match what the UI manifest expects
+- Document any endpoints that need a backend schema change
+
+---
+⛔ CHECKPOINT 05-B
+API shapes must be signed off by both design and engineering.
+No build should begin on any endpoint until this contract is agreed.
+Reply YES when both sides confirm. Open questions must be resolved first.`,
+  },
+
+  // ── 06 Build ───────────────────────────────────────────────────────────
+
+  {
+    id: 'p-bld-scope',
+    level: '06 Build',
+    code: '06-A',
+    title: 'Scope boundary review',
+    description: 'Walk the spec and flag anything that exceeds what has been designed or contracted before build starts.',
+    tags: ['scope', 'review', 'pre-build'],
+    body: `Before build begins, walk the full spec and flag anything that exceeds what has been designed, contracted, or agreed.
+
+Spec to review: [FILL — paste handoff notes, annotated designs, or feature description]
+Agreed data contracts: [FILL — paste from 05-B]
+Accepted user stories / tickets: [FILL]
+
+For each item in the spec, confirm:
+- Is this within the agreed object model? (yes / no / edge case)
+- Is this supported by an agreed data contract? (yes / no / partial)
+- Has a design treatment been agreed for every state? (yes / no)
+- Is this within the acceptance criteria? (yes / no)
+
+Flag every item where the answer is no or partial.
+
+For each flagged item:
+- Describe the gap
+- Recommend: descope / design first / add to contract / accept risk
+- Owner for the decision
+
+---
+⛔ CHECKPOINT 06-A
+Scope boundary review must be completed before a single line of build code is written.
+Every flagged item must have a documented resolution.
+Reply YES only when all flags are resolved or formally accepted.`,
+  },
+
+  {
+    id: 'p-bld-qa',
+    level: '06 Build',
+    code: '06-B',
+    title: 'Incremental design QA',
+    description: 'Design reviews implementation against spec at component level throughout build, not just at the end.',
+    tags: ['QA', 'design review', 'accessibility'],
+    body: `Review implementation against spec at the component level. Do not wait until the end.
+
+Component or feature under review: [FILL]
+Agreed design spec: [FILL — link or paste annotated designs]
+Agreed acceptance criteria: [FILL — paste from alignment phase]
+
+For each component, check:
+
+VISUAL FIDELITY
+- [ ] Spacing matches spec (padding, margin, gap)
+- [ ] Typography matches (size, weight, line height, colour)
+- [ ] Colour tokens correct (no hardcoded values)
+- [ ] Icons and assets match spec
+
+BEHAVIOUR
+- [ ] All states implemented (empty, loading, error, populated, locked)
+- [ ] Interactions match spec (hover, focus, active, disabled)
+- [ ] Transitions and motion match spec (or have an agreed deviation)
+
+CONTENT
+- [ ] All copy matches approved content
+- [ ] Error messages match agreed copy
+- [ ] Truncation and overflow handled correctly
+
+ACCESSIBILITY
+- [ ] Keyboard navigable
+- [ ] Screen reader labels present and correct
+- [ ] Colour contrast passes WCAG AA
+- [ ] Touch targets ≥ 44px
+
+For every item that fails: document it in the deviation log with severity (critical / major / minor) and an owner.
+
+---
+⛔ CHECKPOINT 06-B
+Design QA sign-off is required before this component is merged.
+Reply YES only when all critical and major items are resolved.`,
+  },
+
+  // ── Utility ────────────────────────────────────────────────────────────
+
+  {
+    id: 'u-global',
     level: 'Utility',
     code: 'U-00',
     title: 'Global working contract',
@@ -68,490 +538,15 @@ export const DEFAULT_PROMPTS: Prompt[] = [
     body: `You are a design-led AI collaborator. You accelerate research, synthesis, prototyping, and scoping — but humans own every decision.
 
 Rules that always apply:
-- Never skip ahead to a level the human hasn't approved
+- Never skip ahead to a phase the human hasn't approved
 - At the end of every output, summarise what was produced and ask for explicit approval before continuing
 - Flag risks and open questions immediately — never bury them
 - Design intent must be preserved and stated explicitly in every output
-- If you are uncertain whether something is signal or noise, ask
-
-Memory check (if applicable):
-- Read /memory-bank/decisions.md before starting
-- Read /memory-bank/constraints.md before any technical suggestion
-- Add new decisions to decisions.md as they are confirmed
-- Add new risks to open-questions.md immediately`,
+- If you are uncertain whether something is signal or noise, ask`,
   },
+
   {
-    id: '01a',
-    level: '01 Context',
-    code: '01-A',
-    title: 'Project brief intake',
-    description: 'Structured question flow to capture project context before design begins.',
-    tags: ['kickoff', 'discovery'],
-    body: `You are helping an Experience Designer understand and articulate the full context of a project before any design work begins.
-
-Ask me the following questions one group at a time. Wait for my answers before moving to the next group.
-
-GROUP 1 — The problem
-- What problem are we solving, and for whom?
-- What does success look like in 6 months?
-- What has already been tried?
-
-GROUP 2 — The constraints
-- What are the hard constraints? (time, budget, tech, legal)
-- What is out of scope?
-- Who are the key stakeholders and what do they care about most?
-
-GROUP 3 — The signals
-- What research or data already exists?
-- What do we know vs what are we assuming?
-- What would change our direction if we learned it?
-
-After I answer all three groups, synthesise my answers into a structured project brief using this format:
-
-## Project brief
-**Problem statement:** [one sentence]
-**Primary users:** [who]
-**Success criteria:** [measurable outcomes]
-**Hard constraints:** [list]
-**Known risks / assumptions:** [list]
-**Open questions:** [list]
-
----
-⛔ CHECKPOINT 01-A
-Before we proceed: does this brief accurately capture the project context?
-Reply YES to continue, or correct anything that's wrong.`,
-  },
-  {
-    id: '01b',
-    level: '01 Context',
-    code: '01-B',
-    title: 'Stakeholder alignment map',
-    description: 'Maps competing stakeholder priorities and surfaces likely tension points.',
-    tags: ['stakeholders', 'alignment'],
-    body: `I'll describe the key stakeholders on this project. For each one, help me map:
-
-1. Their primary goal for this project
-2. What they fear most (failure mode)
-3. How they define quality
-4. Where they are likely to conflict with other stakeholders
-
-Stakeholders: [FILL — e.g. "Product Manager, Engineering Lead, Marketing Director, Customer Success"]
-
-After mapping each stakeholder, produce:
-- A tension matrix showing where conflicts are likely
-- A recommended approach for each tension point
-- Any decisions that should be made before design begins
-
----
-⛔ CHECKPOINT 01-B
-Does this stakeholder map reflect the real dynamics on this project?
-Any missing perspectives or misread priorities?
-Reply YES to continue, or provide corrections.`,
-  },
-  {
-    id: '01c',
-    level: '01 Context',
-    code: '01-C',
-    title: 'Constraints register',
-    description: 'Catalogues fixed, flexible, and assumed constraints before any direction is proposed.',
-    tags: ['constraints', 'risk'],
-    body: `Help me create a constraints register for this project.
-
-I'll share what I know. Organise it into three categories:
-
-FIXED constraints — cannot be changed under any circumstance
-(e.g. regulatory, existing contracts, hard deadlines)
-
-FLEXIBLE constraints — defaults we should work within but could negotiate if there's a strong reason
-(e.g. preferred tech stack, design system, team size)
-
-ASSUMPTIONS — things we're treating as constraints but haven't confirmed
-(flag these clearly — they need validation)
-
-What I know so far: [FILL]
-
-Format the output as a table with columns:
-Constraint | Category | Owner | Last validated
-
----
-⛔ CHECKPOINT 01-C
-Review the constraints register.
-- Are all fixed constraints correctly classified?
-- Which assumptions need urgent validation?
-Reply YES to confirm, or flag corrections.`,
-  },
-  {
-    id: '02a',
-    level: '02 Capabilities',
-    code: '02-A',
-    title: 'User outcome mapping',
-    description: 'Reframes requirements as user outcomes and surfaces vanity features.',
-    tags: ['outcomes', 'requirements'],
-    body: `I'll share a list of requirements, features, or stakeholder asks. Your job is to reframe each one as a user outcome — what the user is able to do, feel, or decide as a result.
-
-Requirements / asks: [FILL]
-
-For each item, produce:
-- Original ask (verbatim)
-- Underlying user need
-- User outcome statement (format: "As a [user], I can [capability] so that [value]")
-- Risk if we skip this
-- Risk if we over-build this
-
-Then identify:
-- Any outcomes that duplicate each other
-- Any user needs that have NO corresponding ask (gaps)
-- Any asks that have no clear user benefit (vanity features)
-
----
-⛔ CHECKPOINT 02-A
-Review the outcome map:
-- Do these outcomes reflect what your users actually need?
-- Are there any gaps or vanity features you'd challenge or remove?
-Reply YES to confirm, or adjust.`,
-  },
-  {
-    id: '02b',
-    level: '02 Capabilities',
-    code: '02-B',
-    title: 'Capability gap analysis',
-    description: 'Compares current state to desired outcomes and prioritises the gaps.',
-    tags: ['gap analysis', 'prioritisation'],
-    body: `I want to identify the gap between what users can do today and what they need to be able to do.
-
-Current state: [FILL — describe the existing product, process, or workaround]
-
-Target outcomes: [FILL — paste confirmed outcomes from 02-A, or describe the desired future state]
-
-For each target outcome, assess:
-- Does the current state support it? (fully / partially / not at all)
-- What's missing?
-- What would need to be true for this outcome to be achievable?
-
-Produce a gap table:
-Outcome | Current support | Gap | What's needed
-
-Then prioritise the gaps by:
-1. User impact (high / medium / low)
-2. Build complexity (high / medium / low)
-3. Recommended sequence
-
----
-⛔ CHECKPOINT 02-B
-Does this gap analysis reflect your current reality?
-Are the priorities in the right order?
-Reply YES to confirm, or adjust before we move to object modelling.`,
-  },
-  {
-    id: '02c',
-    level: '02 Capabilities',
-    code: '02-C',
-    title: 'Persona pressure-test',
-    description: 'Validates capabilities against each persona, surfacing edge cases and de-scope candidates.',
-    tags: ['personas', 'edge cases'],
-    body: `I want to pressure-test our capability decisions against our key personas.
-
-Personas: [FILL — paste persona summaries or describe user types, including any edge cases]
-
-For each persona, assess each confirmed capability:
-- Does this outcome matter to this persona?
-- Is the capability accessible given their context and constraints?
-  (device, literacy, time pressure, trust level, etc.)
-- What edge case does this persona expose?
-
-Produce:
-- A persona × capability matrix (does it work for them: yes / partially / no / not applicable)
-- A list of design decisions that need persona-specific treatment
-- Any capabilities that should be de-scoped for this release
-
----
-⛔ CHECKPOINT 02-C
-Persona validation is a human decision.
-- Do these personas accurately represent your real users?
-- Are the edge cases surfaced ones you recognise from research?
-Reply YES to confirm personas and proceed, or correct before we move to object modelling.`,
-  },
-  {
-    id: '03a',
-    level: '03 Objects',
-    code: '03-A',
-    title: 'OOUX entity inventory',
-    description: 'Identifies core system entities, attributes, relationships, and actions using OOUX principles.',
-    tags: ['OOUX', 'entities', 'modelling'],
-    body: `Using Object-Oriented UX principles, help me identify the core entities in this product.
-
-Context: [FILL — paste project brief from 01-A and confirmed outcomes from 02-A]
-
-For each entity, define:
-- Entity name (noun, not a screen or action)
-- What it IS (brief definition)
-- Key attributes (what properties does it have?)
-- Relationships (what other entities does it connect to, and how?)
-- Actions that can be performed on it
-- Who owns or creates it
-
-Then produce:
-- An entity relationship summary (prose, not a technical ERD)
-- Any entities that are unclear or contested
-- Any entities that might be missing
-
----
-⛔ CHECKPOINT 03-A
-Object modelling shapes everything that follows.
-- Are all core entities named correctly?
-- Are there any missing objects or relationships?
-- Are there any entities that should be merged or split?
-Reply YES to confirm the entity inventory, or make corrections before we map flows.`,
-  },
-  {
-    id: '03b',
-    level: '03 Objects',
-    code: '03-B',
-    title: 'Object state mapping',
-    description: 'Maps the full lifecycle of each entity including null states and error states.',
-    tags: ['states', 'lifecycle'],
-    body: `For each confirmed entity, map its full lifecycle.
-
-Entities to map: [FILL — paste entity list from 03-A]
-
-For each entity, produce:
-- All possible states (e.g. draft / active / archived / deleted)
-- What triggers each state transition
-- Who can trigger each transition
-- What the user sees and can do in each state
-- Null state (what does a new user with no data see?)
-- Error state (what happens when something goes wrong?)
-
-Format each entity as a simple state table:
-State | Triggered by | Who can act | What user sees
-
----
-⛔ CHECKPOINT 03-B
-State mapping catches edge cases before they become bugs.
-- Are all states accounted for?
-- Is the null state designed for?
-- Are there any transitions that feel wrong or are missing?
-Reply YES to confirm, or add missing states before we map interactions.`,
-  },
-  {
-    id: '04a',
-    level: '04 Interactions',
-    code: '04-A',
-    title: 'Flow generation',
-    description: 'Generates a detailed end-to-end user flow including critical path, branches, and error routes.',
-    tags: ['flows', 'journeys'],
-    body: `Generate a detailed user flow for the following task:
-
-Task: [FILL — e.g. "A user who has never logged in creates their first project"]
-
-Use the confirmed entities from Level 03.
-Design system in use: [FILL or "not yet defined"]
-
-For each step in the flow, include:
-- Step name
-- What the user wants to accomplish
-- What the system does
-- What the user sees (screen/state/component type)
-- Decision points or branches
-- Error paths
-- Success criteria for this step
-
-Then identify:
-- The critical path (minimum steps to task completion)
-- All alternate paths
-- All error paths and recovery routes
-- Any steps where user drop-off is likely and why
-
----
-⛔ CHECKPOINT 04-A
-Flow review before we consider edge cases:
-- Does the critical path feel right?
-- Are any steps missing or in the wrong order?
-- Are the branches and error paths realistic?
-Reply YES to confirm the flow, or adjust before we map edge cases.`,
-  },
-  {
-    id: '04b',
-    level: '04 Interactions',
-    code: '04-B',
-    title: 'Edge case inventory',
-    description: 'Systematically finds data, permission, system, and human edge cases for a confirmed flow.',
-    tags: ['edge cases', 'QA'],
-    body: `Take the confirmed flow from 04-A and generate a comprehensive edge case inventory.
-
-Flow to analyse: [FILL — paste confirmed flow or summarise it]
-User types to consider: [FILL — paste personas from 02-C]
-
-Organise edge cases into four categories:
-
-1. DATA EDGE CASES
-   (empty states, truncation, special characters, max/min values, null returns)
-
-2. PERMISSION EDGE CASES
-   (different roles, expired access, first-time users, users mid-process when permissions change)
-
-3. CONNECTIVITY / SYSTEM EDGE CASES
-   (slow network, timeout, partial save, browser back button, session expiry)
-
-4. HUMAN EDGE CASES
-   (user makes a mistake, changes their mind mid-flow, two users editing at once, accessibility needs)
-
-For each edge case: describe it, rate its likelihood (high / medium / low), rate its severity if it occurs (high / medium / low), and recommend how to handle it.
-
----
-⛔ CHECKPOINT 04-B
-Edge cases are a human decision — you know which ones matter for your users.
-- Are the high likelihood + high severity cases all accounted for?
-- Are there known edge cases from user research that aren't here?
-- Which ones are in scope for this release vs a future one?
-Reply YES to confirm scope of edge cases, or adjust the list.`,
-  },
-  {
-    id: '05a',
-    level: '05 Alignment',
-    code: '05-A',
-    title: 'Data contract definition',
-    description: 'Defines API shapes and data contracts as the handshake between design and engineering.',
-    tags: ['API', 'data', 'engineering'],
-    body: `Based on the confirmed flows and object model, help me define the data contracts needed for this feature.
-
-Confirmed objects: [FILL — paste from 03-A]
-Confirmed flows: [FILL — paste from 04-A]
-Tech stack: [FILL]
-
-For each key interaction in the flow, define:
-- What data the UI needs to display
-- What data the user inputs
-- What the API endpoint should return (shape, not implementation)
-- Required vs optional fields
-- Null/empty states the UI must handle
-- Error responses the UI must handle
-
-Format each contract as:
-
-## [Action name]
-**Request:** [what the frontend sends]
-**Success response:** [shape of data returned]
-**Error responses:** [list of error codes + what UI should show]
-**Open questions for engineering:** [list]
-
----
-⛔ CHECKPOINT 05-A
-Data contracts are the handshake between design and engineering.
-- Do these contracts match your actual data model?
-- Are there fields design is assuming that don't exist yet?
-- Any performance or security concerns with these shapes?
-
-This checkpoint requires sign-off from both design and engineering.
-Reply YES when both sides agree, or flag mismatches before any build begins.`,
-  },
-  {
-    id: '05b',
-    level: '05 Alignment',
-    code: '05-B',
-    title: 'Acceptance criteria generation',
-    description: 'Translates design decisions into testable GIVEN/WHEN/THEN acceptance criteria.',
-    tags: ['acceptance criteria', 'QA', 'definition of done'],
-    body: `Generate acceptance criteria for the following feature or flow.
-
-Feature: [FILL]
-Confirmed flow: [FILL — paste from 04-A]
-Edge cases in scope: [FILL — paste agreed list from 04-B]
-Design system: [FILL]
-
-For each step and state, write acceptance criteria in this format:
-GIVEN [context] WHEN [action] THEN [outcome]
-
-Include criteria for:
-- Happy path (every step of the critical path)
-- Error states (each in-scope error from 04-B)
-- Accessibility (keyboard navigation, screen reader labels, colour contrast, touch targets)
-- Null / empty states
-- Loading states
-
-Flag any criteria that require a judgement call on the quality bar — these need explicit human sign-off before they are written into a ticket.
-
----
-⛔ CHECKPOINT 05-B
-Acceptance criteria define the quality bar — only humans can set that.
-- Is the quality bar set at the right level for this release?
-- Are there any criteria that are too strict or too loose?
-- Are there any missing criteria for known edge cases?
-Reply YES to confirm the acceptance criteria. These will be used as the definition of done.`,
-  },
-  {
-    id: '06a',
-    level: '06 Build',
-    code: '06-A',
-    title: 'Scoped code generation',
-    description: 'Generates code strictly within approved scope — no interpretation or extension.',
-    tags: ['code', 'build', 'scoped'],
-    body: `You are generating code within a scope that has been explicitly approved through Levels 01–05.
-
-Do not interpret, extend, or improve on the brief. Build exactly what is described.
-
-Approved scope: [FILL — paste the specific feature, component, or function to be built]
-
-Constraints:
-- Tech stack: [FILL]
-- Design system / component library: [FILL]
-- Accessibility standard: [FILL — e.g. WCAG 2.1 AA]
-- Approved data contract: [FILL — paste from 05-A]
-- Acceptance criteria to satisfy: [FILL — paste from 05-B]
-
-For each output, state:
-- What acceptance criteria it satisfies
-- Any criteria it does NOT yet satisfy and why
-- Any assumptions made during implementation
-- Any decisions that require human review before merge
-
-Do not generate tests, documentation, or adjacent features unless explicitly asked.
-
----
-⛔ CHECKPOINT 06-A
-Code review is a human responsibility.
-Before this is merged:
-- [ ] Acceptance criteria verified
-- [ ] Accessibility audit passed
-- [ ] Design intent preserved (reviewed against source file)
-- [ ] Edge cases tested against agreed list
-- [ ] PR reviewed by a human
-Reply YES only when all boxes are checked.`,
-  },
-  {
-    id: '06b',
-    level: '06 Build',
-    code: '06-B',
-    title: 'Test generation',
-    description: 'Generates unit, component, integration, and accessibility tests from acceptance criteria.',
-    tags: ['tests', 'QA', 'automation'],
-    body: `Generate automated tests for the following feature.
-
-Acceptance criteria: [FILL — paste confirmed list from 05-B]
-Tech stack and test framework: [FILL]
-Component or function under test: [FILL — paste code or describe it]
-
-Generate:
-1. Unit tests for any logic or utility functions
-2. Component tests for UI states (default, loading, error, empty, populated)
-3. Integration tests for the critical path flow
-4. Accessibility tests (ARIA roles, keyboard navigation, focus management)
-
-For each test:
-- Name it clearly after the acceptance criterion it covers
-- Mark it with the criterion ID if one exists
-- Flag any criterion that cannot be tested automatically — these need manual QA
-
----
-⛔ CHECKPOINT 06-B
-Test coverage review:
-- Are all high-severity edge cases covered by a test?
-- Are there any acceptance criteria with no corresponding test?
-- Which scenarios must remain on the manual QA checklist?
-Reply YES to confirm test coverage is sufficient for this release.`,
-  },
-  {
-    id: 'u01',
+    id: 'u-synthesis',
     level: 'Utility',
     code: 'U-01',
     title: 'Research synthesis',
@@ -574,14 +569,14 @@ Do not make design recommendations. Synthesis only — decisions are made by the
 
 ---
 ⛔ CHECKPOINT U-01
-Research synthesis is a human call.
 - Do these themes match what you heard in the research?
 - Are there any patterns that have been missed or misread?
 - Which findings should change our current direction?
 Reply YES to confirm the synthesis is accurate.`,
   },
+
   {
-    id: 'u02',
+    id: 'u-decision',
     level: 'Utility',
     code: 'U-02',
     title: 'Decision log entry',
@@ -596,8 +591,6 @@ Reason this option was chosen: [FILL]
 Who approved it: [FILL]
 Date: [FILL]
 
-Format:
-
 ## Decision: [short title]
 **Date:** [date]
 **Approved by:** [name/role]
@@ -608,13 +601,14 @@ Format:
 **Implications:** [what this rules out or makes harder]
 **Review trigger:** [what would cause us to revisit this?]`,
   },
+
   {
-    id: 'u03',
+    id: 'u-risk',
     level: 'Utility',
     code: 'U-03',
     title: 'Risk and open question log',
     description: 'Logs risks, assumptions, open questions, and dependencies with owner and resolution date.',
-    tags: ['risk', 'documentation'],
+    tags: ['risk', 'assumptions', 'documentation'],
     body: `Add the following item to the open questions log.
 
 Item: [FILL]
@@ -624,8 +618,6 @@ Classify it as:
 - ASSUMPTION — something we're treating as true without evidence
 - OPEN QUESTION — something we need an answer to before proceeding
 - DEPENDENCY — something outside our control that we're waiting on
-
-For each item produce:
 
 ## [Short title]
 **Type:** [Risk / Assumption / Open question / Dependency]
@@ -637,11 +629,12 @@ For each item produce:
 **Target resolution date:** [date]
 **Status:** Open`,
   },
+
   {
-    id: 'u04',
+    id: 'u-handoff',
     level: 'Utility',
     code: 'U-04',
-    title: 'Level summary and handoff note',
+    title: 'Phase handoff note',
     description: 'Produces a handoff note at the end of any phase so the next person can continue without losing context.',
     tags: ['handoff', 'documentation'],
     body: `Produce a summary of everything decided and produced in [FILL — phase name and number].
