@@ -65,22 +65,24 @@ export function PhaseView({
 }: Props) {
   const [showCheckpointForm, setShowCheckpointForm] = useState(false);
   const [checkpointDraft, setCheckpointDraft] = useState<CheckpointDraft>(EMPTY_CHECKPOINT);
-  const [showPromptPicker, setShowPromptPicker] = useState(false);
   const [expandedCheckpointId, setExpandedCheckpointId] = useState<string | null>(null);
   const [editingCheckpointId, setEditingCheckpointId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<CheckpointDraft>(EMPTY_CHECKPOINT);
   const [showDeliverableForm, setShowDeliverableForm] = useState(false);
   const [deliverableDraft, setDeliverableDraft] = useState<DeliverableDraft>(EMPTY_DELIVERABLE);
   const [notesValue, setNotesValue] = useState(phase.notes);
-  const [showPromptLibrary, setShowPromptLibrary] = useState(false);
+  const [expandedPromptId, setExpandedPromptId] = useState<string | null>(null);
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
   const notesTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const phaseColor = PHASE_COLORS[phase.code];
   const phaseLevel = phase.code === 'U' ? 'Utility' : `0${phase.code} ${phase.label}`;
   const phasePrompts = prompts.filter(p => p.level === phaseLevel);
+  // For Utility phase, also show U-00 global contract
+  const allPhasePrompts = phase.code === 'U'
+    ? prompts.filter(p => p.level === 'Utility')
+    : phasePrompts;
 
-  // Sync notes to state when phase changes
   useEffect(() => {
     setNotesValue(phase.notes);
   }, [phase.id]);
@@ -88,9 +90,7 @@ export function PhaseView({
   function handleNotesChange(value: string) {
     setNotesValue(value);
     if (notesTimeout.current) clearTimeout(notesTimeout.current);
-    notesTimeout.current = setTimeout(() => {
-      onUpdatePhase({ notes: value });
-    }, 600);
+    notesTimeout.current = setTimeout(() => onUpdatePhase({ notes: value }), 600);
   }
 
   function handleStatusChange(status: PhaseStatus) {
@@ -99,6 +99,24 @@ export function PhaseView({
       startedAt: status === 'in-progress' && !phase.startedAt ? new Date().toISOString() : phase.startedAt,
       completedAt: status === 'completed' ? new Date().toISOString() : undefined,
     });
+  }
+
+  function openCaptureForm(prompt?: Prompt) {
+    const draft: CheckpointDraft = prompt
+      ? {
+          title: `${prompt.code} · ${prompt.title}`,
+          content: prompt.body,
+          promptId: prompt.id,
+          promptTitle: `${prompt.code} ${prompt.title}`,
+          tags: prompt.tags.join(', '),
+        }
+      : EMPTY_CHECKPOINT;
+    setCheckpointDraft(draft);
+    setShowCheckpointForm(true);
+    // scroll to form
+    setTimeout(() => {
+      document.querySelector('.checkpoint-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   function handleCheckpointSubmit(e: React.FormEvent) {
@@ -113,7 +131,6 @@ export function PhaseView({
     });
     setCheckpointDraft(EMPTY_CHECKPOINT);
     setShowCheckpointForm(false);
-    setShowPromptPicker(false);
   }
 
   function handleDeliverableSubmit(e: React.FormEvent) {
@@ -129,18 +146,7 @@ export function PhaseView({
     setShowDeliverableForm(false);
   }
 
-  function usePromptAsScaffold(prompt: Prompt) {
-    setCheckpointDraft(d => ({
-      ...d,
-      promptId: prompt.id,
-      promptTitle: `${prompt.code} ${prompt.title}`,
-      content: d.content ? d.content : prompt.body,
-    }));
-    setShowPromptPicker(false);
-    if (!showCheckpointForm) setShowCheckpointForm(true);
-  }
-
-  function copyPromptToClipboard(prompt: Prompt) {
+  function copyPrompt(prompt: Prompt) {
     navigator.clipboard.writeText(prompt.body).then(() => {
       setCopiedPromptId(prompt.id);
       setTimeout(() => setCopiedPromptId(null), 2000);
@@ -163,13 +169,15 @@ export function PhaseView({
     setEditingCheckpointId(null);
   }
 
+  // Which prompts have an associated captured checkpoint?
+  const capturedPromptIds = new Set(phase.checkpoints.map(c => c.promptId).filter(Boolean) as string[]);
+  const capturedCount = allPhasePrompts.filter(p => capturedPromptIds.has(p.id)).length;
+
   return (
     <div className="phase-view">
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <button className="breadcrumb-link" onClick={onBack}>
-          ← {project.name}
-        </button>
+        <button className="breadcrumb-link" onClick={onBack}>← {project.name}</button>
       </div>
 
       {/* Phase header */}
@@ -187,6 +195,11 @@ export function PhaseView({
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
+          {allPhasePrompts.length > 0 && (
+            <span className="phase-completion-badge">
+              {capturedCount}/{allPhasePrompts.length} captured
+            </span>
+          )}
         </div>
         <p className="phase-view-description">{phase.description}</p>
       </div>
@@ -194,102 +207,132 @@ export function PhaseView({
       {/* Two-column layout */}
       <div className="phase-columns">
 
-        {/* ── Left: Checkpoints ───────────────────────────────────────────── */}
+        {/* ── Left: Process steps + Captured context ──────────────────── */}
         <div className="phase-main">
-          <div className="section-header">
-            <h3 className="section-title">Context checkpoints</h3>
-            <button
-              className="btn-primary"
-              onClick={() => { setShowCheckpointForm(v => !v); setShowPromptPicker(false); }}
-            >
-              {showCheckpointForm ? 'Cancel' : '+ Add checkpoint'}
-            </button>
-          </div>
-          <p className="section-subtitle">
-            Capture decisions, insights, and AI-generated outputs as reference points.
-          </p>
 
-          {/* Checkpoint form */}
+          {/* ── Process steps (prompt-based checkpoints) ── */}
+          {allPhasePrompts.length > 0 && (
+            <div className="process-steps-section">
+              <div className="section-header">
+                <h3 className="section-title">Process steps</h3>
+                <span className="section-subtitle" style={{ marginBottom: 0 }}>
+                  Capture AI output for each step as a checkpoint
+                </span>
+              </div>
+
+              <div className="process-steps-list">
+                {allPhasePrompts.map(prompt => {
+                  const captured = phase.checkpoints.find(c => c.promptId === prompt.id);
+                  const isExpanded = expandedPromptId === prompt.id;
+                  return (
+                    <div
+                      key={prompt.id}
+                      className={`process-step ${captured ? 'process-step-captured' : ''}`}
+                    >
+                      <div className="process-step-header">
+                        <div className="process-step-left">
+                          <span className="process-step-code">{prompt.code}</span>
+                          <div className="process-step-info">
+                            <span className="process-step-title">{prompt.title}</span>
+                            <span className="process-step-desc">{prompt.description}</span>
+                          </div>
+                        </div>
+                        <div className="process-step-actions">
+                          {captured ? (
+                            <span className="step-captured-badge">✓ Captured</span>
+                          ) : (
+                            <button
+                              className="btn-capture"
+                              onClick={() => openCaptureForm(prompt)}
+                            >
+                              Capture →
+                            </button>
+                          )}
+                          <button
+                            className="icon-btn"
+                            title={isExpanded ? 'Hide prompt' : 'View prompt'}
+                            onClick={() => setExpandedPromptId(id => id === prompt.id ? null : prompt.id)}
+                          >
+                            {isExpanded ? '▲' : '▼'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="process-step-body">
+                          <pre className="prompt-body-preview">{prompt.body}</pre>
+                          <div className="prompt-card-actions">
+                            <button onClick={() => copyPrompt(prompt)}>
+                              {copiedPromptId === prompt.id ? '✓ Copied' : 'Copy prompt'}
+                            </button>
+                            <button className="btn-primary" onClick={() => openCaptureForm(prompt)}>
+                              Capture output →
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {captured && (
+                        <div className="process-step-captured-preview">
+                          <span className="captured-date">{formatDateShort(captured.createdAt)}</span>
+                          <span className="captured-title">{captured.title}</span>
+                          <button
+                            className="captured-expand-link"
+                            onClick={() => setExpandedCheckpointId(id => id === captured.id ? null : captured.id)}
+                          >
+                            {expandedCheckpointId === captured.id ? 'Collapse' : 'View'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── Checkpoint capture form ── */}
           {showCheckpointForm && (
             <form className="checkpoint-form" onSubmit={handleCheckpointSubmit}>
-              {/* Prompt scaffold picker */}
-              <div className="scaffold-section">
-                <button
-                  type="button"
-                  className="scaffold-toggle"
-                  onClick={() => setShowPromptPicker(v => !v)}
-                >
+              <div className="checkpoint-form-header">
+                <span className="form-title">
                   {checkpointDraft.promptTitle
-                    ? `Scaffold: ${checkpointDraft.promptTitle}`
-                    : '◈ Use a prompt as scaffold (optional)'}
-                </button>
+                    ? `Capturing: ${checkpointDraft.promptTitle}`
+                    : 'New checkpoint'}
+                </span>
                 {checkpointDraft.promptTitle && (
-                  <button type="button" className="scaffold-clear" onClick={() => setCheckpointDraft(d => ({ ...d, promptId: '', promptTitle: '' }))}>
-                    ✕ Clear
+                  <button
+                    type="button"
+                    className="scaffold-clear"
+                    onClick={() => setCheckpointDraft(EMPTY_CHECKPOINT)}
+                  >
+                    ✕ Clear scaffold
                   </button>
                 )}
               </div>
-
-              {showPromptPicker && (
-                <div className="prompt-picker">
-                  <p className="prompt-picker-hint">
-                    Select a prompt — its body will pre-fill the content below.
-                  </p>
-                  {phasePrompts.length === 0 ? (
-                    <p style={{ color: 'var(--color-text-tertiary)', fontSize: 13 }}>No prompts for this phase.</p>
-                  ) : (
-                    phasePrompts.map(p => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        className={`prompt-picker-item ${checkpointDraft.promptId === p.id ? 'prompt-picker-item-active' : ''}`}
-                        onClick={() => usePromptAsScaffold(p)}
-                      >
-                        <span className="prompt-picker-code">{p.code}</span>
-                        <span className="prompt-picker-title">{p.title}</span>
-                        <span className="prompt-picker-desc">{p.description}</span>
-                      </button>
-                    ))
-                  )}
-                  {/* Show utility prompts too */}
-                  {phase.code !== 'U' && (
-                    <>
-                      <p className="prompt-picker-group-label">Utility prompts</p>
-                      {prompts.filter(p => p.level === 'Utility').map(p => (
-                        <button
-                          key={p.id}
-                          type="button"
-                          className={`prompt-picker-item ${checkpointDraft.promptId === p.id ? 'prompt-picker-item-active' : ''}`}
-                          onClick={() => usePromptAsScaffold(p)}
-                        >
-                          <span className="prompt-picker-code">{p.code}</span>
-                          <span className="prompt-picker-title">{p.title}</span>
-                          <span className="prompt-picker-desc">{p.description}</span>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
-
               <div className="form-field">
                 <label>Title *</label>
                 <input
                   type="text"
-                  placeholder="e.g. Project brief confirmed with stakeholders"
+                  placeholder="e.g. Brief confirmed with stakeholders"
                   value={checkpointDraft.title}
                   onChange={e => setCheckpointDraft(d => ({ ...d, title: e.target.value }))}
-                  autoFocus={!showPromptPicker}
+                  autoFocus
                 />
               </div>
               <div className="form-field">
-                <label>Content</label>
+                <label>
+                  Content
+                  {checkpointDraft.promptTitle && (
+                    <span className="label-hint"> — edit the prompt below with your actual AI output</span>
+                  )}
+                </label>
                 <textarea
                   className="checkpoint-textarea"
-                  placeholder="Paste AI output, key decisions, research findings, or any context worth preserving..."
+                  placeholder="Paste AI output, decisions, research findings, or any context to preserve..."
                   value={checkpointDraft.content}
                   onChange={e => setCheckpointDraft(d => ({ ...d, content: e.target.value }))}
-                  rows={8}
+                  rows={10}
                 />
               </div>
               <div className="form-field">
@@ -302,7 +345,7 @@ export function PhaseView({
                 />
               </div>
               <div className="form-actions">
-                <button type="button" onClick={() => { setShowCheckpointForm(false); setCheckpointDraft(EMPTY_CHECKPOINT); setShowPromptPicker(false); }}>
+                <button type="button" onClick={() => { setShowCheckpointForm(false); setCheckpointDraft(EMPTY_CHECKPOINT); }}>
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary">
@@ -312,51 +355,61 @@ export function PhaseView({
             </form>
           )}
 
-          {/* Checkpoint list */}
-          {phase.checkpoints.length === 0 && !showCheckpointForm && (
-            <div className="empty-state-inline">
-              No checkpoints yet. Add one to start building your project memory.
+          {/* ── Captured context ── */}
+          <div className="captured-section">
+            <div className="section-header">
+              <h3 className="section-title">Captured context</h3>
+              {!showCheckpointForm && (
+                <button onClick={() => openCaptureForm()}>+ Add</button>
+              )}
             </div>
-          )}
+            {allPhasePrompts.length === 0 && (
+              <p className="section-subtitle">Free-form context notes for this phase.</p>
+            )}
 
-          <div className="checkpoint-list">
-            {phase.checkpoints.map(checkpoint => (
-              editingCheckpointId === checkpoint.id ? (
-                <form key={checkpoint.id} className="checkpoint-form checkpoint-edit-form" onSubmit={handleEditSubmit}>
-                  <div className="form-field">
-                    <label>Title</label>
-                    <input type="text" value={editDraft.title} onChange={e => setEditDraft(d => ({ ...d, title: e.target.value }))} autoFocus />
-                  </div>
-                  <div className="form-field">
-                    <label>Content</label>
-                    <textarea className="checkpoint-textarea" value={editDraft.content} onChange={e => setEditDraft(d => ({ ...d, content: e.target.value }))} rows={8} />
-                  </div>
-                  <div className="form-field">
-                    <label>Tags</label>
-                    <input type="text" value={editDraft.tags} onChange={e => setEditDraft(d => ({ ...d, tags: e.target.value }))} />
-                  </div>
-                  <div className="form-actions">
-                    <button type="button" onClick={() => setEditingCheckpointId(null)}>Cancel</button>
-                    <button type="submit" className="btn-primary">Save</button>
-                  </div>
-                </form>
-              ) : (
-                <CheckpointCard
-                  key={checkpoint.id}
-                  checkpoint={checkpoint}
-                  isExpanded={expandedCheckpointId === checkpoint.id}
-                  onToggle={() => setExpandedCheckpointId(id => id === checkpoint.id ? null : checkpoint.id)}
-                  onEdit={() => startEditCheckpoint(checkpoint)}
-                  onDelete={() => {
-                    if (confirm('Delete this checkpoint?')) onDeleteCheckpoint(checkpoint.id);
-                  }}
-                />
-              )
-            ))}
+            {phase.checkpoints.length === 0 ? (
+              <div className="empty-state-inline">
+                No context captured yet. Use the process steps above to get started.
+              </div>
+            ) : (
+              <div className="checkpoint-list">
+                {phase.checkpoints.map(checkpoint =>
+                  editingCheckpointId === checkpoint.id ? (
+                    <form key={checkpoint.id} className="checkpoint-form checkpoint-edit-form" onSubmit={handleEditSubmit}>
+                      <div className="form-field">
+                        <label>Title</label>
+                        <input type="text" value={editDraft.title} onChange={e => setEditDraft(d => ({ ...d, title: e.target.value }))} autoFocus />
+                      </div>
+                      <div className="form-field">
+                        <label>Content</label>
+                        <textarea className="checkpoint-textarea" value={editDraft.content} onChange={e => setEditDraft(d => ({ ...d, content: e.target.value }))} rows={8} />
+                      </div>
+                      <div className="form-field">
+                        <label>Tags</label>
+                        <input type="text" value={editDraft.tags} onChange={e => setEditDraft(d => ({ ...d, tags: e.target.value }))} />
+                      </div>
+                      <div className="form-actions">
+                        <button type="button" onClick={() => setEditingCheckpointId(null)}>Cancel</button>
+                        <button type="submit" className="btn-primary">Save</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <CheckpointCard
+                      key={checkpoint.id}
+                      checkpoint={checkpoint}
+                      isExpanded={expandedCheckpointId === checkpoint.id}
+                      onToggle={() => setExpandedCheckpointId(id => id === checkpoint.id ? null : checkpoint.id)}
+                      onEdit={() => startEditCheckpoint(checkpoint)}
+                      onDelete={() => { if (confirm('Delete this checkpoint?')) onDeleteCheckpoint(checkpoint.id); }}
+                    />
+                  )
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ── Right: Deliverables + Prompt Library ─────────────────────────── */}
+        {/* ── Right: Deliverables + Notes ─────────────────────────────── */}
         <div className="phase-sidebar">
 
           {/* Deliverables */}
@@ -367,6 +420,7 @@ export function PhaseView({
                 {showDeliverableForm ? 'Cancel' : '+ Add'}
               </button>
             </div>
+            <p className="section-subtitle">Link Figma files, docs, and other outputs.</p>
 
             {showDeliverableForm && (
               <form className="deliverable-form" onSubmit={handleDeliverableSubmit}>
@@ -401,7 +455,7 @@ export function PhaseView({
                   <label>Description (optional)</label>
                   <input
                     type="text"
-                    placeholder="Brief note about this deliverable"
+                    placeholder="Brief note"
                     value={deliverableDraft.description}
                     onChange={e => setDeliverableDraft(d => ({ ...d, description: e.target.value }))}
                   />
@@ -409,57 +463,23 @@ export function PhaseView({
                 <div className="form-actions">
                   <button type="button" onClick={() => { setShowDeliverableForm(false); setDeliverableDraft(EMPTY_DELIVERABLE); }}>Cancel</button>
                   <button type="submit" className="btn-primary" disabled={!deliverableDraft.title.trim() || !deliverableDraft.url.trim()}>
-                    Add deliverable
+                    Add
                   </button>
                 </div>
               </form>
             )}
 
             {phase.deliverables.length === 0 && !showDeliverableForm ? (
-              <div className="empty-state-inline">Link Figma files, docs, and other outputs here.</div>
+              <div className="empty-state-inline">No deliverables linked yet.</div>
             ) : (
               <div className="deliverable-list">
                 {phase.deliverables.map(d => (
                   <DeliverableCard
                     key={d.id}
                     deliverable={d}
-                    onDelete={() => {
-                      if (confirm('Remove this deliverable?')) onDeleteDeliverable(d.id);
-                    }}
+                    onDelete={() => { if (confirm('Remove this deliverable?')) onDeleteDeliverable(d.id); }}
                   />
                 ))}
-              </div>
-            )}
-          </div>
-
-          {/* Prompt library for this phase */}
-          <div className="sidebar-section">
-            <div className="section-header">
-              <h3 className="section-title">Prompt scaffolding</h3>
-              <button onClick={() => setShowPromptLibrary(v => !v)}>
-                {showPromptLibrary ? 'Hide' : 'Show'}
-              </button>
-            </div>
-            <p className="section-subtitle">Prompts for this phase. Use as scaffold when adding checkpoints.</p>
-
-            {showPromptLibrary && (
-              <div className="prompt-library-list">
-                {phasePrompts.length === 0 ? (
-                  <p style={{ color: 'var(--color-text-tertiary)', fontSize: 13 }}>No prompts for this phase.</p>
-                ) : (
-                  phasePrompts.map(prompt => (
-                    <PromptCard
-                      key={prompt.id}
-                      prompt={prompt}
-                      isCopied={copiedPromptId === prompt.id}
-                      onCopy={() => copyPromptToClipboard(prompt)}
-                      onUseAsScaffold={() => {
-                        usePromptAsScaffold(prompt);
-                        setShowCheckpointForm(true);
-                      }}
-                    />
-                  ))
-                )}
               </div>
             )}
           </div>
@@ -469,13 +489,14 @@ export function PhaseView({
             <h3 className="section-title">Phase notes</h3>
             <textarea
               className="notes-textarea"
-              placeholder="General notes for this phase — context, blockers, open questions..."
+              placeholder="Blockers, open questions, general context..."
               value={notesValue}
               onChange={e => handleNotesChange(e.target.value)}
-              rows={5}
+              rows={6}
             />
             <p className="notes-hint">Auto-saved</p>
           </div>
+
         </div>
       </div>
     </div>
@@ -491,7 +512,7 @@ function CheckpointCard({ checkpoint, isExpanded, onToggle, onEdit, onDelete }: 
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const preview = checkpoint.content.slice(0, 120) + (checkpoint.content.length > 120 ? '…' : '');
+  const preview = checkpoint.content.slice(0, 140) + (checkpoint.content.length > 140 ? '…' : '');
 
   return (
     <div className={`checkpoint-card ${isExpanded ? 'checkpoint-card-expanded' : ''}`}>
@@ -538,7 +559,6 @@ function CheckpointCard({ checkpoint, isExpanded, onToggle, onEdit, onDelete }: 
 
 function DeliverableCard({ deliverable, onDelete }: { deliverable: Deliverable; onDelete: () => void }) {
   const typeInfo = DELIVERABLE_TYPES.find(t => t.value === deliverable.type) || DELIVERABLE_TYPES[DELIVERABLE_TYPES.length - 1];
-
   return (
     <div className="deliverable-card">
       <div className="deliverable-icon" title={typeInfo.label}>{typeInfo.icon}</div>
@@ -546,9 +566,7 @@ function DeliverableCard({ deliverable, onDelete }: { deliverable: Deliverable; 
         <a className="deliverable-title" href={deliverable.url} target="_blank" rel="noopener noreferrer">
           {deliverable.title}
         </a>
-        {deliverable.description && (
-          <p className="deliverable-description">{deliverable.description}</p>
-        )}
+        {deliverable.description && <p className="deliverable-description">{deliverable.description}</p>}
         <span className="deliverable-meta">{typeInfo.label} · {formatDateShort(deliverable.addedAt)}</span>
       </div>
       <button className="icon-btn icon-btn-danger" title="Remove" onClick={onDelete}>
@@ -556,35 +574,6 @@ function DeliverableCard({ deliverable, onDelete }: { deliverable: Deliverable; 
           <polyline points="2,4 12,4"/><path d="M5 4V2h4v2"/><path d="M3 4l1 8h6l1-8"/>
         </svg>
       </button>
-    </div>
-  );
-}
-
-function PromptCard({ prompt, isCopied, onCopy, onUseAsScaffold }: {
-  prompt: Prompt;
-  isCopied: boolean;
-  onCopy: () => void;
-  onUseAsScaffold: () => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="prompt-library-card">
-      <div className="prompt-library-card-header" onClick={() => setExpanded(v => !v)} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && setExpanded(v => !v)}>
-        <div>
-          <span className="prompt-code">{prompt.code}</span>
-          <span className="prompt-title">{prompt.title}</span>
-        </div>
-        <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)' }}>{expanded ? '▲' : '▼'}</span>
-      </div>
-      {!expanded && <p className="prompt-desc">{prompt.description}</p>}
-      {expanded && (
-        <pre className="prompt-body-preview">{prompt.body}</pre>
-      )}
-      <div className="prompt-card-actions" onClick={e => e.stopPropagation()}>
-        <button onClick={onUseAsScaffold}>Use as scaffold</button>
-        <button onClick={onCopy}>{isCopied ? '✓ Copied' : 'Copy prompt'}</button>
-      </div>
     </div>
   );
 }
