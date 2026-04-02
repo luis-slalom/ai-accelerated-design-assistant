@@ -1,6 +1,43 @@
 import type { Phase, Prompt } from './types';
 
-export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
+export interface ActivityDef {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  promptId?: string; // matches a Prompt.id in DEFAULT_PROMPTS
+  phaseCode: string;
+}
+
+export const ACTIVITY_DEFS: ActivityDef[] = [
+  // 01 Context — understand project, users, constraints
+  { id: 'ctx-brief',        code: '01-A', phaseCode: '01', title: 'Project brief',          description: 'Capture problem statement, users, success criteria, and timeline',   promptId: '01a' },
+  { id: 'ctx-stakeholders', code: '01-B', phaseCode: '01', title: 'Stakeholder map',         description: 'Map competing priorities, conflict points, and decision makers',       promptId: '01b' },
+  { id: 'ctx-constraints',  code: '01-C', phaseCode: '01', title: 'Constraints register',    description: 'Catalogue what is fixed, flexible, and assumed — with owners',        promptId: '01c' },
+
+  // 02 Capabilities — define user outcomes, not features
+  { id: 'cap-outcomes',     code: '02-A', phaseCode: '02', title: 'User outcome mapping',    description: 'Reframe every requirement as a user outcome, flag vanity features',    promptId: '02a' },
+  { id: 'cap-gaps',         code: '02-B', phaseCode: '02', title: 'Capability gap analysis', description: 'Compare current state to desired outcomes, prioritise gaps',           promptId: '02b' },
+  { id: 'cap-personas',     code: '02-C', phaseCode: '02', title: 'Persona pressure-test',   description: 'Validate each capability against real user types and edge cases',      promptId: '02c' },
+
+  // 03 Objects — identify core entities and relationships
+  { id: 'obj-entities',     code: '03-A', phaseCode: '03', title: 'Entity inventory',        description: 'Name every core object, its attributes, relationships, and actions',   promptId: '03a' },
+  { id: 'obj-states',       code: '03-B', phaseCode: '03', title: 'Object state mapping',    description: 'Map the full lifecycle of each entity including null and error states', promptId: '03b' },
+
+  // 04 Interactions — map flows, states, and edge cases
+  { id: 'int-flows',        code: '04-A', phaseCode: '04', title: 'User flows',              description: 'Generate end-to-end flows with critical path, branches, and errors',   promptId: '04a' },
+  { id: 'int-edge',         code: '04-B', phaseCode: '04', title: 'Edge case inventory',     description: 'Surface data, permission, system, and human edge cases systematically', promptId: '04b' },
+
+  // 05 Alignment — agree data contracts and API shapes
+  { id: 'aln-contracts',    code: '05-A', phaseCode: '05', title: 'Data contracts',          description: 'Define API shapes as the handshake between design and engineering',    promptId: '05a' },
+  { id: 'aln-criteria',     code: '05-B', phaseCode: '05', title: 'Acceptance criteria',     description: 'Translate design decisions into GIVEN/WHEN/THEN test criteria',        promptId: '05b' },
+
+  // 06 Build — generate code only within defined scope
+  { id: 'bld-code',         code: '06-A', phaseCode: '06', title: 'Scoped code',             description: 'Generate implementation strictly within approved scope, no extras',    promptId: '06a' },
+  { id: 'bld-tests',        code: '06-B', phaseCode: '06', title: 'Test suite',              description: 'Generate unit, component, integration, and accessibility tests',       promptId: '06b' },
+];
+
+export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
   { code: '01', label: 'Context', description: 'Capture project brief, stakeholder landscape, and core constraints' },
   { code: '02', label: 'Capabilities', description: 'Define user outcomes, identify gaps, validate against personas' },
   { code: '03', label: 'Objects', description: 'Model core entities, relationships, states, and data structures' },

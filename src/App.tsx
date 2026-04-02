@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus } from './types';
+import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState } from './types';
 import { loadProjects, saveProjects, loadPrompts, generateId } from './storage';
-import { DEFAULT_PROMPTS, PHASE_TEMPLATES } from './data';
+import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
 import { Dashboard } from './views/Dashboard';
 import { ProjectView } from './views/ProjectView';
 import { PhaseView } from './views/PhaseView';
@@ -24,6 +24,9 @@ function buildNewProject(name: string, client: string, description: string, tags
       status: 'not-started' as PhaseStatus,
       deliverables: [],
       checkpoints: [],
+      activities: ACTIVITY_DEFS
+        .filter(d => d.phaseCode === t.code)
+        .map(d => ({ defId: d.id, status: 'empty' as const, content: '' })),
       notes: '',
     })),
   };
@@ -60,7 +63,7 @@ export default function App() {
     setActivePhaseId(null);
   }
 
-  // ── Phase CRUD ────────────────────────────────────────────────────────────
+  // ── Phase ─────────────────────────────────────────────────────────────────
 
   function updatePhase(projectId: string, phaseId: string, changes: Partial<Phase>) {
     update(projects.map(p => {
@@ -73,7 +76,27 @@ export default function App() {
     }));
   }
 
-  // ── Checkpoints ───────────────────────────────────────────────────────────
+  // ── Activities ────────────────────────────────────────────────────────────
+
+  function updateActivity(projectId: string, phaseId: string, defId: string, changes: Partial<Omit<ActivityState, 'defId'>>) {
+    update(projects.map(p => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        updatedAt: new Date().toISOString(),
+        phases: p.phases.map(ph => {
+          if (ph.id !== phaseId) return ph;
+          const exists = ph.activities.some(a => a.defId === defId);
+          const updated = exists
+            ? ph.activities.map(a => a.defId === defId ? { ...a, ...changes, updatedAt: new Date().toISOString() } : a)
+            : [...ph.activities, { defId, status: 'empty' as const, content: '', ...changes, updatedAt: new Date().toISOString() }];
+          return { ...ph, activities: updated };
+        }),
+      };
+    }));
+  }
+
+  // ── Checkpoints (used by Utility phase) ──────────────────────────────────
 
   function addCheckpoint(projectId: string, phaseId: string, data: Omit<Checkpoint, 'id' | 'createdAt'>) {
     const checkpoint: Checkpoint = { ...data, id: generateId(), createdAt: new Date().toISOString() };
@@ -85,20 +108,6 @@ export default function App() {
         phases: p.phases.map(ph => {
           if (ph.id !== phaseId) return ph;
           return { ...ph, checkpoints: [checkpoint, ...ph.checkpoints] };
-        }),
-      };
-    }));
-  }
-
-  function updateCheckpoint(projectId: string, phaseId: string, checkpointId: string, changes: Partial<Omit<Checkpoint, 'id' | 'createdAt'>>) {
-    update(projects.map(p => {
-      if (p.id !== projectId) return p;
-      return {
-        ...p,
-        updatedAt: new Date().toISOString(),
-        phases: p.phases.map(ph => {
-          if (ph.id !== phaseId) return ph;
-          return { ...ph, checkpoints: ph.checkpoints.map(c => c.id === checkpointId ? { ...c, ...changes } : c) };
         }),
       };
     }));
@@ -193,8 +202,8 @@ export default function App() {
           prompts={prompts}
           onBack={() => { setView('project'); setActivePhaseId(null); }}
           onUpdatePhase={(changes) => updatePhase(activeProject.id, activePhase.id, changes)}
+          onUpdateActivity={(defId, changes) => updateActivity(activeProject.id, activePhase.id, defId, changes)}
           onAddCheckpoint={(data) => addCheckpoint(activeProject.id, activePhase.id, data)}
-          onUpdateCheckpoint={(id, changes) => updateCheckpoint(activeProject.id, activePhase.id, id, changes)}
           onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
           onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
           onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}

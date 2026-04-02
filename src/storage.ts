@@ -1,12 +1,29 @@
-import type { Project, Prompt } from './types';
+import type { Project, ActivityStatus } from './types';
+import { ACTIVITY_DEFS } from './data';
 
 const PROJECTS_KEY = 'design-tracker-projects';
 const PROMPTS_KEY = 'design-tracker-prompts';
 
+// Migrate old phase objects that predate the activities field
+function migrateProject(p: any): Project {
+  return {
+    ...p,
+    phases: (p.phases || []).map((ph: any) => ({
+      ...ph,
+      activities: ph.activities ?? ACTIVITY_DEFS
+        .filter(d => d.phaseCode === ph.code)
+        .map(d => ({ defId: d.id, status: 'empty' as ActivityStatus, content: '' })),
+      checkpoints: ph.checkpoints ?? [],
+      deliverables: ph.deliverables ?? [],
+      notes: ph.notes ?? '',
+    })),
+  };
+}
+
 export function loadProjects(): Project[] {
   try {
     const raw = localStorage.getItem(PROJECTS_KEY);
-    if (raw) return JSON.parse(raw) as Project[];
+    if (raw) return (JSON.parse(raw) as any[]).map(migrateProject);
   } catch {}
   return [];
 }
@@ -15,15 +32,15 @@ export function saveProjects(projects: Project[]): void {
   localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
 }
 
-export function loadPrompts(defaults: Prompt[]): Prompt[] {
+export function loadPrompts<T>(defaults: T[]): T[] {
   try {
     const raw = localStorage.getItem(PROMPTS_KEY);
-    if (raw) return JSON.parse(raw) as Prompt[];
+    if (raw) return JSON.parse(raw) as T[];
   } catch {}
   return defaults;
 }
 
-export function savePrompts(prompts: Prompt[]): void {
+export function savePrompts<T>(prompts: T[]): void {
   localStorage.setItem(PROMPTS_KEY, JSON.stringify(prompts));
 }
 

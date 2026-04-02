@@ -31,7 +31,8 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
   });
 
   const completedCount = project.phases.filter(p => p.status === 'completed').length;
-  const totalCheckpoints = project.phases.reduce((n, p) => n + p.checkpoints.length, 0);
+  const totalValidated = project.phases.reduce((n, p) => n + p.activities.filter(a => a.status === 'validated').length, 0);
+  const totalActivities = project.phases.reduce((n, p) => n + p.activities.length, 0);
   const totalDeliverables = project.phases.reduce((n, p) => n + p.deliverables.length, 0);
 
   function handleEditSubmit(e: React.FormEvent) {
@@ -64,7 +65,7 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
     }
     lines.push(`---`, ``, `## Project summary`, ``);
     lines.push(`- ${completedCount}/${project.phases.length} phases completed`);
-    lines.push(`- ${totalCheckpoints} context checkpoint${totalCheckpoints !== 1 ? 's' : ''}`);
+    lines.push(`- ${totalValidated}/${totalActivities} activities validated`);
     lines.push(`- ${totalDeliverables} deliverable${totalDeliverables !== 1 ? 's' : ''}`, ``);
 
     for (const phase of project.phases) {
@@ -193,8 +194,8 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
             </div>
             <div className="stat-divider" />
             <div className="stat-item">
-              <span className="stat-value">{totalCheckpoints}</span>
-              <span className="stat-label">checkpoints</span>
+              <span className="stat-value">{totalValidated}/{totalActivities}</span>
+              <span className="stat-label">validated</span>
             </div>
             <div className="stat-divider" />
             <div className="stat-item">
@@ -257,10 +258,11 @@ function PhaseRow({ phase, onOpen, onStatusChange }: {
         <div className="phase-row-name">{phase.label}</div>
         <div className="phase-row-desc">{phase.description}</div>
         <div className="phase-row-stats">
-          {phase.checkpoints.length > 0 && (
-            <span>{phase.checkpoints.length} checkpoint{phase.checkpoints.length !== 1 ? 's' : ''}</span>
-          )}
-          {phase.checkpoints.length > 0 && phase.deliverables.length > 0 && <span className="stat-dot">·</span>}
+          {phase.activities.length > 0 && (() => {
+            const validated = phase.activities.filter(a => a.status === 'validated').length;
+            return <span className={validated === phase.activities.length ? 'stat-all-done' : ''}>{validated}/{phase.activities.length} validated</span>;
+          })()}
+          {phase.activities.length > 0 && phase.deliverables.length > 0 && <span className="stat-dot">·</span>}
           {phase.deliverables.length > 0 && (
             <span>{phase.deliverables.length} deliverable{phase.deliverables.length !== 1 ? 's' : ''}</span>
           )}

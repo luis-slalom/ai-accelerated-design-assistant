@@ -1,6 +1,7 @@
 export type ProjectStatus = 'active' | 'on-hold' | 'completed';
 export type PhaseStatus = 'not-started' | 'in-progress' | 'completed' | 'skipped';
 export type DeliverableType = 'figma' | 'doc' | 'slides' | 'notion' | 'video' | 'link' | 'other';
+export type ActivityStatus = 'empty' | 'in-progress' | 'validated';
 
 export interface Deliverable {
   id: string;
@@ -21,6 +22,15 @@ export interface Checkpoint {
   tags: string[];
 }
 
+export interface ActivityState {
+  defId: string;
+  status: ActivityStatus;
+  content: string;
+  source?: 'manual' | 'generated';
+  validatedAt?: string;
+  updatedAt?: string;
+}
+
 export interface Phase {
   id: string;
   code: string;
@@ -31,6 +41,7 @@ export interface Phase {
   completedAt?: string;
   deliverables: Deliverable[];
   checkpoints: Checkpoint[];
+  activities: ActivityState[];
   notes: string;
 }
 
