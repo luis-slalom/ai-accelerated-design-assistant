@@ -263,10 +263,6 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
 
   // Keep draft in sync if parent updates (e.g. after save)
   useEffect(() => { setDraft(state.content); }, [state.content]);
-  // When status changes to validated, collapse
-  useEffect(() => {
-    if (state.status === 'validated') setIsExpanded(false);
-  }, [state.status]);
 
   function startEdit() {
     setDraft(state.content);
@@ -292,7 +288,7 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
   function handleValidate() {
     onUpdate({ status: 'validated', validatedAt: new Date().toISOString() });
     setShowValidateConfirm(false);
-    setIsExpanded(false);
+    // keep expanded so user sees the validated result immediately
   }
 
   function handleUnvalidate() {
@@ -345,13 +341,12 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
           <span className="activity-code">{def.code}</span>
           <div className="activity-title-group">
             <span className="activity-title">{def.title}</span>
-            {!isExpanded && state.status === 'validated' && (
-              <span className="activity-validated-inline">
-                ✓ Validated {state.validatedAt ? formatDateShort(state.validatedAt) : ''}
+            {!isExpanded && (
+              <span className="activity-description">
+                {state.status === 'validated'
+                  ? `✓ Validated ${state.validatedAt ? formatDateShort(state.validatedAt) : ''}`
+                  : def.description}
               </span>
-            )}
-            {!isExpanded && state.status !== 'validated' && (
-              <span className="activity-description">{def.description}</span>
             )}
           </div>
         </div>
@@ -361,7 +356,7 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
               Reopen
             </button>
           )}
-          {state.status !== 'validated' && !isEditing && state.content && (
+          {!isEditing && state.content && (
             <button className="activity-edit-btn" onClick={startEdit}>Edit</button>
           )}
           {state.status === 'empty' && !isEditing && (
@@ -384,12 +379,35 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
           {!isEditing && state.content && (
             <div className="activity-content-view">
               <pre className="activity-content-text">{state.content}</pre>
-              {state.source === 'generated' && (
-                <p className="activity-source-label">Generated with AI · {state.updatedAt ? formatDate(state.updatedAt) : ''}</p>
-              )}
-              {state.source === 'manual' && state.updatedAt && (
-                <p className="activity-source-label">Written manually · {formatDate(state.updatedAt)}</p>
-              )}
+              <div className="activity-provenance">
+                <div className="provenance-row">
+                  <span className="provenance-label">Source</span>
+                  <span className="provenance-value">
+                    {state.source === 'generated' ? '◈ Generated with AI' : state.source === 'manual' ? '✏ Written manually' : '—'}
+                  </span>
+                </div>
+                {prompt && (
+                  <div className="provenance-row">
+                    <span className="provenance-label">Prompt scaffold</span>
+                    <span className="provenance-value provenance-prompt">
+                      <span className="provenance-prompt-code">{prompt.code}</span>
+                      {prompt.title}
+                    </span>
+                  </div>
+                )}
+                {state.updatedAt && (
+                  <div className="provenance-row">
+                    <span className="provenance-label">Last updated</span>
+                    <span className="provenance-value">{formatDate(state.updatedAt)}</span>
+                  </div>
+                )}
+                {state.status === 'validated' && state.validatedAt && (
+                  <div className="provenance-row provenance-row-validated">
+                    <span className="provenance-label">Validated</span>
+                    <span className="provenance-value">✓ {formatDate(state.validatedAt)}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -546,12 +564,6 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
             </div>
           )}
 
-          {/* ── Validated state footer ── */}
-          {!isEditing && state.status === 'validated' && (
-            <div className="activity-validated-footer">
-              <span>✓ Validated {state.validatedAt ? formatDate(state.validatedAt) : ''}</span>
-            </div>
-          )}
         </div>
       )}
     </div>
