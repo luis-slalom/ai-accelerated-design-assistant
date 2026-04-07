@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prompt, Project, ActivityState, ActivityStatus, Task } from '../types';
-import type { ActivityDef } from '../data';
+import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prompt, Project, ActivityState, ActivityStatus, CustomActivity, EngagementEntry } from '../types';
 import { PHASE_COLORS, ACTIVITY_DEFS, PHASE_DELIVERABLE_HINTS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
 import { RichTextEditor } from '../components/RichTextEditor';
@@ -65,9 +64,8 @@ interface Props {
   onDeleteCheckpoint: (id: string) => void;
   onAddDeliverable: (data: Omit<Deliverable, 'id' | 'addedAt'>) => void;
   onDeleteDeliverable: (id: string) => void;
-  onAddTask: (data: Omit<Task, 'id' | 'createdAt'>) => void;
-  onUpdateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
-  onDeleteTask: (taskId: string) => void;
+  onAddCustomActivity: (data: Omit<CustomActivity, 'id' | 'createdAt'>) => void;
+  onDeleteCustomActivity: (caId: string) => void;
   onLogAlignment: (ruleId: string, note: string) => void;
 }
 
@@ -76,7 +74,7 @@ export function PhaseView({
   onBack, onUpdatePhase, onUpdateActivity,
   onAddCheckpoint, onDeleteCheckpoint,
   onAddDeliverable, onDeleteDeliverable,
-  onAddTask, onUpdateTask, onDeleteTask,
+  onAddCustomActivity, onDeleteCustomActivity,
   onLogAlignment,
 }: Props) {
   const [showDeliverableForm, setShowDeliverableForm] = useState(false);
@@ -90,11 +88,8 @@ export function PhaseView({
   );
   const phaseColor = PHASE_COLORS[phase.code];
   const phaseDefs = ACTIVITY_DEFS.filter(d => d.phaseCode === phase.code);
-  const validatedActivities = phase.activities.filter(a => a.status === 'validated').length;
-  const validatedTasks = phase.tasks.filter(t => !!t.validatedAt).length;
-  const totalTasks = phase.tasks.length;
-  const validatedCount = validatedActivities + validatedTasks;
-  const totalValidatable = phaseDefs.length + totalTasks;
+  const validatedCount = phase.activities.filter(a => a.status === 'validated').length;
+  const totalValidatable = phaseDefs.length + (phase.customActivities?.length ?? 0);
   const allValidated = totalValidatable > 0 && validatedCount === totalValidatable;
 
   useEffect(() => { setNotesValue(phase.notes); }, [phase.id]);
@@ -181,11 +176,11 @@ export function PhaseView({
 
         {/* ── Left: Activities ─────────────────────────────────────────── */}
         <div className="phase-main">
-          {!isUtility && phaseDefs.length > 0 && (
+          {!isUtility && (
             <div className="activity-list">
               {phaseDefs.map(def => {
                 const state = phase.activities.find(a => a.defId === def.id)
-                  ?? { defId: def.id, status: 'empty' as ActivityStatus, content: '' };
+                  ?? { defId: def.id, status: 'empty' as ActivityStatus, content: '', informed: [] };
                 const prompt = prompts.find(p => p.id === def.promptId);
                 return (
                   <ActivityCard
@@ -197,19 +192,23 @@ export function PhaseView({
                   />
                 );
               })}
+              {(phase.customActivities ?? []).map(ca => {
+                const state = phase.activities.find(a => a.defId === ca.id)
+                  ?? { defId: ca.id, status: 'empty' as ActivityStatus, content: '', informed: [] };
+                return (
+                  <ActivityCard
+                    key={ca.id}
+                    def={{ id: ca.id, phaseCode: phase.code, code: '', title: ca.title, description: ca.description }}
+                    state={state}
+                    prompt={undefined}
+                    onUpdate={(changes) => onUpdateActivity(ca.id, changes)}
+                    onDelete={() => { if (confirm('Remove this activity?')) onDeleteCustomActivity(ca.id); }}
+                  />
+                );
+              })}
+              <AddActivityForm onAdd={onAddCustomActivity} />
             </div>
           )}
-
-          {/* Custom tasks */}
-          <TasksSection
-            tasks={phase.tasks}
-            onAdd={onAddTask}
-            onUpdate={onUpdateTask}
-            onDelete={onDeleteTask}
-            onMarkPhaseComplete={allValidated && phase.status !== 'completed'
-              ? () => handleStatusChange('completed')
-              : undefined}
-          />
 
           {/* Utility: prompt library + checkpoints */}
           {isUtility && (
@@ -294,170 +293,150 @@ export function PhaseView({
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  TASKS SECTION
-// ═══════════════════════════════════════════════════════════════════════════
+const ENGAGEMENT_TEAMS: { key: string; label: string }[] = [
+  { key: 'stakeholder', label: 'Stakeholders' },
+  { key: 'delivery',    label: 'Delivery team' },
+  { key: 'pm',          label: 'PM team' },
+  { key: 'other',       label: 'Other' },
+];
 
-function TasksSection({ tasks, onAdd, onUpdate, onDelete, onMarkPhaseComplete }: {
-  tasks: Task[];
-  onAdd: (data: Omit<Task, 'id' | 'createdAt'>) => void;
-  onUpdate: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
-  onDelete: (taskId: string) => void;
-  onMarkPhaseComplete?: () => void;
-}) {
-  const [showForm, setShowForm] = useState(false);
+// ── Add custom activity form ──────────────────────────────────────────────────
+
+function AddActivityForm({ onAdd }: { onAdd: (data: Omit<CustomActivity, 'id' | 'createdAt'>) => void }) {
+  const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState({ title: '', description: '' });
-
-  const allValidated = tasks.length > 0 && tasks.every(t => !!t.validatedAt);
-  const validatedCount = tasks.filter(t => !!t.validatedAt).length;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.title.trim()) return;
-    onAdd({ title: draft.title.trim(), description: draft.description.trim() || undefined, informed: [] });
+    onAdd({ title: draft.title.trim(), description: draft.description.trim() });
     setDraft({ title: '', description: '' });
-    setShowForm(false);
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <button className="add-activity-btn" onClick={() => setOpen(true)}>
+        + Add activity
+      </button>
+    );
   }
 
   return (
-    <div className="tasks-section">
-      <div className="tasks-header">
-        <h3 className="section-title">Tasks</h3>
-        <button onClick={() => setShowForm(v => !v)}>
-          {showForm ? 'Cancel' : '+ Add task'}
-        </button>
+    <form className="add-activity-form" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Activity name"
+        value={draft.title}
+        onChange={e => setDraft(d => ({ ...d, title: e.target.value }))}
+        autoFocus
+      />
+      <input
+        type="text"
+        placeholder="Short description (optional)"
+        value={draft.description}
+        onChange={e => setDraft(d => ({ ...d, description: e.target.value }))}
+      />
+      <div className="form-actions">
+        <button type="button" onClick={() => { setOpen(false); setDraft({ title: '', description: '' }); }}>Cancel</button>
+        <button type="submit" className="btn-primary" disabled={!draft.title.trim()}>Add</button>
       </div>
+    </form>
+  );
+}
 
-      {/* Validation banner */}
-      {allValidated && (
-        <div className="tasks-validated-banner">
-          <span>✓ All {tasks.length} task{tasks.length !== 1 ? 's' : ''} validated</span>
-          {onMarkPhaseComplete && (
-            <button className="btn-primary" onClick={onMarkPhaseComplete}>
-              Mark phase complete
-            </button>
-          )}
-        </div>
-      )}
-      {!allValidated && tasks.length > 0 && (
-        <div className="tasks-progress-bar">
-          <div
-            className="tasks-progress-fill"
-            style={{ width: `${(validatedCount / tasks.length) * 100}%` }}
-          />
-        </div>
-      )}
+// ── Engagement components ─────────────────────────────────────────────────────
 
-      {/* Add form */}
-      {showForm && (
-        <form className="task-add-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Task title"
-            value={draft.title}
-            onChange={e => setDraft(d => ({ ...d, title: e.target.value }))}
-            autoFocus
-          />
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={draft.description}
-            onChange={e => setDraft(d => ({ ...d, description: e.target.value }))}
-          />
-          <div className="form-actions">
-            <button type="button" onClick={() => { setShowForm(false); setDraft({ title: '', description: '' }); }}>Cancel</button>
-            <button type="submit" className="btn-primary" disabled={!draft.title.trim()}>Add task</button>
-          </div>
-        </form>
-      )}
-
-      {/* Task list */}
-      {tasks.length === 0 && !showForm && (
-        <div className="empty-state-inline">No tasks yet. Add tasks to track work for this phase.</div>
-      )}
-      <div className="task-list">
-        {tasks.map(task => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onValidate={() => onUpdate(task.id, {
-              validatedAt: task.validatedAt ? undefined : new Date().toISOString(),
-            })}
-            onUpdateInformed={(informed) => onUpdate(task.id, { informed })}
-            onDelete={() => { if (confirm('Delete this task?')) onDelete(task.id); }}
-          />
-        ))}
+function EngagementRow({ entries, onEngage, onDisengage, onSetDate }: {
+  entries: EngagementEntry[];
+  onEngage: (key: string) => void;
+  onDisengage: (key: string) => void;
+  onSetDate: (key: string, date: string | undefined) => void;
+}) {
+  return (
+    <div className="engagement-row">
+      <span className="engagement-label">Engaged with</span>
+      <div className="engagement-chips">
+        {ENGAGEMENT_TEAMS.map(team => {
+          const entry = entries.find(e => e.key === team.key);
+          return (
+            <EngagementChip
+              key={team.key}
+              teamKey={team.key}
+              label={team.label}
+              entry={entry}
+              onEngage={() => onEngage(team.key)}
+              onDisengage={() => onDisengage(team.key)}
+              onSetDate={(d) => onSetDate(team.key, d)}
+            />
+          );
+        })}
       </div>
     </div>
   );
 }
 
-const LOOP_IN_TEAMS: { key: string; label: string; abbr: string }[] = [
-  { key: 'stakeholder', label: 'Stakeholders',   abbr: 'SH' },
-  { key: 'delivery',    label: 'Delivery team',  abbr: 'DT' },
-  { key: 'pm',          label: 'PM team',        abbr: 'PM' },
-  { key: 'other',       label: 'Other',          abbr: '···' },
-];
-
-function TaskCard({ task, onValidate, onUpdateInformed, onDelete }: {
-  task: Task;
-  onValidate: () => void;
-  onUpdateInformed: (informed: string[]) => void;
-  onDelete: () => void;
+function EngagementChip({ teamKey, label, entry, onEngage, onDisengage, onSetDate }: {
+  teamKey: string;
+  label: string;
+  entry: EngagementEntry | undefined;
+  onEngage: () => void;
+  onDisengage: () => void;
+  onSetDate: (date: string | undefined) => void;
 }) {
-  const validated = !!task.validatedAt;
-  const [pulsing, setPulsing] = useState<string | null>(null);
+  const [editingDate, setEditingDate] = useState(false);
+  const active = !!entry;
 
-  function toggleTeam(key: string) {
-    const current = task.informed ?? [];
-    const next = current.includes(key) ? current.filter(k => k !== key) : [...current, key];
-    if (!current.includes(key)) {
-      setPulsing(key);
-      setTimeout(() => setPulsing(null), 500);
-    }
-    onUpdateInformed(next);
+  // Format ISO → YYYY-MM-DD for <input type="date">
+  function toDateValue(iso?: string) {
+    if (!iso) return '';
+    return iso.slice(0, 10);
+  }
+
+  if (!active) {
+    return (
+      <button
+        type="button"
+        className={`engagement-chip engagement-chip-${teamKey}`}
+        onClick={onEngage}
+        title={`Mark ${label} as engaged`}
+      >
+        {label}
+      </button>
+    );
   }
 
   return (
-    <div className={`task-card ${validated ? 'task-card-validated' : ''}`}>
+    <div className={`engagement-chip engagement-chip-${teamKey} engagement-chip-active`}>
+      <span className="engagement-chip-name">✓ {label}</span>
+      {editingDate ? (
+        <input
+          type="date"
+          className="engagement-date-input"
+          value={toDateValue(entry.engagedAt)}
+          onChange={e => {
+            onSetDate(e.target.value ? new Date(e.target.value + 'T12:00:00').toISOString() : undefined);
+            setEditingDate(false);
+          }}
+          onBlur={() => setEditingDate(false)}
+          autoFocus
+        />
+      ) : (
+        <button
+          type="button"
+          className="engagement-chip-date"
+          onClick={() => setEditingDate(true)}
+          title="Edit date"
+        >
+          {entry.engagedAt ? formatDateShort(entry.engagedAt) : '+ date'}
+        </button>
+      )}
       <button
-        className={`task-validate-btn ${validated ? 'task-validate-btn-done' : ''}`}
-        onClick={onValidate}
-        title={validated ? 'Mark as not validated' : 'Mark as validated'}
-        aria-label={validated ? 'Validated' : 'Mark validated'}
-      >
-        {validated ? '✓' : ''}
-      </button>
-      <div className="task-card-body">
-        <span className={`task-title ${validated ? 'task-title-validated' : ''}`}>{task.title}</span>
-        {task.description && <span className="task-description">{task.description}</span>}
-        {validated && task.validatedAt && (
-          <span className="task-validated-at">Validated {formatDateShort(task.validatedAt)}</span>
-        )}
-        <div className="loop-in-row">
-          <span className="loop-in-label">Looped in</span>
-          {LOOP_IN_TEAMS.map(team => {
-            const active = (task.informed ?? []).includes(team.key);
-            return (
-              <button
-                key={team.key}
-                type="button"
-                className={`loop-in-chip loop-in-chip-${team.key} ${active ? 'loop-in-chip-active' : ''} ${pulsing === team.key ? 'loop-in-chip-pulse' : ''}`}
-                onClick={() => toggleTeam(team.key)}
-                title={active ? `${team.label} informed ✓` : `Mark ${team.label} as informed`}
-              >
-                {team.abbr}
-                {active && <span className="loop-in-dot" />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <button className="task-delete-btn" onClick={onDelete} title="Delete task">
-        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="2,4 12,4"/><path d="M5 4V2h4v2"/><path d="M3 4l1 8h6l1-8"/>
-        </svg>
-      </button>
+        type="button"
+        className="engagement-chip-remove"
+        onClick={onDisengage}
+        title={`Remove ${label}`}
+      >×</button>
     </div>
   );
 }
@@ -517,12 +496,32 @@ function PhaseAlignmentCard({ suggestion, onLog }: {
 //  ACTIVITY CARD
 // ═══════════════════════════════════════════════════════════════════════════
 
-function ActivityCard({ def, state, prompt, onUpdate }: {
-  def: ActivityDef;
+type ActivityDefLike = { id: string; phaseCode: string; code: string; title: string; description: string; promptId?: string };
+
+function ActivityCard({ def, state, prompt, onUpdate, onDelete }: {
+  def: ActivityDefLike;
   state: ActivityState;
   prompt: Prompt | undefined;
   onUpdate: (changes: Partial<Omit<ActivityState, 'defId'>>) => void;
+  onDelete?: () => void;
 }) {
+  function engage(key: string) {
+    const current = state.informed ?? [];
+    if (current.some(e => e.key === key)) return;
+    onUpdate({ informed: [...current, { key, engagedAt: new Date().toISOString() }] });
+  }
+
+  function disengage(key: string) {
+    onUpdate({ informed: (state.informed ?? []).filter(e => e.key !== key) });
+  }
+
+  function setEngagementDate(key: string, date: string | undefined) {
+    onUpdate({
+      informed: (state.informed ?? []).map(e =>
+        e.key === key ? { ...e, engagedAt: date } : e
+      ),
+    });
+  }
   const [isExpanded, setIsExpanded] = useState(state.status === 'empty' || state.status === 'in-progress');
   const [activeTab, setActiveTab] = useState<'write' | 'generate'>('write');
   const [draft, setDraft] = useState(state.content);
@@ -633,9 +632,16 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
             <button className="activity-edit-btn" onClick={startEdit}>Edit</button>
           )}
           {state.status === 'empty' && !isEditing && (
-            <button className="btn-primary" style={{ fontSize: 12, padding: '4px 12px' }}
+            <button className="btn-primary" style={{ fontSize: 12, padding: '6px 16px', fontWeight: 600 }}
               onClick={() => { setIsEditing(true); setIsExpanded(true); }}>
               Get started
+            </button>
+          )}
+          {onDelete && (
+            <button className="activity-delete-btn" onClick={onDelete} title="Remove activity">
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="2,4 12,4"/><path d="M5 4V2h4v2"/><path d="M3 4l1 8h6l1-8"/>
+              </svg>
             </button>
           )}
           <span className="activity-chevron">{isExpanded ? '▲' : '▼'}</span>
@@ -813,6 +819,16 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
                 <button onClick={() => { setActiveTab('generate'); setIsEditing(true); }}>◈ Generate with AI</button>
               </div>
             </div>
+          )}
+
+          {/* ── Engaged with ── */}
+          {!isEditing && (
+            <EngagementRow
+              entries={state.informed ?? []}
+              onEngage={engage}
+              onDisengage={disengage}
+              onSetDate={setEngagementDate}
+            />
           )}
 
           {/* ── Human validation ── */}

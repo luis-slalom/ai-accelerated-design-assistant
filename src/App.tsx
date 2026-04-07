@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, TeamMember, AlignmentEvent, Task } from './types';
+import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, AlignmentEvent, CustomActivity } from './types';
 import { loadPrompts, generateId } from './storage';
 import * as api from './api';
 import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
@@ -27,10 +27,10 @@ function buildNewProject(name: string, client: string, description: string, tags
       status: 'not-started' as PhaseStatus,
       deliverables: [],
       checkpoints: [],
-      tasks: [],
+      customActivities: [],
       activities: ACTIVITY_DEFS
         .filter(d => d.phaseCode === t.code)
-        .map(d => ({ defId: d.id, status: 'empty' as const, content: '' })),
+        .map(d => ({ defId: d.id, status: 'empty' as const, content: '', informed: [] })),
       notes: '',
     })),
   };
@@ -84,21 +84,6 @@ export default function App() {
     setView('dashboard');
     setActiveProjectId(null);
     setActivePhaseId(null);
-  }
-
-  // ── Team ──────────────────────────────────────────────────────────────────
-
-  function addTeamMember(projectId: string, member: Omit<TeamMember, 'id'>) {
-    const newMember: TeamMember = { ...member, id: generateId() };
-    update(projects.map(p => p.id !== projectId ? p : {
-      ...p, team: [...p.team, newMember], updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function removeTeamMember(projectId: string, memberId: string) {
-    update(projects.map(p => p.id !== projectId ? p : {
-      ...p, team: p.team.filter(m => m.id !== memberId), updatedAt: new Date().toISOString(),
-    }));
   }
 
   function logAlignment(projectId: string, ruleId: string, note: string) {
@@ -203,21 +188,10 @@ export default function App() {
     }));
   }
 
-  // ── Tasks ─────────────────────────────────────────────────────────────────
+  // ── Custom Activities ─────────────────────────────────────────────────────
 
-  function addTask(projectId: string, phaseId: string, data: Omit<Task, 'id' | 'createdAt'>) {
-    const task: Task = { ...data, id: generateId(), createdAt: new Date().toISOString() };
-    update(projects.map(p => {
-      if (p.id !== projectId) return p;
-      return {
-        ...p,
-        updatedAt: new Date().toISOString(),
-        phases: p.phases.map(ph => ph.id !== phaseId ? ph : { ...ph, tasks: [...ph.tasks, task] }),
-      };
-    }));
-  }
-
-  function updateTask(projectId: string, phaseId: string, taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) {
+  function addCustomActivity(projectId: string, phaseId: string, data: Omit<CustomActivity, 'id' | 'createdAt'>) {
+    const ca: CustomActivity = { ...data, id: generateId(), createdAt: new Date().toISOString() };
     update(projects.map(p => {
       if (p.id !== projectId) return p;
       return {
@@ -225,13 +199,14 @@ export default function App() {
         updatedAt: new Date().toISOString(),
         phases: p.phases.map(ph => ph.id !== phaseId ? ph : {
           ...ph,
-          tasks: ph.tasks.map(t => t.id === taskId ? { ...t, ...changes } : t),
+          customActivities: [...ph.customActivities, ca],
+          activities: [...ph.activities, { defId: ca.id, status: 'empty' as const, content: '', informed: [] }],
         }),
       };
     }));
   }
 
-  function deleteTask(projectId: string, phaseId: string, taskId: string) {
+  function deleteCustomActivity(projectId: string, phaseId: string, caId: string) {
     update(projects.map(p => {
       if (p.id !== projectId) return p;
       return {
@@ -239,7 +214,8 @@ export default function App() {
         updatedAt: new Date().toISOString(),
         phases: p.phases.map(ph => ph.id !== phaseId ? ph : {
           ...ph,
-          tasks: ph.tasks.filter(t => t.id !== taskId),
+          customActivities: ph.customActivities.filter(ca => ca.id !== caId),
+          activities: ph.activities.filter(a => a.defId !== caId),
         }),
       };
     }));
@@ -296,8 +272,6 @@ export default function App() {
           onEditProject={(changes) => editProject(activeProject.id, changes)}
           onDeleteProject={() => deleteProject(activeProject.id)}
           onUpdatePhase={(phaseId, changes) => updatePhase(activeProject.id, phaseId, changes)}
-          onAddTeamMember={(m) => addTeamMember(activeProject.id, m)}
-          onRemoveTeamMember={(id) => removeTeamMember(activeProject.id, id)}
           onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
         />
       )}
@@ -313,9 +287,8 @@ export default function App() {
           onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
           onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
           onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}
-          onAddTask={(data) => addTask(activeProject.id, activePhase.id, data)}
-          onUpdateTask={(taskId, changes) => updateTask(activeProject.id, activePhase.id, taskId, changes)}
-          onDeleteTask={(taskId) => deleteTask(activeProject.id, activePhase.id, taskId)}
+          onAddCustomActivity={(data) => addCustomActivity(activeProject.id, activePhase.id, data)}
+          onDeleteCustomActivity={(caId) => deleteCustomActivity(activeProject.id, activePhase.id, caId)}
           onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
         />
       )}

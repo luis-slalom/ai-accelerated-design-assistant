@@ -1,4 +1,4 @@
-import type { Project, ActivityStatus, ActivityState } from './types';
+import type { Project, ActivityStatus, ActivityState, CustomActivity, EngagementEntry } from './types';
 import { ACTIVITY_DEFS } from './data';
 
 const PROMPTS_KEY = 'design-tracker-prompts';
@@ -9,7 +9,13 @@ function migratePhaseActivities(ph: any): ActivityState[] {
   const existing: ActivityState[] = ph.activities ?? [];
   return currentDefs.map(d => {
     const found = existing.find((a: ActivityState) => a.defId === d.id);
-    return found ?? { defId: d.id, status: 'empty' as ActivityStatus, content: '' };
+    if (!found) return { defId: d.id, status: 'empty' as ActivityStatus, content: '', informed: [] };
+    // Migrate old string[] informed → EngagementEntry[]
+    const raw = found.informed ?? [];
+    const informed: EngagementEntry[] = raw.map((e: any) =>
+      typeof e === 'string' ? { key: e } : e
+    );
+    return { ...found, informed };
   });
 }
 
@@ -23,7 +29,7 @@ export function migrateProject(p: any): Project {
       activities: migratePhaseActivities(ph),
       checkpoints: ph.checkpoints ?? [],
       deliverables: ph.deliverables ?? [],
-      tasks: (ph.tasks ?? []).map((t: any) => ({ ...t, informed: t.informed ?? [] })),
+      customActivities: (ph.customActivities ?? []) as CustomActivity[],
       notes: ph.notes ?? '',
     })),
   };

@@ -38,6 +38,11 @@ export interface Checkpoint {
   tags: string[];
 }
 
+export interface EngagementEntry {
+  key: string;        // one of the ENGAGEMENT_TEAMS keys
+  engagedAt?: string; // ISO date string, optional
+}
+
 export interface ActivityState {
   defId: string;
   status: ActivityStatus;
@@ -45,15 +50,14 @@ export interface ActivityState {
   source?: 'manual' | 'generated';
   validatedAt?: string;
   updatedAt?: string;
+  informed?: EngagementEntry[];
 }
 
-export interface Task {
+export interface CustomActivity {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   createdAt: string;
-  validatedAt?: string;
-  informed: string[]; // keys from LOOP_IN_TEAMS
 }
 
 export interface Phase {
@@ -67,7 +71,7 @@ export interface Phase {
   deliverables: Deliverable[];
   checkpoints: Checkpoint[];
   activities: ActivityState[];
-  tasks: Task[];
+  customActivities: CustomActivity[];
   notes: string;
 }
 
