@@ -1,4 +1,18 @@
 export type ProjectStatus = 'active' | 'on-hold' | 'completed';
+export type TeamMemberRole = 'designer' | 'engineer' | 'pm' | 'researcher' | 'business' | 'stakeholder';
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: TeamMemberRole;
+}
+
+export interface AlignmentEvent {
+  id: string;
+  ruleId: string;
+  note: string;
+  alignedAt: string;
+}
 export type PhaseStatus = 'not-started' | 'in-progress' | 'completed' | 'skipped';
 export type DeliverableType = 'figma' | 'doc' | 'slides' | 'notion' | 'video' | 'link' | 'other';
 export type ActivityStatus = 'empty' | 'in-progress' | 'validated';
@@ -55,6 +69,8 @@ export interface Project {
   updatedAt: string;
   phases: Phase[];
   tags: string[];
+  team: TeamMember[];
+  alignmentLog: AlignmentEvent[];
 }
 
 export interface Prompt {

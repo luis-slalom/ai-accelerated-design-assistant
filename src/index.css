@@ -1964,3 +1964,230 @@ button:active { background: #e9e9e9; }
   color: var(--color-active-text);
   font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEAM & ALIGNMENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Role chips ─────────────────────────────────────────────────────────── */
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.role-chip-designer   { background: #1e3a5f; color: #93c5fd; }
+.role-chip-engineer   { background: #2d1b69; color: #c4b5fd; }
+.role-chip-pm         { background: #3b1f5e; color: #e879f9; }
+.role-chip-researcher { background: #134e4a; color: #5eead4; }
+.role-chip-business   { background: #1a3a2a; color: #6ee7b7; }
+.role-chip-stakeholder{ background: #431407; color: #fb923c; }
+
+.role-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.role-dot-designer    { background: #93c5fd; }
+.role-dot-engineer    { background: #c4b5fd; }
+.role-dot-pm          { background: #e879f9; }
+.role-dot-researcher  { background: #5eead4; }
+.role-dot-business    { background: #6ee7b7; }
+.role-dot-stakeholder { background: #fb923c; }
+
+/* ── Alignment panel (ProjectView) ──────────────────────────────────────── */
+.alignment-panel {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.alignment-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.alignment-required-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+.alignment-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alignment-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+.alignment-card-required {
+  background: rgba(251, 146, 60, 0.06);
+  border-left-color: #fb923c;
+}
+.alignment-card-optional {
+  background: var(--color-bg);
+  border-left-color: var(--color-border);
+}
+.alignment-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 4px;
+}
+.alignment-card-required .alignment-card-label { color: #fb923c; }
+.alignment-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.alignment-card-message {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+.alignment-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.alignment-confirm-form {
+  margin-top: 8px;
+}
+.alignment-note-input {
+  width: 100%;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+.alignment-mark-btn {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.alignment-mark-btn:hover { color: var(--color-text); }
+
+/* Stat item alert (alignment needed) */
+.stat-item-alert .stat-value { color: #fb923c; }
+.stat-item-alert .stat-label { color: #fb923c; }
+
+/* ── Alignment sidebar (PhaseView) ──────────────────────────────────────── */
+.alignment-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.alignment-sidebar-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-border);
+  background: var(--color-bg);
+}
+.alignment-sidebar-card-required {
+  border-left-color: #fb923c;
+  background: rgba(251, 146, 60, 0.05);
+}
+.alignment-sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: 3px;
+}
+.alignment-sidebar-card-required .alignment-sidebar-label { color: #fb923c; }
+.alignment-sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.alignment-sidebar-message {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Team panel (ProjectView) ───────────────────────────────────────────── */
+.team-panel {
+  margin-top: 28px;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.team-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.team-add-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.team-add-form input {
+  flex: 1;
+  min-width: 120px;
+}
+.team-empty {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.5;
+}
+.team-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.team-member-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.team-member-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  flex: 1;
+}
+.team-member-remove {
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.team-member-remove:hover { color: var(--color-danger, #f87171); }

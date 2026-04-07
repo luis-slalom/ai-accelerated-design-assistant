@@ -5,6 +5,7 @@ import { PHASE_COLORS, ACTIVITY_DEFS, PHASE_DELIVERABLE_HINTS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
 import { RichTextEditor } from '../components/RichTextEditor';
 import { RichTextView } from '../components/RichTextView';
+import { computeSuggestions, ROLE_LABELS } from '../alignment';
 
 const PHASE_STATUS_OPTIONS: { value: PhaseStatus; label: string }[] = [
   { value: 'not-started', label: '○ Not started' },
@@ -43,6 +44,7 @@ interface Props {
   onDeleteCheckpoint: (id: string) => void;
   onAddDeliverable: (data: Omit<Deliverable, 'id' | 'addedAt'>) => void;
   onDeleteDeliverable: (id: string) => void;
+  onLogAlignment: (ruleId: string, note: string) => void;
 }
 
 export function PhaseView({
@@ -50,6 +52,7 @@ export function PhaseView({
   onBack, onUpdatePhase, onUpdateActivity,
   onAddCheckpoint, onDeleteCheckpoint,
   onAddDeliverable, onDeleteDeliverable,
+  onLogAlignment,
 }: Props) {
   const [showDeliverableForm, setShowDeliverableForm] = useState(false);
   const [deliverableDraft, setDeliverableDraft] = useState<DeliverableDraft>(EMPTY_DELIVERABLE);
@@ -57,6 +60,9 @@ export function PhaseView({
   const notesTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isUtility = phase.code === 'U';
+  const phaseSuggestions = computeSuggestions(project).filter(
+    s => !s.phaseContext || s.phaseContext === phase.code
+  );
   const phaseColor = PHASE_COLORS[phase.code];
   const phaseDefs = ACTIVITY_DEFS.filter(d => d.phaseCode === phase.code);
   const validatedCount = phase.activities.filter(a => a.status === 'validated').length;
@@ -252,8 +258,71 @@ export function PhaseView({
             />
             <p className="notes-hint">Auto-saved</p>
           </div>
+
+          {/* Alignment suggestions for this phase */}
+          {phaseSuggestions.length > 0 && (
+            <div className="sidebar-section">
+              <h3 className="section-title">Alignment</h3>
+              <div className="alignment-sidebar-list">
+                {phaseSuggestions.map(s => (
+                  <PhaseAlignmentCard key={s.ruleId} suggestion={s} onLog={onLogAlignment} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Alignment card (sidebar variant) ─────────────────────────────────────────
+
+function PhaseAlignmentCard({ suggestion, onLog }: {
+  suggestion: import('../alignment').AlignmentSuggestion;
+  onLog: (ruleId: string, note: string) => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [note, setNote] = useState('');
+
+  return (
+    <div className={`alignment-sidebar-card ${suggestion.isNonNegotiable ? 'alignment-sidebar-card-required' : ''}`}>
+      <div className="alignment-sidebar-label">
+        {suggestion.isNonNegotiable ? '⚠ Required' : '↗ Consider'}
+      </div>
+      <div className="alignment-sidebar-title">{suggestion.title}</div>
+      <p className="alignment-sidebar-message">{suggestion.message}</p>
+      {suggestion.involvedMembers.length > 0 && (
+        <div className="alignment-members" style={{ marginTop: 6 }}>
+          {suggestion.involvedMembers.map(m => (
+            <span key={m.id} className={`role-chip role-chip-${m.role}`}>{m.name} · {ROLE_LABELS[m.role]}</span>
+          ))}
+        </div>
+      )}
+      {confirming ? (
+        <div className="alignment-confirm-form">
+          <input
+            type="text"
+            className="alignment-note-input"
+            placeholder="What was agreed? (optional)"
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            autoFocus
+          />
+          <div className="form-actions" style={{ marginTop: 6 }}>
+            <button type="button" onClick={() => { setConfirming(false); setNote(''); }}>Cancel</button>
+            <button type="button" className="btn-primary" onClick={() => {
+              onLog(suggestion.ruleId, note.trim());
+              setConfirming(false);
+              setNote('');
+            }}>Confirm</button>
+          </div>
+        </div>
+      ) : (
+        <button className="alignment-mark-btn" style={{ marginTop: 8 }} onClick={() => setConfirming(true)}>
+          Mark as aligned →
+        </button>
+      )}
     </div>
   );
 }

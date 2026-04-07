@@ -16,6 +16,8 @@ function migratePhaseActivities(ph: any): ActivityState[] {
 export function migrateProject(p: any): Project {
   return {
     ...p,
+    team: p.team ?? [],
+    alignmentLog: p.alignmentLog ?? [],
     phases: (p.phases || []).map((ph: any) => ({
       ...ph,
       activities: migratePhaseActivities(ph),

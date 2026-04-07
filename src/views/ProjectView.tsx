@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import type { Project, Phase, PhaseStatus, ProjectStatus } from '../types';
+import type { Project, Phase, PhaseStatus, ProjectStatus, TeamMember, TeamMemberRole } from '../types';
 import { PHASE_COLORS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
+import { computeSuggestions, ROLE_LABELS, TEAM_ROLES, type AlignmentSuggestion } from '../alignment';
 
 const STATUS_LABELS: Record<ProjectStatus, string> = { active: 'Active', 'on-hold': 'On Hold', completed: 'Completed' };
 const PHASE_STATUS_LABELS: Record<PhaseStatus, string> = {
@@ -18,9 +19,15 @@ interface Props {
   onEditProject: (changes: Partial<Pick<Project, 'name' | 'client' | 'description' | 'status' | 'tags'>>) => void;
   onDeleteProject: () => void;
   onUpdatePhase: (phaseId: string, changes: Partial<Phase>) => void;
+  onAddTeamMember: (member: Omit<TeamMember, 'id'>) => void;
+  onRemoveTeamMember: (memberId: string) => void;
+  onLogAlignment: (ruleId: string, note: string) => void;
 }
 
-export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDeleteProject, onUpdatePhase }: Props) {
+export function ProjectView({
+  project, onBack, onOpenPhase, onEditProject, onDeleteProject,
+  onUpdatePhase, onAddTeamMember, onRemoveTeamMember, onLogAlignment,
+}: Props) {
   const [showEdit, setShowEdit] = useState(false);
   const [editDraft, setEditDraft] = useState({
     name: project.name,
@@ -34,6 +41,9 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
   const totalValidated = project.phases.reduce((n, p) => n + p.activities.filter(a => a.status === 'validated').length, 0);
   const totalActivities = project.phases.reduce((n, p) => n + p.activities.length, 0);
   const totalDeliverables = project.phases.reduce((n, p) => n + p.deliverables.length, 0);
+
+  const suggestions = computeSuggestions(project);
+  const nonNegotiableCount = suggestions.filter(s => s.isNonNegotiable).length;
 
   function handleEditSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,11 +67,10 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
       `**Last updated:** ${formatDate(project.updatedAt)}`,
       ``,
     ];
-    if (project.description) {
-      lines.push(project.description, ``);
-    }
-    if (project.tags.length) {
-      lines.push(`**Tags:** ${project.tags.map(t => `#${t}`).join(' ')}`, ``);
+    if (project.description) lines.push(project.description, ``);
+    if (project.tags.length) lines.push(`**Tags:** ${project.tags.map(t => `#${t}`).join(' ')}`, ``);
+    if (project.team.length) {
+      lines.push(`**Team:** ${project.team.map(m => `${m.name} (${ROLE_LABELS[m.role]})`).join(', ')}`, ``);
     }
     lines.push(`---`, ``, `## Project summary`, ``);
     lines.push(`- ${completedCount}/${project.phases.length} phases completed`);
@@ -97,6 +106,13 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
 
       if (phase.notes) {
         lines.push(`### Phase notes`, ``, phase.notes.replace(/<[^>]*>/g, '').trim(), ``);
+      }
+    }
+
+    if (project.alignmentLog.length > 0) {
+      lines.push(`---`, ``, `## Alignment log`, ``);
+      for (const e of project.alignmentLog) {
+        lines.push(`- **${e.ruleId}** — ${formatDate(e.alignedAt)}${e.note ? `: ${e.note}` : ''}`);
       }
     }
 
@@ -170,24 +186,17 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
               )}
             </div>
             <div className="project-header-actions">
-              <button onClick={exportMarkdown} title="Export full project context as Markdown">
-                Export context
-              </button>
+              <button onClick={exportMarkdown} title="Export full project context as Markdown">Export context</button>
               <button onClick={() => {
                 setEditDraft({ name: project.name, client: project.client, description: project.description, status: project.status, tags: project.tags.join(', ') });
                 setShowEdit(true);
-              }}>
-                Edit
-              </button>
+              }}>Edit</button>
               <button className="btn-danger-outline" onClick={() => {
                 if (confirm(`Delete "${project.name}"? This cannot be undone.`)) onDeleteProject();
-              }}>
-                Delete
-              </button>
+              }}>Delete</button>
             </div>
           </div>
 
-          {/* Project stats */}
           <div className="project-stats">
             <div className="stat-item">
               <span className="stat-value">{completedCount}/{project.phases.length}</span>
@@ -208,8 +217,22 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
               <span className="stat-value">{formatDateShort(project.updatedAt)}</span>
               <span className="stat-label">last activity</span>
             </div>
+            {nonNegotiableCount > 0 && (
+              <>
+                <div className="stat-divider" />
+                <div className="stat-item stat-item-alert">
+                  <span className="stat-value">{nonNegotiableCount}</span>
+                  <span className="stat-label">alignment{nonNegotiableCount !== 1 ? 's' : ''} needed</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
+      )}
+
+      {/* Alignment suggestions */}
+      {suggestions.length > 0 && (
+        <AlignmentPanel suggestions={suggestions} onLog={onLogAlignment} />
       )}
 
       {/* Phase timeline */}
@@ -230,9 +253,161 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
           ))}
         </div>
       </div>
+
+      {/* Team */}
+      <TeamPanel
+        team={project.team}
+        onAdd={onAddTeamMember}
+        onRemove={onRemoveTeamMember}
+      />
     </div>
   );
 }
+
+// ── Alignment panel ───────────────────────────────────────────────────────────
+
+function AlignmentPanel({ suggestions, onLog }: {
+  suggestions: AlignmentSuggestion[];
+  onLog: (ruleId: string, note: string) => void;
+}) {
+  const required = suggestions.filter(s => s.isNonNegotiable);
+  const optional = suggestions.filter(s => !s.isNonNegotiable);
+
+  return (
+    <div className="alignment-panel">
+      <div className="alignment-panel-header">
+        <h3 className="section-title">Alignment</h3>
+        {required.length > 0 && (
+          <span className="alignment-required-badge">{required.length} required</span>
+        )}
+      </div>
+      <div className="alignment-card-list">
+        {required.map(s => <AlignmentCard key={s.ruleId} suggestion={s} onLog={onLog} />)}
+        {optional.map(s => <AlignmentCard key={s.ruleId} suggestion={s} onLog={onLog} />)}
+      </div>
+    </div>
+  );
+}
+
+function AlignmentCard({ suggestion, onLog }: {
+  suggestion: AlignmentSuggestion;
+  onLog: (ruleId: string, note: string) => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [note, setNote] = useState('');
+
+  return (
+    <div className={`alignment-card ${suggestion.isNonNegotiable ? 'alignment-card-required' : 'alignment-card-optional'}`}>
+      <div className="alignment-card-label">
+        {suggestion.isNonNegotiable ? '⚠ Required' : '↗ Consider'}
+      </div>
+      <div className="alignment-card-title">{suggestion.title}</div>
+      <p className="alignment-card-message">{suggestion.message}</p>
+      {suggestion.involvedMembers.length > 0 && (
+        <div className="alignment-members">
+          {suggestion.involvedMembers.map(m => (
+            <span key={m.id} className={`role-chip role-chip-${m.role}`}>
+              {m.name} · {ROLE_LABELS[m.role]}
+            </span>
+          ))}
+        </div>
+      )}
+      {confirming ? (
+        <div className="alignment-confirm-form">
+          <input
+            type="text"
+            className="alignment-note-input"
+            placeholder="What was agreed? (optional)"
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            autoFocus
+          />
+          <div className="form-actions">
+            <button type="button" onClick={() => { setConfirming(false); setNote(''); }}>Cancel</button>
+            <button type="button" className="btn-primary" onClick={() => {
+              onLog(suggestion.ruleId, note.trim());
+              setConfirming(false);
+              setNote('');
+            }}>
+              Confirm alignment
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="alignment-mark-btn" onClick={() => setConfirming(true)}>
+          Mark as aligned →
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Team panel ────────────────────────────────────────────────────────────────
+
+function TeamPanel({ team, onAdd, onRemove }: {
+  team: TeamMember[];
+  onAdd: (member: Omit<TeamMember, 'id'>) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [draft, setDraft] = useState<{ name: string; role: TeamMemberRole }>({ name: '', role: 'designer' });
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!draft.name.trim()) return;
+    onAdd({ name: draft.name.trim(), role: draft.role });
+    setDraft({ name: '', role: 'designer' });
+    setShowForm(false);
+  }
+
+  return (
+    <div className="team-panel">
+      <div className="team-panel-header">
+        <h3 className="section-title">Team</h3>
+        <button onClick={() => setShowForm(v => !v)}>{showForm ? 'Cancel' : '+ Add member'}</button>
+      </div>
+
+      {showForm && (
+        <form className="team-add-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Name"
+            value={draft.name}
+            onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
+            autoFocus
+          />
+          <select value={draft.role} onChange={e => setDraft(d => ({ ...d, role: e.target.value as TeamMemberRole }))}>
+            {TEAM_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+          </select>
+          <button type="submit" className="btn-primary" disabled={!draft.name.trim()}>Add</button>
+        </form>
+      )}
+
+      {team.length === 0 && !showForm ? (
+        <p className="team-empty">
+          Add your team and stakeholders — the tool will surface alignment moments based on who needs to be in the room.
+        </p>
+      ) : (
+        <div className="team-member-list">
+          {team.map(m => (
+            <div key={m.id} className="team-member-row">
+              <span className={`role-dot role-dot-${m.role}`} />
+              <span className="team-member-name">{m.name}</span>
+              <span className={`role-chip role-chip-${m.role}`}>{ROLE_LABELS[m.role]}</span>
+              <button
+                className="team-member-remove"
+                onClick={() => onRemove(m.id)}
+                title={`Remove ${m.name}`}
+              >×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Phase row ─────────────────────────────────────────────────────────────────
 
 function PhaseRow({ phase, onOpen, onStatusChange }: {
   phase: Phase;
@@ -246,15 +421,9 @@ function PhaseRow({ phase, onOpen, onStatusChange }: {
 
   return (
     <div className={`phase-row phase-row-${phase.status}`}>
-      {/* Phase badge */}
-      <div
-        className="phase-row-badge"
-        style={{ background: color.bg, color: color.text }}
-      >
+      <div className="phase-row-badge" style={{ background: color.bg, color: color.text }}>
         {phase.code === 'U' ? 'U' : `0${phase.code}`}
       </div>
-
-      {/* Phase info */}
       <div className="phase-row-info">
         <div className="phase-row-name">{phase.label}</div>
         <div className="phase-row-desc">{phase.description}</div>
@@ -268,15 +437,10 @@ function PhaseRow({ phase, onOpen, onStatusChange }: {
             <span>{phase.deliverables.length} deliverable{phase.deliverables.length !== 1 ? 's' : ''}</span>
           )}
           {phase.completedAt && (
-            <>
-              <span className="stat-dot">·</span>
-              <span>Completed {formatDateShort(phase.completedAt)}</span>
-            </>
+            <><span className="stat-dot">·</span><span>Completed {formatDateShort(phase.completedAt)}</span></>
           )}
         </div>
       </div>
-
-      {/* Actions */}
       <div className="phase-row-actions" onClick={e => e.stopPropagation()}>
         <button
           className={`phase-status-toggle phase-status-${phase.status}`}
@@ -288,9 +452,7 @@ function PhaseRow({ phase, onOpen, onStatusChange }: {
           {phase.status === 'completed' && <span>● Completed</span>}
           {phase.status === 'skipped' && <span>— Skipped</span>}
         </button>
-        <button className="btn-open-phase" onClick={onOpen}>
-          Open →
-        </button>
+        <button className="btn-open-phase" onClick={onOpen}>Open →</button>
       </div>
     </div>
   );

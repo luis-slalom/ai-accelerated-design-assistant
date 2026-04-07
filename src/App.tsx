@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState } from './types';
+import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, TeamMember, AlignmentEvent } from './types';
 import { loadPrompts, generateId } from './storage';
 import * as api from './api';
 import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
@@ -19,6 +19,8 @@ function buildNewProject(name: string, client: string, description: string, tags
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     tags,
+    team: [],
+    alignmentLog: [],
     phases: PHASE_TEMPLATES.map(t => ({
       ...t,
       id: generateId(),
@@ -81,6 +83,28 @@ export default function App() {
     setView('dashboard');
     setActiveProjectId(null);
     setActivePhaseId(null);
+  }
+
+  // ── Team ──────────────────────────────────────────────────────────────────
+
+  function addTeamMember(projectId: string, member: Omit<TeamMember, 'id'>) {
+    const newMember: TeamMember = { ...member, id: generateId() };
+    update(projects.map(p => p.id !== projectId ? p : {
+      ...p, team: [...p.team, newMember], updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function removeTeamMember(projectId: string, memberId: string) {
+    update(projects.map(p => p.id !== projectId ? p : {
+      ...p, team: p.team.filter(m => m.id !== memberId), updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function logAlignment(projectId: string, ruleId: string, note: string) {
+    const event: AlignmentEvent = { id: generateId(), ruleId, note, alignedAt: new Date().toISOString() };
+    update(projects.map(p => p.id !== projectId ? p : {
+      ...p, alignmentLog: [...p.alignmentLog, event], updatedAt: new Date().toISOString(),
+    }));
   }
 
   // ── Phase ─────────────────────────────────────────────────────────────────
@@ -229,6 +253,9 @@ export default function App() {
           onEditProject={(changes) => editProject(activeProject.id, changes)}
           onDeleteProject={() => deleteProject(activeProject.id)}
           onUpdatePhase={(phaseId, changes) => updatePhase(activeProject.id, phaseId, changes)}
+          onAddTeamMember={(m) => addTeamMember(activeProject.id, m)}
+          onRemoveTeamMember={(id) => removeTeamMember(activeProject.id, id)}
+          onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
         />
       )}
       {view === 'phase' && activeProject && activePhase && (
@@ -243,6 +270,7 @@ export default function App() {
           onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
           onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
           onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}
+          onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
         />
       )}
     </div>
