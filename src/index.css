@@ -998,13 +998,14 @@ button:active { background: #e9e9e9; }
 }
 
 .checkpoint-body {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.6;
   color: var(--color-text-secondary);
 }
+.checkpoint-body p { margin: 0; }
+.checkpoint-body p + p { margin-top: 6px; }
+.checkpoint-body ul { margin: 4px 0 0 16px; padding: 0; }
+.checkpoint-body li { margin: 2px 0; }
 
 /* ── Sidebar ───────────────────────────────────────────────────────────── */
 .phase-sidebar {
@@ -1234,9 +1235,8 @@ button:active { background: #e9e9e9; }
 }
 
 /* ── Notes ──────────────────────────────────────────────────────────── */
-.notes-textarea {
+.sidebar-section .rich-editor {
   margin-top: 8px;
-  font-size: 13px;
 }
 .notes-hint {
   font-size: 10px;
@@ -1582,13 +1582,14 @@ button:active { background: #e9e9e9; }
 }
 
 .activity-content-text {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
+  font-size: 13px;
+  line-height: 1.6;
   color: var(--color-text-secondary);
 }
+.activity-content-text p { margin: 0; }
+.activity-content-text p + p { margin-top: 6px; }
+.activity-content-text ul { margin: 4px 0 0 16px; padding: 0; }
+.activity-content-text li { margin: 2px 0; }
 
 .activity-source-label {
   font-size: 11px;

@@ -91,12 +91,12 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
           lines.push(`#### ${c.title}`);
           lines.push(`*${formatDate(c.createdAt)}*${c.promptTitle ? ` · Scaffold: ${c.promptTitle}` : ''}`);
           if (c.tags.length) lines.push(c.tags.map(t => `#${t}`).join(' '));
-          lines.push(``, c.content, ``);
+          lines.push(``, c.content.replace(/<[^>]*>/g, '').trim(), ``);
         }
       }
 
       if (phase.notes) {
-        lines.push(`### Phase notes`, ``, phase.notes, ``);
+        lines.push(`### Phase notes`, ``, phase.notes.replace(/<[^>]*>/g, '').trim(), ``);
       }
     }
 

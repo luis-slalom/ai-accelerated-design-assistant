@@ -245,9 +245,11 @@ export function PhaseView({
           {/* Phase notes */}
           <div className="sidebar-section">
             <h3 className="section-title">Phase notes</h3>
-            <textarea className="notes-textarea"
+            <RichTextEditor
+              content={notesValue}
+              onChange={handleNotesChange}
               placeholder="Blockers, open questions, general context..."
-              value={notesValue} onChange={e => handleNotesChange(e.target.value)} rows={6} />
+            />
             <p className="notes-hint">Auto-saved</p>
           </div>
         </div>
@@ -394,7 +396,7 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
           {/* ── Read-only content (not editing, has content) ── */}
           {!isEditing && state.content && (
             <div className="activity-content-view">
-              <pre className="activity-content-text">{state.content}</pre>
+              <RichTextView html={state.content} className="activity-content-text" />
               <div className="activity-provenance">
                 <div className="provenance-row">
                   <span className="provenance-label">Source</span>
@@ -447,13 +449,10 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
               {/* Write tab */}
               {activeTab === 'write' && (
                 <div className="activity-write-tab">
-                  <textarea
-                    className="activity-textarea"
-                    placeholder={`Paste or write your ${def.title.toLowerCase()} here…\n\nThis can be a brief summary, key decisions, structured output, or anything worth preserving as project context.`}
-                    value={draft}
-                    onChange={e => setDraft(e.target.value)}
-                    rows={10}
-                    autoFocus
+                  <RichTextEditor
+                    content={draft}
+                    onChange={setDraft}
+                    placeholder={`Paste or write your ${def.title.toLowerCase()} here…`}
                   />
                   <div className="form-actions">
                     <button type="button" onClick={cancelEdit}>Cancel</button>
@@ -530,12 +529,10 @@ function ActivityCard({ def, state, prompt, onUpdate }: {
                   {/* Paste AI output */}
                   <div className="generate-output-section">
                     <label className="generate-output-label">Paste AI output here</label>
-                    <textarea
-                      className="activity-textarea"
+                    <RichTextEditor
+                      content={generateOutput}
+                      onChange={setGenerateOutput}
                       placeholder="Run the prompt above in your AI tool, then paste the response here…"
-                      value={generateOutput}
-                      onChange={e => setGenerateOutput(e.target.value)}
-                      rows={10}
                     />
                   </div>
 
@@ -677,9 +674,11 @@ function UtilityPanel({ prompts, checkpoints, onAddCheckpoint, onDeleteCheckpoin
             </div>
             <div className="form-field">
               <label>Content</label>
-              <textarea className="checkpoint-textarea" value={draft.content}
-                onChange={e => setDraft(d => ({ ...d, content: e.target.value }))}
-                placeholder="Paste output, decisions, or research findings…" rows={8} />
+              <RichTextEditor
+                content={draft.content}
+                onChange={html => setDraft(d => ({ ...d, content: html }))}
+                placeholder="Paste output, decisions, or research findings…"
+              />
             </div>
             <div className="form-field">
               <label>Tags</label>
@@ -726,7 +725,7 @@ function UtilityPanel({ prompts, checkpoints, onAddCheckpoint, onDeleteCheckpoin
               </div>
               {expandedId === c.id && (
                 <div className="checkpoint-content">
-                  <pre className="checkpoint-body">{c.content}</pre>
+                  <RichTextView html={c.content} className="checkpoint-body" />
                 </div>
               )}
             </div>
