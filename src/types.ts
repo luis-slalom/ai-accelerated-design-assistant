@@ -21,7 +21,9 @@ export interface Deliverable {
   id: string;
   title: string;
   type: DeliverableType;
-  url: string;
+  url?: string;
+  fileData?: string;   // base64 data URL for uploaded files
+  fileName?: string;
   description?: string;
   addedAt: string;
 }

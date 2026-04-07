@@ -47,18 +47,12 @@ export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' 
 
 // Expected deliverables per phase — shown as hints in the sidebar
 export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
-  '01': ['Project brief — problem statement, target users, goals, constraints, open questions',
-         'Assumption register — what the team is taking on faith, ranked by risk'],
-  '02': ['Capability map — user outcome → enabling capability → success metric (no features)',
-         'Out-of-scope log — what the product will not do this iteration, and why'],
-  '03': ['Object model — canonical diagram and glossary of entities, attributes, relationships, states',
-         'Domain glossary — every entity and relationship defined in plain language'],
-  '04': ['Flow diagrams — one per major user journey, annotated with decision points and error branches',
-         'State inventory — component/object → all states → design treatment for each'],
-  '05': ['Screen data manifest — per screen: fields, source, loading behaviour, fallback',
-         'Contract spec — endpoint, method, payload, error responses; signed off by both sides'],
-  '06': ['Annotated design specs — handoff files with redlines, interaction notes, motion specs',
-         'Deviation log — any departure from agreed spec, with rationale and sign-off'],
+  '01': ['Project brief', 'Assumption register'],
+  '02': ['Capability map', 'Out-of-scope log'],
+  '03': ['Object model', 'Domain glossary'],
+  '04': ['Flow diagrams', 'State inventory'],
+  '05': ['Screen data manifest', 'Contract spec'],
+  '06': ['Annotated design specs', 'Deviation log'],
   'U':  [],
 };
 

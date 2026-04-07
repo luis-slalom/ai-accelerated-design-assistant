@@ -25,13 +25,34 @@ const DELIVERABLE_TYPES: { value: DeliverableType; label: string; icon: string }
 ];
 
 interface DeliverableDraft {
+  mode: 'link' | 'upload';
   title: string;
-  type: DeliverableType;
   url: string;
+  fileData: string;
+  fileName: string;
   description: string;
 }
 
-const EMPTY_DELIVERABLE: DeliverableDraft = { title: '', type: 'link', url: '', description: '' };
+const EMPTY_DELIVERABLE: DeliverableDraft = { mode: 'link', title: '', url: '', fileData: '', fileName: '', description: '' };
+
+function typeFromUrl(url: string): DeliverableType {
+  const u = url.toLowerCase();
+  if (u.includes('figma.com')) return 'figma';
+  if (u.includes('notion.so') || u.includes('notion.site')) return 'notion';
+  if (u.includes('docs.google.com/presentation') || u.includes('slides.')) return 'slides';
+  if (u.includes('docs.google.com') || u.includes('.doc') || u.includes('confluence')) return 'doc';
+  if (u.includes('youtube.com') || u.includes('vimeo.com') || u.includes('loom.com')) return 'video';
+  return 'link';
+}
+
+function typeFromFile(name: string): DeliverableType {
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  if (['mp4','mov','webm','avi'].includes(ext)) return 'video';
+  if (['pdf','doc','docx','txt','md'].includes(ext)) return 'doc';
+  if (['ppt','pptx','key'].includes(ext)) return 'slides';
+  if (['fig'].includes(ext)) return 'figma';
+  return 'other';
+}
 
 interface Props {
   project: Project;
@@ -94,12 +115,17 @@ export function PhaseView({
 
   function handleDeliverableSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!deliverableDraft.title.trim() || !deliverableDraft.url.trim()) return;
+    const { mode, title, url, fileData, fileName, description } = deliverableDraft;
+    if (!title.trim()) return;
+    if (mode === 'link' && !url.trim()) return;
+    if (mode === 'upload' && !fileData) return;
     onAddDeliverable({
-      title: deliverableDraft.title.trim(),
-      type: deliverableDraft.type,
-      url: deliverableDraft.url.trim(),
-      description: deliverableDraft.description.trim() || undefined,
+      title: title.trim(),
+      type: mode === 'upload' ? typeFromFile(fileName) : typeFromUrl(url),
+      url: mode === 'link' ? url.trim() : undefined,
+      fileData: mode === 'upload' ? fileData : undefined,
+      fileName: mode === 'upload' ? fileName : undefined,
+      description: description.trim() || undefined,
     });
     setDeliverableDraft(EMPTY_DELIVERABLE);
     setShowDeliverableForm(false);
@@ -207,52 +233,25 @@ export function PhaseView({
                 {showDeliverableForm ? 'Cancel' : '+ Add'}
               </button>
             </div>
-            {/* Expected deliverables hint */}
-            {PHASE_DELIVERABLE_HINTS[phase.code]?.length > 0 && phase.deliverables.length === 0 && !showDeliverableForm && (
-              <div className="deliverable-hints">
-                <p className="deliverable-hints-label">Expected for this phase:</p>
-                {PHASE_DELIVERABLE_HINTS[phase.code].map((hint, i) => (
-                  <p key={i} className="deliverable-hint-item">→ {hint}</p>
-                ))}
+            {/* Expected deliverables hint — simple chips */}
+            {PHASE_DELIVERABLE_HINTS[phase.code]?.length > 0 && !showDeliverableForm && (
+              <div className="deliverable-hints-chips">
+                {PHASE_DELIVERABLE_HINTS[phase.code].map((hint, i) => {
+                  const done = phase.deliverables.some(d =>
+                    d.title.toLowerCase().includes(hint.toLowerCase().split(' ')[0])
+                  );
+                  return <span key={i} className={`deliverable-hint-chip ${done ? 'deliverable-hint-chip-done' : ''}`}>{hint}</span>;
+                })}
               </div>
-            )}
-            {PHASE_DELIVERABLE_HINTS[phase.code]?.length > 0 && phase.deliverables.length > 0 && (
-              <p className="section-subtitle">Link Figma files, docs, and other outputs.</p>
             )}
 
             {showDeliverableForm && (
-              <form className="deliverable-form" onSubmit={handleDeliverableSubmit}>
-                <div className="form-field">
-                  <label>Title *</label>
-                  <input type="text" placeholder="e.g. Figma prototype v2" value={deliverableDraft.title}
-                    onChange={e => setDeliverableDraft(d => ({ ...d, title: e.target.value }))} autoFocus />
-                </div>
-                <div className="form-field">
-                  <label>Type</label>
-                  <select value={deliverableDraft.type}
-                    onChange={e => setDeliverableDraft(d => ({ ...d, type: e.target.value as DeliverableType }))}>
-                    {DELIVERABLE_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
-                  </select>
-                </div>
-                <div className="form-field">
-                  <label>URL *</label>
-                  <input type="url" placeholder="https://..." value={deliverableDraft.url}
-                    onChange={e => setDeliverableDraft(d => ({ ...d, url: e.target.value }))} />
-                </div>
-                <div className="form-field">
-                  <label>Description (optional)</label>
-                  <RichTextEditor
-                    content={deliverableDraft.description}
-                    onChange={html => setDeliverableDraft(d => ({ ...d, description: html }))}
-                    placeholder="Brief note"
-                  />
-                </div>
-                <div className="form-actions">
-                  <button type="button" onClick={() => { setShowDeliverableForm(false); setDeliverableDraft(EMPTY_DELIVERABLE); }}>Cancel</button>
-                  <button type="submit" className="btn-primary"
-                    disabled={!deliverableDraft.title.trim() || !deliverableDraft.url.trim()}>Add</button>
-                </div>
-              </form>
+              <DeliverableForm
+                draft={deliverableDraft}
+                onChange={setDeliverableDraft}
+                onSubmit={handleDeliverableSubmit}
+                onCancel={() => { setShowDeliverableForm(false); setDeliverableDraft(EMPTY_DELIVERABLE); }}
+              />
             )}
 
             {phase.deliverables.length === 0 && !showDeliverableForm
@@ -993,20 +992,137 @@ function UtilityPanel({ prompts, checkpoints, onAddCheckpoint, onDeleteCheckpoin
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  DELIVERABLE FORM
+// ═══════════════════════════════════════════════════════════════════════════
+
+function DeliverableForm({ draft, onChange, onSubmit, onCancel }: {
+  draft: DeliverableDraft;
+  onChange: (d: DeliverableDraft) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onCancel: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const isLink = draft.mode === 'link';
+  const canSubmit = draft.title.trim() && (isLink ? !!draft.url.trim() : !!draft.fileData);
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const data = ev.target?.result as string;
+      onChange({
+        ...draft,
+        fileName: file.name,
+        fileData: data,
+        title: draft.title || file.name.replace(/\.[^.]+$/, ''),
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  return (
+    <form className="deliverable-form" onSubmit={onSubmit}>
+      {/* Mode toggle */}
+      <div className="deliverable-mode-toggle">
+        <button
+          type="button"
+          className={`deliverable-mode-btn ${isLink ? 'active' : ''}`}
+          onClick={() => onChange({ ...draft, mode: 'link' })}
+        >⊞ Link</button>
+        <button
+          type="button"
+          className={`deliverable-mode-btn ${!isLink ? 'active' : ''}`}
+          onClick={() => onChange({ ...draft, mode: 'upload' })}
+        >↑ Upload</button>
+      </div>
+
+      <div className="form-field">
+        <label>Title *</label>
+        <input
+          type="text"
+          placeholder="e.g. Figma prototype v2"
+          value={draft.title}
+          onChange={e => onChange({ ...draft, title: e.target.value })}
+          autoFocus
+        />
+      </div>
+
+      {isLink ? (
+        <div className="form-field">
+          <label>URL *</label>
+          <input
+            type="url"
+            placeholder="https://..."
+            value={draft.url}
+            onChange={e => onChange({ ...draft, url: e.target.value })}
+          />
+        </div>
+      ) : (
+        <div className="form-field">
+          <label>File *</label>
+          {draft.fileData ? (
+            <div className="deliverable-file-chosen">
+              <span className="deliverable-file-name">📎 {draft.fileName}</span>
+              <button type="button" className="scaffold-clear" onClick={() => onChange({ ...draft, fileData: '', fileName: '' })}>✕</button>
+            </div>
+          ) : (
+            <>
+              <button type="button" className="deliverable-upload-btn" onClick={() => fileRef.current?.click()}>
+                Choose file
+              </button>
+              <input ref={fileRef} type="file" style={{ display: 'none' }} onChange={handleFile} />
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="form-field">
+        <label>Description (optional)</label>
+        <RichTextEditor
+          content={draft.description}
+          onChange={html => onChange({ ...draft, description: html })}
+          placeholder="Brief note"
+        />
+      </div>
+      <div className="form-actions">
+        <button type="button" onClick={onCancel}>Cancel</button>
+        <button type="submit" className="btn-primary" disabled={!canSubmit}>Add</button>
+      </div>
+    </form>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  DELIVERABLE CARD
 // ═══════════════════════════════════════════════════════════════════════════
 
 function DeliverableCard({ deliverable, onDelete }: { deliverable: Deliverable; onDelete: () => void }) {
   const typeInfo = DELIVERABLE_TYPES.find(t => t.value === deliverable.type) ?? DELIVERABLE_TYPES[DELIVERABLE_TYPES.length - 1];
+  const isFile = !!deliverable.fileData;
+
   return (
     <div className="deliverable-card">
       <div className="deliverable-icon">{typeInfo.icon}</div>
       <div className="deliverable-info">
-        <a className="deliverable-title" href={deliverable.url} target="_blank" rel="noopener noreferrer">
-          {deliverable.title}
-        </a>
+        {isFile ? (
+          <a
+            className="deliverable-title"
+            href={deliverable.fileData}
+            download={deliverable.fileName}
+          >
+            {deliverable.title}
+          </a>
+        ) : (
+          <a className="deliverable-title" href={deliverable.url} target="_blank" rel="noopener noreferrer">
+            {deliverable.title}
+          </a>
+        )}
         {deliverable.description && <RichTextView html={deliverable.description} className="deliverable-description" />}
-        <span className="deliverable-meta">{typeInfo.label} · {formatDateShort(deliverable.addedAt)}</span>
+        <span className="deliverable-meta">
+          {isFile ? `File · ${deliverable.fileName}` : typeInfo.label} · {formatDateShort(deliverable.addedAt)}
+        </span>
       </div>
       <button className="icon-btn icon-btn-danger" title="Remove" onClick={onDelete}>
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
