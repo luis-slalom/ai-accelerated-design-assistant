@@ -2191,3 +2191,108 @@ button:active { background: #e9e9e9; }
   line-height: 1;
 }
 .team-member-remove:hover { color: var(--color-danger, #f87171); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+
+  /* ── App wrapper ── */
+  .app-wrapper { padding: 1rem 0.875rem 3rem; }
+
+  /* ── Dashboard ── */
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .project-grid { grid-template-columns: 1fr; }
+  .filter-pills { flex-wrap: wrap; }
+
+  /* ── Project view ── */
+  .project-header-main {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .project-header-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .project-header-actions button { flex: 1; }
+  .project-header-name { font-size: 20px; }
+  .project-stats {
+    flex-wrap: wrap;
+    padding: 10px 0;
+  }
+  .stat-item { flex: 1 0 40%; padding: 8px 12px; }
+  .stat-divider { display: none; }
+  .phase-timeline .section-title { font-size: 13px; }
+
+  /* ── Phase rows ── */
+  .phase-row { flex-wrap: wrap; gap: 8px; }
+  .phase-row-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* ── Phase view ── */
+  .phase-view-title-row { flex-wrap: wrap; gap: 8px; }
+  .phase-view-badge { font-size: 12px; }
+  .phase-status-select { font-size: 12px; }
+  .phase-completion-badge { font-size: 10px; }
+
+  /* Phase columns: sidebar stacks above, full width */
+  .phase-columns { grid-template-columns: 1fr; gap: 1.5rem; }
+  .phase-sidebar { order: -1; }
+
+  /* ── Activities ── */
+  .activity-header { gap: 8px; }
+  .activity-title-row { flex-wrap: wrap; gap: 6px; }
+  .activity-tabs { gap: 0; }
+  .activity-tab { font-size: 12px; padding: 7px 10px; }
+  .generate-prompt-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  /* ── Forms ── */
+  .form-row { grid-template-columns: 1fr; }
+  .form-actions { flex-direction: column; }
+  .form-actions button { width: 100%; }
+  .deliverable-form .form-actions { flex-direction: row; }
+  .deliverable-form .form-actions button { flex: 1; }
+
+  /* ── Team panel ── */
+  .team-add-form { flex-direction: column; align-items: stretch; }
+  .team-add-form input,
+  .team-add-form select,
+  .team-add-form button { width: 100%; }
+  .team-member-row { flex-wrap: wrap; gap: 6px; }
+
+  /* ── Alignment panel ── */
+  .alignment-panel { padding: 12px 14px; }
+  .alignment-card { padding: 12px 14px; }
+  .alignment-members { gap: 4px; }
+
+  /* ── Checkpoint form ── */
+  .checkpoint-form .form-actions { flex-direction: row; }
+  .checkpoint-form .form-actions button { flex: 1; }
+
+  /* ── Project form (edit) ── */
+  .project-form .form-actions { flex-direction: row; }
+  .project-form .form-actions button { flex: 1; }
+
+  /* ── Rich editor ── */
+  .rich-toolbar button { width: 28px; height: 28px; }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb-link { font-size: 13px; }
+}
+
+/* Tiny screens (≤ 380px) */
+@media (max-width: 380px) {
+  .app-wrapper { padding: 0.875rem 0.75rem 3rem; }
+  .project-header-name { font-size: 18px; }
+  .phase-view-badge { padding: 4px 8px; }
+  .stat-item { flex: 1 0 100%; }
+  .role-chip { font-size: 10px; padding: 2px 6px; }
+}
