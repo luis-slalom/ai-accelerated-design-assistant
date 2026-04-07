@@ -315,7 +315,7 @@ function TasksSection({ tasks, onAdd, onUpdate, onDelete, onMarkPhaseComplete }:
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.title.trim()) return;
-    onAdd({ title: draft.title.trim(), description: draft.description.trim() || undefined });
+    onAdd({ title: draft.title.trim(), description: draft.description.trim() || undefined, informed: [] });
     setDraft({ title: '', description: '' });
     setShowForm(false);
   }
@@ -384,6 +384,7 @@ function TasksSection({ tasks, onAdd, onUpdate, onDelete, onMarkPhaseComplete }:
             onValidate={() => onUpdate(task.id, {
               validatedAt: task.validatedAt ? undefined : new Date().toISOString(),
             })}
+            onUpdateInformed={(informed) => onUpdate(task.id, { informed })}
             onDelete={() => { if (confirm('Delete this task?')) onDelete(task.id); }}
           />
         ))}
@@ -392,12 +393,32 @@ function TasksSection({ tasks, onAdd, onUpdate, onDelete, onMarkPhaseComplete }:
   );
 }
 
-function TaskCard({ task, onValidate, onDelete }: {
+const LOOP_IN_TEAMS: { key: string; label: string; abbr: string }[] = [
+  { key: 'stakeholder', label: 'Stakeholders',   abbr: 'SH' },
+  { key: 'delivery',    label: 'Delivery team',  abbr: 'DT' },
+  { key: 'pm',          label: 'PM team',        abbr: 'PM' },
+  { key: 'other',       label: 'Other',          abbr: '···' },
+];
+
+function TaskCard({ task, onValidate, onUpdateInformed, onDelete }: {
   task: Task;
   onValidate: () => void;
+  onUpdateInformed: (informed: string[]) => void;
   onDelete: () => void;
 }) {
   const validated = !!task.validatedAt;
+  const [pulsing, setPulsing] = useState<string | null>(null);
+
+  function toggleTeam(key: string) {
+    const current = task.informed ?? [];
+    const next = current.includes(key) ? current.filter(k => k !== key) : [...current, key];
+    if (!current.includes(key)) {
+      setPulsing(key);
+      setTimeout(() => setPulsing(null), 500);
+    }
+    onUpdateInformed(next);
+  }
+
   return (
     <div className={`task-card ${validated ? 'task-card-validated' : ''}`}>
       <button
@@ -414,6 +435,24 @@ function TaskCard({ task, onValidate, onDelete }: {
         {validated && task.validatedAt && (
           <span className="task-validated-at">Validated {formatDateShort(task.validatedAt)}</span>
         )}
+        <div className="loop-in-row">
+          <span className="loop-in-label">Looped in</span>
+          {LOOP_IN_TEAMS.map(team => {
+            const active = (task.informed ?? []).includes(team.key);
+            return (
+              <button
+                key={team.key}
+                type="button"
+                className={`loop-in-chip loop-in-chip-${team.key} ${active ? 'loop-in-chip-active' : ''} ${pulsing === team.key ? 'loop-in-chip-pulse' : ''}`}
+                onClick={() => toggleTeam(team.key)}
+                title={active ? `${team.label} informed ✓` : `Mark ${team.label} as informed`}
+              >
+                {team.abbr}
+                {active && <span className="loop-in-dot" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
       <button className="task-delete-btn" onClick={onDelete} title="Delete task">
         <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

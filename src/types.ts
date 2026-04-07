@@ -51,6 +51,7 @@ export interface Task {
   description?: string;
   createdAt: string;
   validatedAt?: string;
+  informed: string[]; // keys from LOOP_IN_TEAMS
 }
 
 export interface Phase {

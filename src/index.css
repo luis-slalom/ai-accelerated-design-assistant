@@ -2464,3 +2464,88 @@ button:active { background: #e9e9e9; }
   .task-delete-btn { opacity: 1; }
   .tasks-validated-banner { flex-direction: column; align-items: flex-start; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOOP-IN CHIPS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.loop-in-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.loop-in-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-right: 2px;
+  white-space: nowrap;
+}
+
+/* Base chip */
+.loop-in-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background: transparent;
+  transition: all 0.15s ease;
+  position: relative;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Inactive state — subtle outline in team colour */
+.loop-in-chip-stakeholder { border-color: rgba(251,146,60,0.3); color: rgba(251,146,60,0.5); }
+.loop-in-chip-delivery    { border-color: rgba(96,165,250,0.3); color: rgba(96,165,250,0.5); }
+.loop-in-chip-pm          { border-color: rgba(216,180,254,0.35); color: rgba(216,180,254,0.5); }
+.loop-in-chip-other       { border-color: rgba(148,163,184,0.3); color: rgba(148,163,184,0.45); }
+
+/* Hover — bring colour up */
+.loop-in-chip-stakeholder:hover { border-color: rgba(251,146,60,0.7); color: #fb923c; background: rgba(251,146,60,0.07); }
+.loop-in-chip-delivery:hover    { border-color: rgba(96,165,250,0.7); color: #60a5fa; background: rgba(96,165,250,0.07); }
+.loop-in-chip-pm:hover          { border-color: rgba(216,180,254,0.7); color: #d8b4fe; background: rgba(216,180,254,0.07); }
+.loop-in-chip-other:hover       { border-color: rgba(148,163,184,0.7); color: #94a3b8; background: rgba(148,163,184,0.07); }
+
+/* Active / informed — filled */
+.loop-in-chip-active.loop-in-chip-stakeholder { background: rgba(251,146,60,0.15); border-color: #fb923c; color: #fb923c; }
+.loop-in-chip-active.loop-in-chip-delivery    { background: rgba(96,165,250,0.15); border-color: #60a5fa; color: #60a5fa; }
+.loop-in-chip-active.loop-in-chip-pm          { background: rgba(216,180,254,0.15); border-color: #d8b4fe; color: #d8b4fe; }
+.loop-in-chip-active.loop-in-chip-other       { background: rgba(148,163,184,0.15); border-color: #94a3b8; color: #94a3b8; }
+
+/* Live dot on active chips */
+.loop-in-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  animation: loop-in-dot-in 0.25s ease forwards;
+}
+
+@keyframes loop-in-dot-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Pulse bounce when toggled on */
+@keyframes loop-in-pulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.loop-in-chip-pulse {
+  animation: loop-in-pulse 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
