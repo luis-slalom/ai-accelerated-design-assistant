@@ -45,6 +45,14 @@ export interface ActivityState {
   updatedAt?: string;
 }
 
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  createdAt: string;
+  validatedAt?: string;
+}
+
 export interface Phase {
   id: string;
   code: string;
@@ -56,6 +64,7 @@ export interface Phase {
   deliverables: Deliverable[];
   checkpoints: Checkpoint[];
   activities: ActivityState[];
+  tasks: Task[];
   notes: string;
 }
 

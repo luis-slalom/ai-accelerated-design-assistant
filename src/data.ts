@@ -35,7 +35,7 @@ export const ACTIVITY_DEFS: ActivityDef[] = [
   { id: 'bld-qa',         code: '06-B', phaseCode: '06', title: 'Incremental design QA',   description: 'Design reviews implementation against spec at component level throughout build, not just at the end',   promptId: 'p-bld-qa' },
 ];
 
-export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
+export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'tasks' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
   { code: '01', label: 'Context',      description: 'Understand the project, its users, and its constraints before any design work begins' },
   { code: '02', label: 'Capabilities', description: 'Define what users need to be able to do — in outcomes, not features' },
   { code: '03', label: 'Objects',      description: 'Identify and agree the core entities the product creates, stores, and acts on' },

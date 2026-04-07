@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, TeamMember, AlignmentEvent } from './types';
+import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, TeamMember, AlignmentEvent, Task } from './types';
 import { loadPrompts, generateId } from './storage';
 import * as api from './api';
 import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
@@ -27,6 +27,7 @@ function buildNewProject(name: string, client: string, description: string, tags
       status: 'not-started' as PhaseStatus,
       deliverables: [],
       checkpoints: [],
+      tasks: [],
       activities: ACTIVITY_DEFS
         .filter(d => d.phaseCode === t.code)
         .map(d => ({ defId: d.id, status: 'empty' as const, content: '' })),
@@ -202,6 +203,48 @@ export default function App() {
     }));
   }
 
+  // ── Tasks ─────────────────────────────────────────────────────────────────
+
+  function addTask(projectId: string, phaseId: string, data: Omit<Task, 'id' | 'createdAt'>) {
+    const task: Task = { ...data, id: generateId(), createdAt: new Date().toISOString() };
+    update(projects.map(p => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        updatedAt: new Date().toISOString(),
+        phases: p.phases.map(ph => ph.id !== phaseId ? ph : { ...ph, tasks: [...ph.tasks, task] }),
+      };
+    }));
+  }
+
+  function updateTask(projectId: string, phaseId: string, taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) {
+    update(projects.map(p => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        updatedAt: new Date().toISOString(),
+        phases: p.phases.map(ph => ph.id !== phaseId ? ph : {
+          ...ph,
+          tasks: ph.tasks.map(t => t.id === taskId ? { ...t, ...changes } : t),
+        }),
+      };
+    }));
+  }
+
+  function deleteTask(projectId: string, phaseId: string, taskId: string) {
+    update(projects.map(p => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        updatedAt: new Date().toISOString(),
+        phases: p.phases.map(ph => ph.id !== phaseId ? ph : {
+          ...ph,
+          tasks: ph.tasks.filter(t => t.id !== taskId),
+        }),
+      };
+    }));
+  }
+
   // ── Navigation ────────────────────────────────────────────────────────────
 
   function openProject(id: string) {
@@ -270,6 +313,9 @@ export default function App() {
           onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
           onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
           onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}
+          onAddTask={(data) => addTask(activeProject.id, activePhase.id, data)}
+          onUpdateTask={(taskId, changes) => updateTask(activeProject.id, activePhase.id, taskId, changes)}
+          onDeleteTask={(taskId) => deleteTask(activeProject.id, activePhase.id, taskId)}
           onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
         />
       )}

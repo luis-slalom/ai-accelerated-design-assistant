@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prompt, Project, ActivityState, ActivityStatus } from '../types';
+import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prompt, Project, ActivityState, ActivityStatus, Task } from '../types';
 import type { ActivityDef } from '../data';
 import { PHASE_COLORS, ACTIVITY_DEFS, PHASE_DELIVERABLE_HINTS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
@@ -44,6 +44,9 @@ interface Props {
   onDeleteCheckpoint: (id: string) => void;
   onAddDeliverable: (data: Omit<Deliverable, 'id' | 'addedAt'>) => void;
   onDeleteDeliverable: (id: string) => void;
+  onAddTask: (data: Omit<Task, 'id' | 'createdAt'>) => void;
+  onUpdateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
+  onDeleteTask: (taskId: string) => void;
   onLogAlignment: (ruleId: string, note: string) => void;
 }
 
@@ -52,6 +55,7 @@ export function PhaseView({
   onBack, onUpdatePhase, onUpdateActivity,
   onAddCheckpoint, onDeleteCheckpoint,
   onAddDeliverable, onDeleteDeliverable,
+  onAddTask, onUpdateTask, onDeleteTask,
   onLogAlignment,
 }: Props) {
   const [showDeliverableForm, setShowDeliverableForm] = useState(false);
@@ -65,8 +69,12 @@ export function PhaseView({
   );
   const phaseColor = PHASE_COLORS[phase.code];
   const phaseDefs = ACTIVITY_DEFS.filter(d => d.phaseCode === phase.code);
-  const validatedCount = phase.activities.filter(a => a.status === 'validated').length;
-  const allValidated = phaseDefs.length > 0 && validatedCount === phaseDefs.length;
+  const validatedActivities = phase.activities.filter(a => a.status === 'validated').length;
+  const validatedTasks = phase.tasks.filter(t => !!t.validatedAt).length;
+  const totalTasks = phase.tasks.length;
+  const validatedCount = validatedActivities + validatedTasks;
+  const totalValidatable = phaseDefs.length + totalTasks;
+  const allValidated = totalValidatable > 0 && validatedCount === totalValidatable;
 
   useEffect(() => { setNotesValue(phase.notes); }, [phase.id]);
 
@@ -120,9 +128,9 @@ export function PhaseView({
           >
             {PHASE_STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          {phaseDefs.length > 0 && (
+          {totalValidatable > 0 && (
             <span className={`phase-completion-badge ${allValidated ? 'phase-completion-badge-done' : ''}`}>
-              {allValidated ? '✓ All validated' : `${validatedCount}/${phaseDefs.length} validated`}
+              {allValidated ? '✓ All validated' : `${validatedCount}/${totalValidatable} validated`}
             </span>
           )}
         </div>
@@ -165,6 +173,17 @@ export function PhaseView({
               })}
             </div>
           )}
+
+          {/* Custom tasks */}
+          <TasksSection
+            tasks={phase.tasks}
+            onAdd={onAddTask}
+            onUpdate={onUpdateTask}
+            onDelete={onDeleteTask}
+            onMarkPhaseComplete={allValidated && phase.status !== 'completed'
+              ? () => handleStatusChange('completed')
+              : undefined}
+          />
 
           {/* Utility: prompt library + checkpoints */}
           {isUtility && (
@@ -272,6 +291,135 @@ export function PhaseView({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TASKS SECTION
+// ═══════════════════════════════════════════════════════════════════════════
+
+function TasksSection({ tasks, onAdd, onUpdate, onDelete, onMarkPhaseComplete }: {
+  tasks: Task[];
+  onAdd: (data: Omit<Task, 'id' | 'createdAt'>) => void;
+  onUpdate: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
+  onDelete: (taskId: string) => void;
+  onMarkPhaseComplete?: () => void;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [draft, setDraft] = useState({ title: '', description: '' });
+
+  const allValidated = tasks.length > 0 && tasks.every(t => !!t.validatedAt);
+  const validatedCount = tasks.filter(t => !!t.validatedAt).length;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!draft.title.trim()) return;
+    onAdd({ title: draft.title.trim(), description: draft.description.trim() || undefined });
+    setDraft({ title: '', description: '' });
+    setShowForm(false);
+  }
+
+  return (
+    <div className="tasks-section">
+      <div className="tasks-header">
+        <h3 className="section-title">Tasks</h3>
+        <button onClick={() => setShowForm(v => !v)}>
+          {showForm ? 'Cancel' : '+ Add task'}
+        </button>
+      </div>
+
+      {/* Validation banner */}
+      {allValidated && (
+        <div className="tasks-validated-banner">
+          <span>✓ All {tasks.length} task{tasks.length !== 1 ? 's' : ''} validated</span>
+          {onMarkPhaseComplete && (
+            <button className="btn-primary" onClick={onMarkPhaseComplete}>
+              Mark phase complete
+            </button>
+          )}
+        </div>
+      )}
+      {!allValidated && tasks.length > 0 && (
+        <div className="tasks-progress-bar">
+          <div
+            className="tasks-progress-fill"
+            style={{ width: `${(validatedCount / tasks.length) * 100}%` }}
+          />
+        </div>
+      )}
+
+      {/* Add form */}
+      {showForm && (
+        <form className="task-add-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Task title"
+            value={draft.title}
+            onChange={e => setDraft(d => ({ ...d, title: e.target.value }))}
+            autoFocus
+          />
+          <input
+            type="text"
+            placeholder="Description (optional)"
+            value={draft.description}
+            onChange={e => setDraft(d => ({ ...d, description: e.target.value }))}
+          />
+          <div className="form-actions">
+            <button type="button" onClick={() => { setShowForm(false); setDraft({ title: '', description: '' }); }}>Cancel</button>
+            <button type="submit" className="btn-primary" disabled={!draft.title.trim()}>Add task</button>
+          </div>
+        </form>
+      )}
+
+      {/* Task list */}
+      {tasks.length === 0 && !showForm && (
+        <div className="empty-state-inline">No tasks yet. Add tasks to track work for this phase.</div>
+      )}
+      <div className="task-list">
+        {tasks.map(task => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            onValidate={() => onUpdate(task.id, {
+              validatedAt: task.validatedAt ? undefined : new Date().toISOString(),
+            })}
+            onDelete={() => { if (confirm('Delete this task?')) onDelete(task.id); }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TaskCard({ task, onValidate, onDelete }: {
+  task: Task;
+  onValidate: () => void;
+  onDelete: () => void;
+}) {
+  const validated = !!task.validatedAt;
+  return (
+    <div className={`task-card ${validated ? 'task-card-validated' : ''}`}>
+      <button
+        className={`task-validate-btn ${validated ? 'task-validate-btn-done' : ''}`}
+        onClick={onValidate}
+        title={validated ? 'Mark as not validated' : 'Mark as validated'}
+        aria-label={validated ? 'Validated' : 'Mark validated'}
+      >
+        {validated ? '✓' : ''}
+      </button>
+      <div className="task-card-body">
+        <span className={`task-title ${validated ? 'task-title-validated' : ''}`}>{task.title}</span>
+        {task.description && <span className="task-description">{task.description}</span>}
+        {validated && task.validatedAt && (
+          <span className="task-validated-at">Validated {formatDateShort(task.validatedAt)}</span>
+        )}
+      </div>
+      <button className="task-delete-btn" onClick={onDelete} title="Delete task">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="2,4 12,4"/><path d="M5 4V2h4v2"/><path d="M3 4l1 8h6l1-8"/>
+        </svg>
+      </button>
     </div>
   );
 }

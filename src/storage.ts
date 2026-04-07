@@ -23,6 +23,7 @@ export function migrateProject(p: any): Project {
       activities: migratePhaseActivities(ph),
       checkpoints: ph.checkpoints ?? [],
       deliverables: ph.deliverables ?? [],
+      tasks: ph.tasks ?? [],
       notes: ph.notes ?? '',
     })),
   };
