@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState } from './types';
-import { loadProjects, saveProjects, loadPrompts, generateId } from './storage';
+import { loadPrompts, generateId } from './storage';
+import * as api from './api';
 import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
 import { Dashboard } from './views/Dashboard';
 import { ProjectView } from './views/ProjectView';
@@ -33,15 +34,34 @@ function buildNewProject(name: string, client: string, description: string, tags
 }
 
 export default function App() {
-  const [projects, setProjects] = useState<Project[]>(() => loadProjects());
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [prompts] = useState<Prompt[]>(() => loadPrompts(DEFAULT_PROMPTS));
   const [view, setView] = useState<View>('dashboard');
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
 
+  useEffect(() => {
+    api.fetchProjects()
+      .then(setProjects)
+      .catch(err => setLoadError(String(err)))
+      .finally(() => setLoading(false));
+  }, []);
+
   function update(updated: Project[]) {
+    const prev = projects;
     setProjects(updated);
-    saveProjects(updated);
+
+    const added = updated.filter(p => !prev.some(o => o.id === p.id));
+    const changed = updated.filter(p => prev.some(o => o.id === p.id && o !== p));
+    const removed = prev.filter(p => !updated.some(u => u.id === p.id));
+
+    Promise.all([
+      ...added.map(p => api.createProject(p)),
+      ...changed.map(p => api.updateProject(p)),
+      ...removed.map(p => api.deleteProject(p.id)),
+    ]).catch(console.error);
   }
 
   // ── Project CRUD ──────────────────────────────────────────────────────────
@@ -173,6 +193,22 @@ export default function App() {
 
   const activeProject = projects.find(p => p.id === activeProjectId) ?? null;
   const activePhase = activeProject?.phases.find(ph => ph.id === activePhaseId) ?? null;
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#6b7280', fontSize: '0.9rem' }}>
+        Loading projects…
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#ef4444', fontSize: '0.9rem' }}>
+        {loadError}
+      </div>
+    );
+  }
 
   return (
     <div className="app-wrapper">

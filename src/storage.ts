@@ -1,7 +1,6 @@
 import type { Project, ActivityStatus, ActivityState } from './types';
 import { ACTIVITY_DEFS } from './data';
 
-const PROJECTS_KEY = 'design-tracker-projects';
 const PROMPTS_KEY = 'design-tracker-prompts';
 
 // Migrate phase activities: preserve matching states, add new defs as empty, drop obsolete ones
@@ -14,7 +13,7 @@ function migratePhaseActivities(ph: any): ActivityState[] {
   });
 }
 
-function migrateProject(p: any): Project {
+export function migrateProject(p: any): Project {
   return {
     ...p,
     phases: (p.phases || []).map((ph: any) => ({
@@ -25,18 +24,6 @@ function migrateProject(p: any): Project {
       notes: ph.notes ?? '',
     })),
   };
-}
-
-export function loadProjects(): Project[] {
-  try {
-    const raw = localStorage.getItem(PROJECTS_KEY);
-    if (raw) return (JSON.parse(raw) as any[]).map(migrateProject);
-  } catch {}
-  return [];
-}
-
-export function saveProjects(projects: Project[]): void {
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
 }
 
 export function loadPrompts<T>(defaults: T[]): T[] {
