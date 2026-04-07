@@ -1,10 +1,14 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(node -e \"const r = require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\(Object.keys\\(r\\).filter\\(k => k.includes\\('Bubble'\\) || k.includes\\('bubble'\\)\\)\\)\")",
+      "Bash(node -e \"const r = require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\(Object.keys\\(r\\).slice\\(0,30\\)\\)\")",
+      "Bash(node -e \"const r = require\\('./node_modules/@tiptap/extension-bubble-menu/dist/index.js'\\); console.log\\(Object.keys\\(r\\)\\)\")",
+      "Bash(node -e \"const r = require\\('./node_modules/@tiptap/react/dist/index.js'\\); const more = require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\(Object.keys\\(more\\)\\)\")"
+    ],
     "additionalDirectories": [
       "/tmp"
-    ],
-    "allow": [
-      "Bash(gh auth:*)"
     ]
   }
 }

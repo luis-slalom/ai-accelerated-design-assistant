@@ -3,6 +3,8 @@ import type { Phase, Checkpoint, Deliverable, DeliverableType, PhaseStatus, Prom
 import type { ActivityDef } from '../data';
 import { PHASE_COLORS, ACTIVITY_DEFS, PHASE_DELIVERABLE_HINTS } from '../data';
 import { formatDate, formatDateShort } from '../storage';
+import { RichTextEditor } from '../components/RichTextEditor';
+import { RichTextView } from '../components/RichTextView';
 
 const PHASE_STATUS_OPTIONS: { value: PhaseStatus; label: string }[] = [
   { value: 'not-started', label: '○ Not started' },
@@ -214,8 +216,11 @@ export function PhaseView({
                 </div>
                 <div className="form-field">
                   <label>Description (optional)</label>
-                  <input type="text" placeholder="Brief note" value={deliverableDraft.description}
-                    onChange={e => setDeliverableDraft(d => ({ ...d, description: e.target.value }))} />
+                  <RichTextEditor
+                    content={deliverableDraft.description}
+                    onChange={html => setDeliverableDraft(d => ({ ...d, description: html }))}
+                    placeholder="Brief note"
+                  />
                 </div>
                 <div className="form-actions">
                   <button type="button" onClick={() => { setShowDeliverableForm(false); setDeliverableDraft(EMPTY_DELIVERABLE); }}>Cancel</button>
@@ -745,7 +750,7 @@ function DeliverableCard({ deliverable, onDelete }: { deliverable: Deliverable; 
         <a className="deliverable-title" href={deliverable.url} target="_blank" rel="noopener noreferrer">
           {deliverable.title}
         </a>
-        {deliverable.description && <p className="deliverable-description">{deliverable.description}</p>}
+        {deliverable.description && <RichTextView html={deliverable.description} className="deliverable-description" />}
         <span className="deliverable-meta">{typeInfo.label} · {formatDateShort(deliverable.addedAt)}</span>
       </div>
       <button className="icon-btn icon-btn-danger" title="Remove" onClick={onDelete}>

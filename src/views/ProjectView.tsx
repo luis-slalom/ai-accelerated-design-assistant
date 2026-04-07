@@ -79,7 +79,8 @@ export function ProjectView({ project, onBack, onOpenPhase, onEditProject, onDel
       if (phase.deliverables.length > 0) {
         lines.push(`### Deliverables`, ``);
         for (const d of phase.deliverables) {
-          lines.push(`- **[${d.title}](${d.url})** (${d.type})${d.description ? ` — ${d.description}` : ''}`);
+          const desc = d.description ? d.description.replace(/<[^>]*>/g, '').trim() : '';
+          lines.push(`- **[${d.title}](${d.url})** (${d.type})${desc ? ` — ${desc}` : ''}`);
         }
         lines.push(``);
       }
