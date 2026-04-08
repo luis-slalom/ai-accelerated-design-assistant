@@ -11,28 +11,41 @@ export interface ActivityDef {
 
 export const ACTIVITY_DEFS: ActivityDef[] = [
   // 01 Context — understand project, users, constraints
-  { id: 'ctx-kickoff',    code: '01-A', phaseCode: '01', title: 'Stakeholder kickoff',    description: 'Structured interview to capture goals, risks, non-negotiables, and definition of success', promptId: 'p-ctx-kickoff' },
-  { id: 'ctx-research',   code: '01-B', phaseCode: '01', title: 'User research digest',   description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief',       promptId: 'p-ctx-research' },
+  { id: 'ctx-kickoff',    code: '01-A', phaseCode: '01', title: 'Stakeholder kickoff',          description: 'Structured interview to capture goals, risks, non-negotiables, and definition of success', promptId: 'p-ctx-kickoff' },
+  { id: 'ctx-research',   code: '01-B', phaseCode: '01', title: 'User research digest',         description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief',       promptId: 'p-ctx-research' },
+  { id: 'ctx-heuristic',  code: '01-C', phaseCode: '01', title: 'Heuristic audit',              description: 'Evaluate existing product or touchpoints against recognised UX principles; produce a scored issue list with severity ratings' },
+  { id: 'ctx-competitive',code: '01-D', phaseCode: '01', title: 'Competitive & analogous review', description: 'Benchmark 3–5 competitors and 2–3 analogous experiences to identify patterns, gaps, and opportunities' },
 
   // 02 Capabilities — define user outcomes, not features
   { id: 'cap-jtbd',       code: '02-A', phaseCode: '02', title: 'Jobs-to-be-done mapping',    description: 'For each user type: the job, desired outcome, current pain point, and definition of done', promptId: 'p-cap-jtbd' },
   { id: 'cap-priority',   code: '02-B', phaseCode: '02', title: 'Outcome prioritisation',     description: 'MoSCoW or impact/effort sort with stakeholders; produces a ranked list of user outcomes',  promptId: 'p-cap-priority' },
+  { id: 'cap-personas',   code: '02-C', phaseCode: '02', title: 'Persona & segment definition', description: 'Consolidate research into 2–4 validated archetypes with goals, frustrations, and behavioural tendencies' },
+  { id: 'cap-blueprint',  code: '02-D', phaseCode: '02', title: 'Service blueprint (as-is)',   description: 'Map the current end-to-end experience across frontstage actions, backstage processes, and supporting systems' },
 
   // 03 Objects — identify core entities and relationships
   { id: 'obj-discovery',  code: '03-A', phaseCode: '03', title: 'Entity discovery workshop', description: 'Collaborative session to name core things the product creates, stores, or acts on',       promptId: 'p-obj-discovery' },
   { id: 'obj-relations',  code: '03-B', phaseCode: '03', title: 'Relationship mapping',       description: 'Draw how entities relate — ownership, containment, reference; agree cardinality',         promptId: 'p-obj-relations' },
+  { id: 'obj-content',    code: '03-C', phaseCode: '03', title: 'Content inventory & audit',  description: 'Catalogue all content types (labels, copy, media) the product needs; flag gaps, duplicates, or tone inconsistencies' },
+  { id: 'obj-mentalmodel',code: '03-D', phaseCode: '03', title: 'Mental model mapping',       description: 'Align the user\'s conceptual model of the domain with the system\'s entity model to surface naming and structural conflicts' },
 
   // 04 Interactions — map flows, states, and edge cases
-  { id: 'int-flows',      code: '04-A', phaseCode: '04', title: 'Flow mapping sessions',  description: 'Walk each capability end-to-end; map happy path then empty, error, permission, and loading states', promptId: 'p-int-flows' },
-  { id: 'int-states',     code: '04-B', phaseCode: '04', title: 'State audit',             description: 'For every key object and UI component, enumerate all possible states and stress test with edge cases', promptId: 'p-int-states' },
+  { id: 'int-flows',      code: '04-A', phaseCode: '04', title: 'Flow mapping sessions',    description: 'Walk each capability end-to-end; map happy path then empty, error, permission, and loading states', promptId: 'p-int-flows' },
+  { id: 'int-states',     code: '04-B', phaseCode: '04', title: 'State audit',              description: 'For every key object and UI component, enumerate all possible states and stress test with edge cases', promptId: 'p-int-states' },
+  { id: 'int-wireframes', code: '04-C', phaseCode: '04', title: 'Wireframe / concept review', description: 'Present low-fidelity concepts to stakeholders and capture structured feedback before moving to high-fidelity' },
+  { id: 'int-a11y',       code: '04-D', phaseCode: '04', title: 'Accessibility & inclusion check', description: 'Audit flows against WCAG 2.2 AA criteria and document barriers for assistive technology or diverse user needs' },
+  { id: 'int-usability',  code: '04-E', phaseCode: '04', title: 'Usability test synthesis',  description: 'Run or analyse 5+ task-based sessions and distil findings into a ranked list of friction points with design recommendations' },
 
   // 05 Alignment — agree data contracts and API shapes
-  { id: 'aln-manifest',   code: '05-A', phaseCode: '05', title: 'Data contract review',  description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly', promptId: 'p-aln-manifest' },
-  { id: 'aln-api',        code: '05-B', phaseCode: '05', title: 'API shape agreement',    description: 'Co-design session to agree request/response shapes and pagination before any code is written',            promptId: 'p-aln-api' },
+  { id: 'aln-manifest',   code: '05-A', phaseCode: '05', title: 'Data contract review',        description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly', promptId: 'p-aln-manifest' },
+  { id: 'aln-api',        code: '05-B', phaseCode: '05', title: 'API shape agreement',          description: 'Co-design session to agree request/response shapes and pagination before any code is written',            promptId: 'p-aln-api' },
+  { id: 'aln-tokens',     code: '05-C', phaseCode: '05', title: 'Design token & component handoff', description: 'Define and agree the design token set (colours, type, spacing) and component inventory before build starts' },
+  { id: 'aln-signoff',    code: '05-D', phaseCode: '05', title: 'Prototype sign-off session',   description: 'Structured walkthrough of the high-fidelity prototype with client and engineering leads; capture open decisions and blockers' },
 
   // 06 Build — generate code only within defined scope
   { id: 'bld-scope',      code: '06-A', phaseCode: '06', title: 'Scope boundary review',   description: 'Walk the spec and flag anything that exceeds what has been designed or contracted before build starts', promptId: 'p-bld-scope' },
   { id: 'bld-qa',         code: '06-B', phaseCode: '06', title: 'Incremental design QA',   description: 'Design reviews implementation against spec at component level throughout build, not just at the end',   promptId: 'p-bld-qa' },
+  { id: 'bld-liveqa',     code: '06-C', phaseCode: '06', title: 'Live UX review',          description: 'Evaluate the deployed product against the approved prototype and log regressions before release' },
+  { id: 'bld-metrics',    code: '06-D', phaseCode: '06', title: 'Analytics & success metrics setup', description: 'Confirm instrumentation for agreed KPIs (task completion, error rate, CSAT) is in place and firing correctly' },
 ];
 
 export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'customActivities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
@@ -47,12 +60,12 @@ export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' 
 
 // Expected deliverables per phase — shown as hints in the sidebar
 export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
-  '01': ['Project brief', 'Assumption register'],
-  '02': ['Capability map', 'Out-of-scope log'],
-  '03': ['Object model', 'Domain glossary'],
-  '04': ['Flow diagrams', 'State inventory'],
-  '05': ['Screen data manifest', 'Contract spec'],
-  '06': ['Annotated design specs', 'Deviation log'],
+  '01': ['Project brief', 'Assumption register', 'Heuristic audit report', 'Competitive review'],
+  '02': ['Capability map', 'Out-of-scope log', 'Personas', 'As-is service blueprint'],
+  '03': ['Object model', 'Domain glossary', 'Content inventory', 'Mental model diagram'],
+  '04': ['Flow diagrams', 'State inventory', 'Wireframes', 'Accessibility audit', 'Usability report'],
+  '05': ['Screen data manifest', 'Contract spec', 'Design tokens', 'Prototype sign-off notes'],
+  '06': ['Annotated design specs', 'Deviation log', 'Live UX review report', 'Analytics setup doc'],
   'U':  [],
 };
 
