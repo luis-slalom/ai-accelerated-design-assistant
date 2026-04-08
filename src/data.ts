@@ -13,39 +13,39 @@ export const ACTIVITY_DEFS: ActivityDef[] = [
   // 01 Context — understand project, users, constraints
   { id: 'ctx-kickoff',    code: '01-A', phaseCode: '01', title: 'Stakeholder kickoff',          description: 'Structured interview to capture goals, risks, non-negotiables, and definition of success', promptId: 'p-ctx-kickoff' },
   { id: 'ctx-research',   code: '01-B', phaseCode: '01', title: 'User research digest',         description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief',       promptId: 'p-ctx-research' },
-  { id: 'ctx-heuristic',  code: '01-C', phaseCode: '01', title: 'Heuristic audit',              description: 'Evaluate existing product or touchpoints against recognised UX principles; produce a scored issue list with severity ratings' },
-  { id: 'ctx-competitive',code: '01-D', phaseCode: '01', title: 'Competitive & analogous review', description: 'Benchmark 3–5 competitors and 2–3 analogous experiences to identify patterns, gaps, and opportunities' },
+  { id: 'ctx-heuristic',  code: '01-C', phaseCode: '01', title: 'Heuristic audit',              description: 'Evaluate existing product or touchpoints against recognised UX principles; produce a scored issue list with severity ratings', promptId: 'p-ctx-heuristic' },
+  { id: 'ctx-competitive',code: '01-D', phaseCode: '01', title: 'Competitive & analogous review', description: 'Benchmark 3–5 competitors and 2–3 analogous experiences to identify patterns, gaps, and opportunities', promptId: 'p-ctx-competitive' },
 
   // 02 Capabilities — define user outcomes, not features
   { id: 'cap-jtbd',       code: '02-A', phaseCode: '02', title: 'Jobs-to-be-done mapping',    description: 'For each user type: the job, desired outcome, current pain point, and definition of done', promptId: 'p-cap-jtbd' },
   { id: 'cap-priority',   code: '02-B', phaseCode: '02', title: 'Outcome prioritisation',     description: 'MoSCoW or impact/effort sort with stakeholders; produces a ranked list of user outcomes',  promptId: 'p-cap-priority' },
-  { id: 'cap-personas',   code: '02-C', phaseCode: '02', title: 'Persona & segment definition', description: 'Consolidate research into 2–4 validated archetypes with goals, frustrations, and behavioural tendencies' },
-  { id: 'cap-blueprint',  code: '02-D', phaseCode: '02', title: 'Service blueprint (as-is)',   description: 'Map the current end-to-end experience across frontstage actions, backstage processes, and supporting systems' },
+  { id: 'cap-personas',   code: '02-C', phaseCode: '02', title: 'Persona & segment definition', description: 'Consolidate research into 2–4 validated archetypes with goals, frustrations, and behavioural tendencies', promptId: 'p-cap-personas' },
+  { id: 'cap-blueprint',  code: '02-D', phaseCode: '02', title: 'Service blueprint (as-is)',   description: 'Map the current end-to-end experience across frontstage actions, backstage processes, and supporting systems', promptId: 'p-cap-blueprint' },
 
   // 03 Objects — identify core entities and relationships
   { id: 'obj-discovery',  code: '03-A', phaseCode: '03', title: 'Entity discovery workshop', description: 'Collaborative session to name core things the product creates, stores, or acts on',       promptId: 'p-obj-discovery' },
   { id: 'obj-relations',  code: '03-B', phaseCode: '03', title: 'Relationship mapping',       description: 'Draw how entities relate — ownership, containment, reference; agree cardinality',         promptId: 'p-obj-relations' },
-  { id: 'obj-content',    code: '03-C', phaseCode: '03', title: 'Content inventory & audit',  description: 'Catalogue all content types (labels, copy, media) the product needs; flag gaps, duplicates, or tone inconsistencies' },
-  { id: 'obj-mentalmodel',code: '03-D', phaseCode: '03', title: 'Mental model mapping',       description: 'Align the user\'s conceptual model of the domain with the system\'s entity model to surface naming and structural conflicts' },
+  { id: 'obj-content',    code: '03-C', phaseCode: '03', title: 'Content inventory & audit',  description: 'Catalogue all content types (labels, copy, media) the product needs; flag gaps, duplicates, or tone inconsistencies', promptId: 'p-obj-content' },
+  { id: 'obj-mentalmodel',code: '03-D', phaseCode: '03', title: 'Mental model mapping',       description: 'Align the user\'s conceptual model of the domain with the system\'s entity model to surface naming and structural conflicts', promptId: 'p-obj-mentalmodel' },
 
   // 04 Interactions — map flows, states, and edge cases
   { id: 'int-flows',      code: '04-A', phaseCode: '04', title: 'Flow mapping sessions',    description: 'Walk each capability end-to-end; map happy path then empty, error, permission, and loading states', promptId: 'p-int-flows' },
   { id: 'int-states',     code: '04-B', phaseCode: '04', title: 'State audit',              description: 'For every key object and UI component, enumerate all possible states and stress test with edge cases', promptId: 'p-int-states' },
-  { id: 'int-wireframes', code: '04-C', phaseCode: '04', title: 'Wireframe / concept review', description: 'Present low-fidelity concepts to stakeholders and capture structured feedback before moving to high-fidelity' },
-  { id: 'int-a11y',       code: '04-D', phaseCode: '04', title: 'Accessibility & inclusion check', description: 'Audit flows against WCAG 2.2 AA criteria and document barriers for assistive technology or diverse user needs' },
-  { id: 'int-usability',  code: '04-E', phaseCode: '04', title: 'Usability test synthesis',  description: 'Run or analyse 5+ task-based sessions and distil findings into a ranked list of friction points with design recommendations' },
+  { id: 'int-wireframes', code: '04-C', phaseCode: '04', title: 'Wireframe / concept review', description: 'Present low-fidelity concepts to stakeholders and capture structured feedback before moving to high-fidelity', promptId: 'p-int-wireframes' },
+  { id: 'int-a11y',       code: '04-D', phaseCode: '04', title: 'Accessibility & inclusion check', description: 'Audit flows against WCAG 2.2 AA criteria and document barriers for assistive technology or diverse user needs', promptId: 'p-int-a11y' },
+  { id: 'int-usability',  code: '04-E', phaseCode: '04', title: 'Usability test synthesis',  description: 'Run or analyse 5+ task-based sessions and distil findings into a ranked list of friction points with design recommendations', promptId: 'p-int-usability' },
 
   // 05 Alignment — agree data contracts and API shapes
   { id: 'aln-manifest',   code: '05-A', phaseCode: '05', title: 'Data contract review',        description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly', promptId: 'p-aln-manifest' },
   { id: 'aln-api',        code: '05-B', phaseCode: '05', title: 'API shape agreement',          description: 'Co-design session to agree request/response shapes and pagination before any code is written',            promptId: 'p-aln-api' },
-  { id: 'aln-tokens',     code: '05-C', phaseCode: '05', title: 'Design token & component handoff', description: 'Define and agree the design token set (colours, type, spacing) and component inventory before build starts' },
-  { id: 'aln-signoff',    code: '05-D', phaseCode: '05', title: 'Prototype sign-off session',   description: 'Structured walkthrough of the high-fidelity prototype with client and engineering leads; capture open decisions and blockers' },
+  { id: 'aln-tokens',     code: '05-C', phaseCode: '05', title: 'Design token & component handoff', description: 'Define and agree the design token set (colours, type, spacing) and component inventory before build starts', promptId: 'p-aln-tokens' },
+  { id: 'aln-signoff',    code: '05-D', phaseCode: '05', title: 'Prototype sign-off session',   description: 'Structured walkthrough of the high-fidelity prototype with client and engineering leads; capture open decisions and blockers', promptId: 'p-aln-signoff' },
 
   // 06 Build — generate code only within defined scope
   { id: 'bld-scope',      code: '06-A', phaseCode: '06', title: 'Scope boundary review',   description: 'Walk the spec and flag anything that exceeds what has been designed or contracted before build starts', promptId: 'p-bld-scope' },
   { id: 'bld-qa',         code: '06-B', phaseCode: '06', title: 'Incremental design QA',   description: 'Design reviews implementation against spec at component level throughout build, not just at the end',   promptId: 'p-bld-qa' },
-  { id: 'bld-liveqa',     code: '06-C', phaseCode: '06', title: 'Live UX review',          description: 'Evaluate the deployed product against the approved prototype and log regressions before release' },
-  { id: 'bld-metrics',    code: '06-D', phaseCode: '06', title: 'Analytics & success metrics setup', description: 'Confirm instrumentation for agreed KPIs (task completion, error rate, CSAT) is in place and firing correctly' },
+  { id: 'bld-liveqa',     code: '06-C', phaseCode: '06', title: 'Live UX review',          description: 'Evaluate the deployed product against the approved prototype and log regressions before release', promptId: 'p-bld-liveqa' },
+  { id: 'bld-metrics',    code: '06-D', phaseCode: '06', title: 'Analytics & success metrics setup', description: 'Confirm instrumentation for agreed KPIs (task completion, error rate, CSAT) is in place and firing correctly', promptId: 'p-bld-metrics' },
 ];
 
 export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'customActivities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
@@ -162,6 +162,89 @@ Are there any misreadings or missing signals?
 Reply YES to confirm.`,
   },
 
+  {
+    id: 'p-ctx-heuristic',
+    level: '01 Context',
+    code: '01-C',
+    title: 'Heuristic audit',
+    description: 'Evaluate existing product or touchpoints against recognised UX principles; produce a scored issue list with severity ratings.',
+    tags: ['heuristics', 'audit', 'UX review'],
+    body: `Conduct a heuristic audit of the existing product or touchpoint using Nielsen's 10 Usability Heuristics as the evaluation framework.
+
+Product / touchpoint to audit: [FILL — e.g. "the client onboarding flow in the web app"]
+How to access it: [FILL — URL, screenshots, recording, or walkthrough notes]
+User type being evaluated for: [FILL]
+
+For each heuristic, identify issues found:
+
+| # | Heuristic | Issue found | Location | Severity (0–4) | Recommendation |
+|---|-----------|-------------|----------|----------------|----------------|
+| 1 | Visibility of system status | | | | |
+| 2 | Match between system and real world | | | | |
+| 3 | User control and freedom | | | | |
+| 4 | Consistency and standards | | | | |
+| 5 | Error prevention | | | | |
+| 6 | Recognition rather than recall | | | | |
+| 7 | Flexibility and efficiency of use | | | | |
+| 8 | Aesthetic and minimalist design | | | | |
+| 9 | Help users recognise, diagnose, recover from errors | | | | |
+| 10 | Help and documentation | | | | |
+
+Severity scale: 0 = not a problem, 1 = cosmetic, 2 = minor, 3 = major, 4 = catastrophic.
+
+After the table, produce:
+## Top 5 priority issues
+Ranked by severity × frequency of encounter.
+
+## Quick wins
+Issues that can be fixed with minimal effort and high impact.
+
+---
+⛔ CHECKPOINT 01-C
+Has the audit been reviewed by at least one other team member?
+Do the severity scores reflect the actual user impact for this specific audience?
+Reply YES to confirm, or adjust scores and recommendations.`,
+  },
+
+  {
+    id: 'p-ctx-competitive',
+    level: '01 Context',
+    code: '01-D',
+    title: 'Competitive & analogous review',
+    description: 'Benchmark 3–5 competitors and 2–3 analogous experiences to identify patterns, gaps, and opportunities.',
+    tags: ['competitive', 'benchmarking', 'discovery'],
+    body: `Conduct a structured competitive and analogous review to identify design patterns, gaps, and opportunities.
+
+Our product / context: [FILL — brief description of what we're building]
+Competitors to review (3–5): [FILL — names or URLs]
+Analogous experiences to review (2–3 from adjacent industries): [FILL — e.g. "Notion for document hierarchy", "Linear for project status"]
+User goals we're evaluating for: [FILL — from JTBD mapping]
+
+For each product reviewed, produce:
+
+## [Product name]
+**Type:** Competitor / Analogous
+**What they do well:** (2–4 specific observations, not generalities)
+**What they do poorly:** (2–4 specific observations)
+**Design patterns worth adopting:** (name and describe the pattern)
+**Anti-patterns to avoid:** (what they do that frustrates users)
+**Unique differentiator:** (what only they do)
+
+After all reviews, produce:
+
+## Cross-product synthesis
+**Common patterns** — what every product does (table stakes)
+**Points of differentiation** — where the market diverges
+**Gaps** — what no product does well that our users need
+**Opportunities** — where we can credibly be better
+
+---
+⛔ CHECKPOINT 01-D
+Does this review cover the right competitors?
+Are there analogous industries or products we've missed that are more relevant?
+Reply YES to confirm, or add missing products before we proceed.`,
+  },
+
   // ── 02 Capabilities ────────────────────────────────────────────────────
 
   {
@@ -226,6 +309,84 @@ Produce:
 Has everyone with sign-off authority agreed to this prioritisation?
 Any outcomes that feel mis-ranked?
 Reply YES to confirm the list is locked, or adjust before we move to object modelling.`,
+  },
+
+  {
+    id: 'p-cap-personas',
+    level: '02 Capabilities',
+    code: '02-C',
+    title: 'Persona & segment definition',
+    description: 'Consolidate research into 2–4 validated archetypes with goals, frustrations, and behavioural tendencies.',
+    tags: ['personas', 'segments', 'users'],
+    body: `Based on the research digest and JTBD mapping, help me define 2–4 user archetypes for this product.
+
+Research inputs: [FILL — paste insight brief from 01-B and JTBD map from 02-A]
+Number of archetypes to define: [FILL — recommended 2–4]
+
+For each archetype, produce:
+
+## [Archetype name — descriptive, not a fake first name]
+**Who they are:** [role, context, relevant background — one paragraph]
+**Primary goal:** [the one thing they most need to accomplish with this product]
+**Secondary goals:** [2–3 supporting goals]
+**Frustrations with the current experience:** [3–5 specific pain points, cited from research]
+**Behaviours and habits:** [how they currently work — tools, workarounds, frequency]
+**What success looks like for them:** [how they'll know the product is working]
+**What would cause them to abandon or distrust the product:** [failure modes]
+**Quote that captures their mindset:** [synthesised from research, not invented]
+
+After all archetypes:
+## Segment tensions
+Where do the archetypes' needs conflict? Which conflicts require explicit design decisions?
+
+## Primary vs secondary
+Which archetype should we optimise for if we have to choose?
+
+---
+⛔ CHECKPOINT 02-C
+Are these archetypes grounded in research — not invented?
+Would your research participants recognise themselves in these descriptions?
+Reply YES to confirm, or adjust before we proceed to service blueprinting.`,
+  },
+
+  {
+    id: 'p-cap-blueprint',
+    level: '02 Capabilities',
+    code: '02-D',
+    title: 'Service blueprint (as-is)',
+    description: 'Map the current end-to-end experience across frontstage actions, backstage processes, and supporting systems.',
+    tags: ['service blueprint', 'journey', 'as-is'],
+    body: `Map the current end-to-end experience as a service blueprint — before we design any improvements.
+
+Experience to map: [FILL — e.g. "a new client from first contact to first signed deliverable"]
+Primary user archetype: [FILL — from 02-C]
+Key touchpoints identified: [FILL — channels, moments of truth]
+
+Produce a service blueprint with these swim lanes:
+
+**USER ACTIONS** — what the user does at each step (their experience, their words)
+**FRONTSTAGE** — what the user sees or interacts with (interfaces, people, communications)
+**BACKSTAGE** — internal processes the user doesn't see (operations, decisions, tools)
+**SUPPORT SYSTEMS** — technology, data, and infrastructure that enables the experience
+**PAIN POINTS** — friction, delays, errors, or workarounds at each step (🔴 critical / 🟡 moderate / 🟢 minor)
+**OPPORTUNITIES** — where improvement is possible (flag only, don't design yet)
+
+For each step:
+| Step | User action | Frontstage | Backstage | Support systems | Pain points | Opportunities |
+|------|-------------|------------|-----------|-----------------|-------------|---------------|
+
+After the blueprint:
+## Moments of truth
+Which 3–5 steps have the highest impact on user trust and satisfaction?
+
+## Biggest systemic gaps
+Where does the experience break down most severely — and why?
+
+---
+⛔ CHECKPOINT 02-D
+Does this blueprint accurately reflect the current experience — not the ideal one?
+Have we validated it with someone who lives this process daily?
+Reply YES to confirm, or correct inaccuracies before we proceed.`,
   },
 
   // ── 03 Objects ─────────────────────────────────────────────────────────
@@ -300,6 +461,87 @@ Produce:
 Relationship mapping has direct implications for data modelling and UI architecture.
 Engineering must sign off on cardinality and delete behaviour before we proceed.
 Reply YES when both design and engineering agree.`,
+  },
+
+  {
+    id: 'p-obj-content',
+    level: '03 Objects',
+    code: '03-C',
+    title: 'Content inventory & audit',
+    description: 'Catalogue all content types (labels, copy, media) the product needs; flag gaps, duplicates, or tone inconsistencies.',
+    tags: ['content', 'copy', 'IA'],
+    body: `Produce a content inventory for the product and audit it for gaps, duplicates, and tone issues.
+
+Product / scope to audit: [FILL — e.g. "the full web app" or "the onboarding flow"]
+Existing content sources: [FILL — paste or link to screens, copy docs, or CMS export]
+Target tone of voice: [FILL — or "to be defined"]
+
+PART 1 — CONTENT INVENTORY
+For each screen or section, catalogue:
+
+| Screen / section | Content type | Label / copy (exact) | Owner | Status (✓ approved / ⚠ draft / ✕ missing) |
+|-----------------|--------------|----------------------|-------|------------------------------------------|
+
+Content types include: page titles, headings, body copy, CTAs, labels, error messages, empty states, tooltips, notifications, legal copy, imagery, icons.
+
+PART 2 — AUDIT FLAGS
+After the inventory, flag:
+
+**Gaps** — content that is needed but doesn't exist yet
+**Duplicates** — the same concept described differently in different places
+**Inconsistencies** — same label used for different things
+**Tone deviations** — copy that doesn't match the agreed voice
+**Missing states** — screens or components with no copy for empty, error, or loading states
+
+PART 3 — Priority fixes
+Rank the top 10 content issues by user impact.
+
+---
+⛔ CHECKPOINT 03-C
+Is any critical content type missing from this inventory?
+Has the tone audit been reviewed by someone with sign-off on brand voice?
+Reply YES to confirm.`,
+  },
+
+  {
+    id: 'p-obj-mentalmodel',
+    level: '03 Objects',
+    code: '03-D',
+    title: 'Mental model mapping',
+    description: 'Align the user\'s conceptual model of the domain with the system\'s entity model to surface naming and structural conflicts.',
+    tags: ['mental model', 'IA', 'naming'],
+    body: `Map the user's mental model of this domain and compare it to the system's entity model to find conflicts and alignment risks.
+
+Domain being modelled: [FILL — e.g. "project management for a design agency"]
+User archetypes: [FILL — from 02-C]
+System entity model: [FILL — paste from 03-A / 03-B]
+Research sources: [FILL — transcripts, surveys, or user vocabulary list]
+
+PART 1 — USER MENTAL MODEL
+Based on the research, how do users think about this domain?
+
+For each key concept users work with:
+| User's term | What they mean by it | How they expect it to behave | Emotional association |
+|-------------|---------------------|------------------------------|-----------------------|
+
+PART 2 — SYSTEM MODEL
+For each entity in the system:
+| System entity | Technical definition | How it maps to user's term | Conflict? |
+|---------------|----------------------|---------------------------|-----------|
+
+PART 3 — CONFLICT ANALYSIS
+For each conflict identified:
+- **What the user expects** vs **what the system does**
+- **Impact:** [how often this conflict will cause confusion]
+- **Recommendation:** rename the entity / restructure the model / educate users / redesign the flow
+
+PART 4 — Naming decisions needed
+List every entity name that needs a design decision before implementation.
+
+---
+⛔ CHECKPOINT 03-D
+Have we tested these mental model assumptions directly with users — not just inferred them?
+Reply YES to confirm, or flag assumptions that need validation.`,
   },
 
   // ── 04 Interactions ────────────────────────────────────────────────────
@@ -382,6 +624,150 @@ Every state listed needs a design treatment before any ticket is written.
 Reply YES when both sides confirm completeness.`,
   },
 
+  {
+    id: 'p-int-wireframes',
+    level: '04 Interactions',
+    code: '04-C',
+    title: 'Wireframe / concept review',
+    description: 'Present low-fidelity concepts to stakeholders and capture structured feedback before moving to high-fidelity.',
+    tags: ['wireframes', 'feedback', 'review'],
+    body: `Facilitate a structured wireframe or concept review with stakeholders. The goal is to gather actionable feedback — not a vote.
+
+Concepts being reviewed: [FILL — list or attach wireframes, sketches, or lo-fi prototypes]
+Review audience: [FILL — client stakeholders / internal team / both]
+Questions we need answered from this review: [FILL — 2–4 specific open questions]
+
+REVIEW STRUCTURE
+
+PART 1 — Context setting (5 min)
+Before showing anything, confirm:
+- What problem are we solving? (restate from kickoff)
+- What is the scope of this review? (lo-fi concepts, not final design)
+- What kind of feedback is useful right now? (structure and flow, not colour or font)
+- What feedback is NOT useful right now? (visual polish, brand — premature)
+
+PART 2 — Concept walkthrough
+For each concept or screen:
+- What user goal is this addressing?
+- Walk the flow without stopping for questions
+- Then open for structured feedback using:
+
+| Screen | What's working | What's confusing | What's missing | Open question answered? |
+|--------|----------------|-----------------|----------------|------------------------|
+
+PART 3 — Synthesis
+After the review:
+**Consensus decisions** — what everyone agreed on
+**Unresolved disagreements** — what needs a follow-up decision
+**Changes to make before high-fidelity** — specific, actionable list
+**What we will NOT change** — document explicitly to prevent revisiting
+
+---
+⛔ CHECKPOINT 04-C
+Has every open question from Part 1 been answered or formally deferred?
+Have stakeholders confirmed the structure before visual design begins?
+Reply YES to confirm sign-off on the wireframe direction.`,
+  },
+
+  {
+    id: 'p-int-a11y',
+    level: '04 Interactions',
+    code: '04-D',
+    title: 'Accessibility & inclusion check',
+    description: 'Audit flows against WCAG 2.2 AA criteria and document barriers for assistive technology or diverse user needs.',
+    tags: ['accessibility', 'WCAG', 'inclusion'],
+    body: `Audit this flow or set of components against WCAG 2.2 AA and inclusive design principles.
+
+Flow / screens to audit: [FILL]
+Assistive technologies to consider: [FILL — screen reader, keyboard-only, voice control, magnification]
+Known diverse user needs for this audience: [FILL — e.g. low vision, motor impairment, cognitive load, non-native language]
+
+PART 1 — WCAG 2.2 AA CHECKLIST
+
+For each screen or component:
+
+**Perceivable**
+- [ ] All non-text content has a text alternative (1.1.1)
+- [ ] Colour is not the only means of conveying information (1.4.1)
+- [ ] Colour contrast ratio ≥ 4.5:1 for normal text, ≥ 3:1 for large text (1.4.3)
+- [ ] Text can be resized to 200% without loss of content (1.4.4)
+- [ ] Content doesn't rely on sensory characteristics alone (1.3.3)
+
+**Operable**
+- [ ] All functionality is available via keyboard (2.1.1)
+- [ ] No keyboard traps (2.1.2)
+- [ ] Focus visible and logical (2.4.7, 2.4.3)
+- [ ] Skip links present (2.4.1)
+- [ ] Touch targets ≥ 24×24px (2.5.8)
+- [ ] Pointer gestures have single-pointer alternatives (2.5.1)
+
+**Understandable**
+- [ ] Page language declared (3.1.1)
+- [ ] Labels or instructions present for all inputs (3.3.2)
+- [ ] Error messages identify the field and suggest a fix (3.3.1, 3.3.3)
+- [ ] Consistent navigation and labelling (3.2.3, 3.2.4)
+
+**Robust**
+- [ ] Name, role, value programmatically available for all UI components (4.1.2)
+- [ ] Status messages don't require focus (4.1.3)
+
+PART 2 — BARRIERS LOG
+For each failure:
+| Issue | WCAG criterion | Severity | Affected users | Recommended fix | Owner |
+|-------|----------------|----------|----------------|-----------------|-------|
+
+PART 3 — INCLUSION NOTES
+Beyond WCAG: are there cognitive, linguistic, or situational barriers not covered by the checklist?
+
+---
+⛔ CHECKPOINT 04-D
+Have critical and major barriers been resolved or formally accepted with a plan to fix post-launch?
+Reply YES to confirm the accessibility review is complete.`,
+  },
+
+  {
+    id: 'p-int-usability',
+    level: '04 Interactions',
+    code: '04-E',
+    title: 'Usability test synthesis',
+    description: 'Run or analyse 5+ task-based sessions and distil findings into a ranked list of friction points with design recommendations.',
+    tags: ['usability', 'testing', 'synthesis'],
+    body: `Synthesise findings from a round of usability testing into a prioritised action list.
+
+Test method: [FILL — moderated / unmoderated / remote / in-person]
+Number of participants: [FILL — minimum 5 recommended]
+Tasks tested: [FILL — list the task scenarios used]
+Raw notes or recordings: [FILL — paste observation notes, timestamps, or key quotes]
+
+PART 1 — TASK PERFORMANCE SUMMARY
+For each task:
+| Task | Completion rate | Avg time | Error rate | Satisfaction (1–5) |
+|------|----------------|----------|------------|-------------------|
+
+PART 2 — FRICTION POINT CATALOGUE
+For each observed problem:
+| Issue | Where it happened | How many participants | Severity (critical / major / minor) | Root cause hypothesis | Quote |
+|-------|-------------------|----------------------|--------------------------------------|-----------------------|-------|
+
+PART 3 — RANKED ACTION LIST
+Sort by: severity × frequency × ease of fix.
+
+For each recommendation:
+- **Problem:** [what users struggled with]
+- **Observed behaviour:** [what they actually did]
+- **Design recommendation:** [specific change to make]
+- **Priority:** P1 (fix before launch) / P2 (fix in next iteration) / P3 (monitor)
+
+PART 4 — WHAT WORKED WELL
+Document what performed well — so we don't accidentally remove it.
+
+---
+⛔ CHECKPOINT 04-E
+Do the recommendations address root causes — not just surface symptoms?
+Has the client reviewed and agreed to the priority rankings?
+Reply YES to confirm the synthesis is actionable and approved.`,
+  },
+
   // ── 05 Alignment ───────────────────────────────────────────────────────
 
   {
@@ -451,6 +837,102 @@ After all endpoints are defined:
 API shapes must be signed off by both design and engineering.
 No build should begin on any endpoint until this contract is agreed.
 Reply YES when both sides confirm. Open questions must be resolved first.`,
+  },
+
+  {
+    id: 'p-aln-tokens',
+    level: '05 Alignment',
+    code: '05-C',
+    title: 'Design token & component handoff',
+    description: 'Define and agree the design token set (colours, type, spacing) and component inventory before build starts.',
+    tags: ['tokens', 'design system', 'handoff'],
+    body: `Define the design token set and component inventory that engineering will implement. Nothing should be built before this is agreed.
+
+Design file / source: [FILL — Figma link or attach]
+Tech stack: [FILL — e.g. React + Tailwind / CSS custom properties / Style Dictionary]
+Existing design system or component library in use: [FILL — or "none"]
+
+PART 1 — DESIGN TOKENS
+
+**Colour tokens**
+| Token name | Value | Usage |
+|------------|-------|-------|
+| color.primary | | |
+| color.surface | | |
+| color.text.primary | | |
+| color.border | | |
+| (add all tokens) | | |
+
+**Typography tokens**
+| Token name | Font / size / weight / line height | Usage |
+|------------|-----------------------------------|-------|
+
+**Spacing tokens**
+| Token name | Value | Usage |
+|------------|-------|-------|
+
+**Radius, shadow, motion tokens** (as applicable)
+
+PART 2 — COMPONENT INVENTORY
+For each UI component:
+| Component | Variants | States | Source (new / existing / modified) | Figma frame | Agreed? |
+|-----------|----------|--------|-------------------------------------|-------------|---------|
+
+PART 3 — OPEN DECISIONS
+- Any token that hasn't been agreed with engineering
+- Any component that doesn't exist in the current library and needs to be built
+- Any animation or motion spec that hasn't been defined
+
+---
+⛔ CHECKPOINT 05-C
+Engineering must confirm the token names match their implementation format.
+No component should be built until it appears in this inventory.
+Reply YES when both design and engineering have signed off.`,
+  },
+
+  {
+    id: 'p-aln-signoff',
+    level: '05 Alignment',
+    code: '05-D',
+    title: 'Prototype sign-off session',
+    description: 'Structured walkthrough of the high-fidelity prototype with client and engineering leads; capture open decisions and blockers.',
+    tags: ['prototype', 'sign-off', 'client review'],
+    body: `Facilitate a prototype sign-off session. The goal is explicit approval from the client before build begins — not just a walkthrough.
+
+Prototype: [FILL — Figma link or recording]
+Attendees: [FILL — client stakeholders, engineering lead, design lead]
+Outstanding open questions from previous phases: [FILL — paste from decision log or alignment notes]
+
+SESSION STRUCTURE
+
+PART 1 — Pre-meeting checklist
+Before the session, confirm:
+- [ ] Prototype covers all agreed capabilities from Phase 02
+- [ ] All states (empty, error, loading) are represented
+- [ ] Accessibility audit (04-D) findings have been addressed
+- [ ] Open questions from wireframe review (04-C) have been resolved
+
+PART 2 — Walkthrough notes
+For each flow or section reviewed:
+| Flow | Client feedback | Engineering concern | Decision made | Owner |
+|------|----------------|---------------------|---------------|-------|
+
+PART 3 — Sign-off decision matrix
+| Item | Status | Notes |
+|------|--------|-------|
+| Overall direction approved | ✓ / ✗ / ⚠ pending | |
+| Scope confirmed (nothing added) | ✓ / ✗ / ⚠ pending | |
+| Data availability confirmed | ✓ / ✗ / ⚠ pending | |
+| Accessibility requirements met | ✓ / ✗ / ⚠ pending | |
+| Content approved | ✓ / ✗ / ⚠ pending | |
+
+PART 4 — Blockers
+List any item that prevents build from starting. Each blocker needs an owner and a resolution date.
+
+---
+⛔ CHECKPOINT 05-D
+Build must not begin until every blocker is resolved and the client has given explicit written approval.
+Reply YES only when all items in the sign-off matrix are confirmed.`,
   },
 
   // ── 06 Build ───────────────────────────────────────────────────────────
@@ -531,6 +1013,95 @@ For every item that fails: document it in the deviation log with severity (criti
 ⛔ CHECKPOINT 06-B
 Design QA sign-off is required before this component is merged.
 Reply YES only when all critical and major items are resolved.`,
+  },
+
+  {
+    id: 'p-bld-liveqa',
+    level: '06 Build',
+    code: '06-C',
+    title: 'Live UX review',
+    description: 'Evaluate the deployed product against the approved prototype and log regressions before release.',
+    tags: ['QA', 'live review', 'regression'],
+    body: `Compare the deployed product against the approved prototype and document all regressions before release.
+
+Environment to review: [FILL — staging URL or build]
+Approved prototype: [FILL — Figma link]
+Scope of this review: [FILL — specific flows or the full product]
+Reference: incremental design QA log from 06-B
+
+PART 1 — FLOW-BY-FLOW COMPARISON
+For each key flow:
+| Screen | Prototype | Deployed | Match? | Regression type | Severity | Owner |
+|--------|-----------|----------|--------|-----------------|----------|-------|
+
+Regression types: Visual / Behaviour / Content / Performance / Accessibility
+
+PART 2 — END-TO-END SMOKE TEST
+Walk each core user task end-to-end on the live environment:
+| Task | Can user complete it? | Blockers | Notes |
+|------|-----------------------|----------|-------|
+
+PART 3 — REGRESSION LOG
+For every regression found:
+- **Description:** [what is wrong]
+- **Expected (from prototype):** [what it should do]
+- **Actual (on live):** [what it does]
+- **Severity:** Critical (blocks release) / Major (fix before launch) / Minor (next sprint)
+- **Screenshot or recording:** [attach]
+- **Assigned to:** [engineer]
+- **Target fix date:** [date]
+
+---
+⛔ CHECKPOINT 06-C
+All critical regressions must be resolved before release.
+Major regressions must have a committed fix date.
+Reply YES only when the release candidate is approved by design.`,
+  },
+
+  {
+    id: 'p-bld-metrics',
+    level: '06 Build',
+    code: '06-D',
+    title: 'Analytics & success metrics setup',
+    description: 'Confirm instrumentation for agreed KPIs (task completion, error rate, CSAT) is in place and firing correctly.',
+    tags: ['analytics', 'metrics', 'KPIs'],
+    body: `Confirm that the agreed success metrics are instrumented, firing correctly, and visible in the analytics platform before launch.
+
+Analytics platform: [FILL — e.g. Mixpanel, GA4, Amplitude, PostHog]
+KPIs agreed in project brief: [FILL — paste from Phase 01 kickoff summary]
+Events to track: [FILL — or list below]
+
+PART 1 — KPI → EVENT MAPPING
+For each KPI, define the events needed to measure it:
+
+| KPI | How it's measured | Events required | Property required | Dashboard / report |
+|-----|-------------------|-----------------|-------------------|--------------------|
+| Task completion rate | | | | |
+| Error rate | | | | |
+| Time on task | | | | |
+| Drop-off by step | | | | |
+| CSAT / NPS | | | | |
+| (add project-specific KPIs) | | | | |
+
+PART 2 — INSTRUMENTATION CHECKLIST
+For each event:
+- [ ] Event fires on correct user action
+- [ ] Properties are correctly populated (not null, not mistyped)
+- [ ] Event is visible in the analytics dashboard
+- [ ] Test recording available (session replay or QA log)
+
+PART 3 — BASELINE CAPTURE
+Before launch, document current baselines (if applicable) so we can measure change:
+| Metric | Baseline value | Source | Date captured |
+|--------|----------------|--------|---------------|
+
+PART 4 — REVIEW CADENCE
+Who reviews these metrics, how often, and what triggers an action?
+
+---
+⛔ CHECKPOINT 06-D
+Instrumentation must be verified in staging before launch — not assumed.
+Reply YES only when every KPI has a confirmed, tested event and is visible in the dashboard.`,
   },
 
   // ── Utility ────────────────────────────────────────────────────────────
