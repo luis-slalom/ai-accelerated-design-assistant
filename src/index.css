@@ -4,11 +4,11 @@
   --font-sans: 'Slalom Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', monospace;
 
-  /* Slalom brand */
-  --color-brand:        #E8220F;
-  --color-brand-hover:  #C81D0D;
-  --color-brand-light:  #FEF2F1;
-  --color-brand-border: #F9B8B3;
+  /* Slalom Consulting Blue */
+  --color-brand:        #0052A5;
+  --color-brand-hover:  #003F82;
+  --color-brand-light:  #EBF2FB;
+  --color-brand-border: #8FBCE4;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -47,9 +47,9 @@
   --color-done-border: #bfdbfe;
 
   /* Status: in progress — use brand */
-  --color-progress-text:   #E8220F;
-  --color-progress-bg:     #FEF2F1;
-  --color-progress-border: #F9B8B3;
+  --color-progress-text:   #0052A5;
+  --color-progress-bg:     #EBF2FB;
+  --color-progress-border: #8FBCE4;
 
   /* Status: neutral */
   --color-neutral-text:   #6b7280;
