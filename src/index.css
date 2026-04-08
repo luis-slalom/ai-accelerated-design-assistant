@@ -1,45 +1,59 @@
 /* ── Design tokens ─────────────────────────────────────────────────────── */
 :root {
-  --font-sans: system-ui, -apple-system, sans-serif;
+  /* Slalom Sans first; Inter as web fallback if Slalom Sans isn't installed */
+  --font-sans: 'Slalom Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', monospace;
 
-  --radius-sm: 5px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Slalom brand */
+  --color-brand:        #E8220F;
+  --color-brand-hover:  #C81D0D;
+  --color-brand-light:  #FEF2F1;
+  --color-brand-border: #F9B8B3;
 
-  --color-text-primary: #111;
-  --color-text-secondary: #555;
-  --color-text-tertiary: #999;
-  --color-text-link: #2563eb;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px; /* unified with md */
 
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f5f5f5;
-  --color-bg-tertiary: #f9f9f9;
-  --color-bg-hover: #f0f0f0;
+  /* Text — Slalom warm near-black */
+  --color-text-primary:   #231F20;
+  --color-text-secondary: #5A5656;
+  --color-text-tertiary:  #9A9A9A;
+  --color-text-link:      #E8220F;
 
-  --color-border-primary: #111;
-  --color-border-secondary: #ddd;
-  --color-border-tertiary: #ebebeb;
+  /* Surfaces */
+  --color-bg-primary:   #FFFFFF;
+  --color-bg-secondary: #F7F5F5;
+  --color-bg-tertiary:  #FAFAFA;
+  --color-bg-hover:     #F2EFEF;
 
-  /* Status colors */
-  --color-active-text: #15803d;
-  --color-active-bg: #f0fdf4;
+  /* Borders */
+  --color-border-primary:   #231F20;
+  --color-border-secondary: #DDD9D9;
+  --color-border-tertiary:  #EBEBEB;
+
+  /* Status: validated / active */
+  --color-active-text:   #15803d;
+  --color-active-bg:     #f0fdf4;
   --color-active-border: #bbf7d0;
 
-  --color-hold-text: #b45309;
-  --color-hold-bg: #fffbeb;
+  /* Status: on hold */
+  --color-hold-text:   #92400e;
+  --color-hold-bg:     #fffbeb;
   --color-hold-border: #fde68a;
 
-  --color-done-text: #1d4ed8;
-  --color-done-bg: #eff6ff;
+  /* Status: completed */
+  --color-done-text:   #1d4ed8;
+  --color-done-bg:     #eff6ff;
   --color-done-border: #bfdbfe;
 
-  --color-progress-text: #1d4ed8;
-  --color-progress-bg: #eff6ff;
-  --color-progress-border: #bfdbfe;
+  /* Status: in progress — use brand */
+  --color-progress-text:   #E8220F;
+  --color-progress-bg:     #FEF2F1;
+  --color-progress-border: #F9B8B3;
 
-  --color-neutral-text: #6b7280;
-  --color-neutral-bg: #f9fafb;
+  /* Status: neutral */
+  --color-neutral-text:   #6b7280;
+  --color-neutral-bg:     #f9fafb;
   --color-neutral-border: #e5e7eb;
 }
 
@@ -144,12 +158,12 @@ button:hover { background: var(--color-bg-secondary); }
 button:active { background: #e9e9e9; }
 
 .btn-primary {
-  background: var(--color-text-primary);
+  background: var(--color-brand);
   color: #fff;
-  border-color: var(--color-text-primary);
+  border-color: var(--color-brand);
 }
-.btn-primary:hover { background: #333; border-color: #333; }
-.btn-primary:disabled { background: #999; border-color: #999; cursor: not-allowed; }
+.btn-primary:hover { background: var(--color-brand-hover); border-color: var(--color-brand-hover); }
+.btn-primary:disabled { background: #C9B8B7; border-color: #C9B8B7; cursor: not-allowed; }
 
 .btn-danger-outline {
   color: #dc2626;
@@ -316,8 +330,8 @@ button:active { background: #e9e9e9; }
 .app-title {
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  color: var(--color-brand);
 }
 
 .app-subtitle {
@@ -1524,8 +1538,8 @@ button:active { background: #e9e9e9; }
 .activity-card:hover { border-color: var(--color-border-secondary); }
 
 .activity-card-in-progress {
-  border-color: #bfdbfe;
-  box-shadow: 0 0 0 2px rgba(191,219,254,0.3);
+  border-color: var(--color-brand-border);
+  box-shadow: 0 0 0 2px rgba(232,34,15,0.08);
 }
 
 .activity-card-validated {
@@ -1964,8 +1978,8 @@ button:active { background: #e9e9e9; }
   font-size: 13px;
   font-weight: 600;
   color: #fff;
-  background: var(--color-active-text, #34d399);
-  border: 1.5px solid var(--color-active-text, #34d399);
+  background: var(--color-brand);
+  border: 1.5px solid var(--color-brand);
   border-radius: var(--radius-sm);
   width: 100%;
   padding: 11px 16px;
@@ -1975,7 +1989,8 @@ button:active { background: #e9e9e9; }
   letter-spacing: 0.01em;
 }
 .btn-validate-trigger:hover {
-  opacity: 0.88;
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
 }
 
 .validate-confirm {
@@ -2081,12 +2096,12 @@ button:active { background: #e9e9e9; }
   font-weight: 500;
   white-space: nowrap;
 }
-.role-chip-designer   { background: #1e3a5f; color: #93c5fd; }
-.role-chip-engineer   { background: #2d1b69; color: #c4b5fd; }
-.role-chip-pm         { background: #3b1f5e; color: #e879f9; }
-.role-chip-researcher { background: #134e4a; color: #5eead4; }
-.role-chip-business   { background: #1a3a2a; color: #6ee7b7; }
-.role-chip-stakeholder{ background: #431407; color: #fb923c; }
+.role-chip-designer,
+.role-chip-engineer,
+.role-chip-pm,
+.role-chip-researcher,
+.role-chip-business   { background: var(--color-bg-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-secondary); }
+.role-chip-stakeholder { background: var(--color-brand-light); color: var(--color-brand); border: 1px solid var(--color-brand-border); }
 
 .role-dot {
   width: 8px; height: 8px;
@@ -2439,27 +2454,38 @@ button:active { background: #e9e9e9; }
   line-height: 1.4;
 }
 
-/* Inactive colour per team */
-.engagement-chip-stakeholder { border-color: rgba(251,146,60,0.35); color: rgba(251,146,60,0.6); }
-.engagement-chip-delivery    { border-color: rgba(96,165,250,0.35); color: rgba(96,165,250,0.6); }
-.engagement-chip-pm          { border-color: rgba(216,180,254,0.4); color: rgba(216,180,254,0.65); }
-.engagement-chip-other       { border-color: rgba(148,163,184,0.35); color: rgba(148,163,184,0.55); }
+/* Inactive — all teams use the same neutral style */
+.engagement-chip-stakeholder,
+.engagement-chip-delivery,
+.engagement-chip-pm,
+.engagement-chip-other {
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-secondary);
+}
 
 /* Hover */
-.engagement-chip-stakeholder:hover { border-color: rgba(251,146,60,0.8); color: #fb923c; background: rgba(251,146,60,0.07); }
-.engagement-chip-delivery:hover    { border-color: rgba(96,165,250,0.8); color: #60a5fa; background: rgba(96,165,250,0.07); }
-.engagement-chip-pm:hover          { border-color: rgba(216,180,254,0.8); color: #d8b4fe; background: rgba(216,180,254,0.07); }
-.engagement-chip-other:hover       { border-color: rgba(148,163,184,0.8); color: #94a3b8; background: rgba(148,163,184,0.07); }
+.engagement-chip-stakeholder:hover,
+.engagement-chip-delivery:hover,
+.engagement-chip-pm:hover,
+.engagement-chip-other:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+  background: var(--color-brand-light);
+}
 
-/* Active — filled pill containing name + date + remove */
+/* Active — brand colour for all teams (simple, consistent) */
 .engagement-chip-active {
   padding: 3px 3px 3px 10px;
   gap: 0;
 }
-.engagement-chip-active.engagement-chip-stakeholder { background: rgba(251,146,60,0.12); border-color: #fb923c; color: #fb923c; }
-.engagement-chip-active.engagement-chip-delivery    { background: rgba(96,165,250,0.12); border-color: #60a5fa; color: #60a5fa; }
-.engagement-chip-active.engagement-chip-pm          { background: rgba(216,180,254,0.12); border-color: #d8b4fe; color: #d8b4fe; }
-.engagement-chip-active.engagement-chip-other       { background: rgba(148,163,184,0.12); border-color: #94a3b8; color: #94a3b8; }
+.engagement-chip-active.engagement-chip-stakeholder,
+.engagement-chip-active.engagement-chip-delivery,
+.engagement-chip-active.engagement-chip-pm,
+.engagement-chip-active.engagement-chip-other {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
 
 .engagement-chip-name {
   font-size: 11px;

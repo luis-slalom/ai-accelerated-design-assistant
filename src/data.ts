@@ -69,14 +69,15 @@ export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
   'U':  [],
 };
 
+// Phase badge colors — Slalom brand palette: warm reds/neutrals with clear progression
 export const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
-  '01': { bg: '#E6F1FB', text: '#0C447C' },
-  '02': { bg: '#E1F5EE', text: '#085041' },
-  '03': { bg: '#EEEDFE', text: '#3C3489' },
-  '04': { bg: '#FAEEDA', text: '#633806' },
-  '05': { bg: '#FAECE7', text: '#712B13' },
-  '06': { bg: '#FBEAF0', text: '#72243E' },
-  'U':  { bg: '#F1EFE8', text: '#444441' },
+  '01': { bg: '#FEF2F1', text: '#9B1810' }, // lightest brand tint
+  '02': { bg: '#FDDBD8', text: '#8A1410' },
+  '03': { bg: '#FAC5C1', text: '#7A1010' },
+  '04': { bg: '#F5AFA9', text: '#6B0E0E' },
+  '05': { bg: '#EE9891', text: '#5C0B0B' },
+  '06': { bg: '#E57F77', text: '#FFFFFF' }, // darkest — white text
+  'U':  { bg: '#F7F5F5', text: '#5A5656' }, // neutral for utility
 };
 
 

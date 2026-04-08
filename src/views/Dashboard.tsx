@@ -67,8 +67,8 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
       {/* Header */}
       <div className="dashboard-header">
         <div>
-          <h1 className="app-title">Design Tracker</h1>
-          <p className="app-subtitle">Project context and delivery memory bank</p>
+          <h1 className="app-title">Slalom Design Delivery</h1>
+          <p className="app-subtitle">CX & XD project tracker for client engagements</p>
         </div>
         <button className="btn-primary" onClick={() => { setEditingId(null); setDraft(EMPTY_DRAFT); setShowForm(true); }}>
           + New Project
