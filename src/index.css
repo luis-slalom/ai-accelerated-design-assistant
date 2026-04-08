@@ -4,32 +4,32 @@
   --font-sans: 'Slalom Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', monospace;
 
-  /* Slalom Consulting Blue */
-  --color-brand:        #0052A5;
-  --color-brand-hover:  #003F82;
-  --color-brand-light:  #EBF2FB;
-  --color-brand-border: #8FBCE4;
+  /* Slalom Blue — sourced from slalom.com production CSS */
+  --color-brand:        #0c62fb;
+  --color-brand-hover:  #002faf;
+  --color-brand-light:  #d0e0fc;
+  --color-brand-border: #88b7e6;
 
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 6px; /* unified with md */
 
-  /* Text — Slalom warm near-black */
-  --color-text-primary:   #231F20;
-  --color-text-secondary: #5A5656;
-  --color-text-tertiary:  #9A9A9A;
-  --color-text-link:      #E8220F;
+  /* Text */
+  --color-text-primary:   #292929;
+  --color-text-secondary: #525252;
+  --color-text-tertiary:  #a3a3a3;
+  --color-text-link:      #0c62fb;
 
   /* Surfaces */
   --color-bg-primary:   #FFFFFF;
-  --color-bg-secondary: #F7F5F5;
-  --color-bg-tertiary:  #FAFAFA;
-  --color-bg-hover:     #F2EFEF;
+  --color-bg-secondary: #f5f5f5;
+  --color-bg-tertiary:  #f8f9fa;
+  --color-bg-hover:     #f1f1f1;
 
   /* Borders */
-  --color-border-primary:   #231F20;
-  --color-border-secondary: #DDD9D9;
-  --color-border-tertiary:  #EBEBEB;
+  --color-border-primary:   #292929;
+  --color-border-secondary: #e0e0e0;
+  --color-border-tertiary:  #ebebeb;
 
   /* Status: validated / active */
   --color-active-text:   #15803d;
@@ -42,14 +42,14 @@
   --color-hold-border: #fde68a;
 
   /* Status: completed */
-  --color-done-text:   #1d4ed8;
-  --color-done-bg:     #eff6ff;
-  --color-done-border: #bfdbfe;
+  --color-done-text:   #002faf;
+  --color-done-bg:     #d0e0fc;
+  --color-done-border: #88b7e6;
 
   /* Status: in progress — use brand */
-  --color-progress-text:   #0052A5;
-  --color-progress-bg:     #EBF2FB;
-  --color-progress-border: #8FBCE4;
+  --color-progress-text:   #0c62fb;
+  --color-progress-bg:     #d0e0fc;
+  --color-progress-border: #88b7e6;
 
   /* Status: neutral */
   --color-neutral-text:   #6b7280;
@@ -163,7 +163,7 @@ button:active { background: #e9e9e9; }
   border-color: var(--color-brand);
 }
 .btn-primary:hover { background: var(--color-brand-hover); border-color: var(--color-brand-hover); }
-.btn-primary:disabled { background: #C9B8B7; border-color: #C9B8B7; cursor: not-allowed; }
+.btn-primary:disabled { background: #b1b6cb; border-color: #b1b6cb; cursor: not-allowed; }
 
 .btn-danger-outline {
   color: #dc2626;
@@ -1539,7 +1539,7 @@ button:active { background: #e9e9e9; }
 
 .activity-card-in-progress {
   border-color: var(--color-brand-border);
-  box-shadow: 0 0 0 2px rgba(232,34,15,0.08);
+  box-shadow: 0 0 0 2px rgba(12,98,251,0.08);
 }
 
 .activity-card-validated {
@@ -2362,18 +2362,24 @@ button:active { background: #e9e9e9; }
   width: 100%;
   margin-top: 6px;
   padding: 10px 16px;
-  background: none;
-  border: 1.5px dashed var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-tertiary);
+  background: transparent;
+  border: 1.5px dashed var(--color-border-secondary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
   font-size: 13px;
   cursor: pointer;
   text-align: center;
-  transition: border-color 0.15s, color 0.15s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .add-activity-btn:hover {
-  border-color: var(--color-accent, #6366f1);
-  color: var(--color-accent, #6366f1);
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-border);
+  color: var(--color-brand);
+}
+.add-activity-btn:active {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand);
+  color: var(--color-brand-hover);
 }
 
 .add-activity-form {

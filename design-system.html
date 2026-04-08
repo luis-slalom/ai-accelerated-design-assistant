@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slalom Design Delivery — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Tokens (mirrors src/index.css) ─────────────────────────────── */
+    :root {
+      --font-sans: 'Slalom Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: ui-monospace, 'Cascadia Code', monospace;
+
+      /* Slalom Blue — sourced from slalom.com production CSS */
+      --color-brand:        #0c62fb;
+      --color-brand-hover:  #002faf;
+      --color-brand-light:  #d0e0fc;
+      --color-brand-border: #88b7e6;
+
+      --radius-sm: 4px;
+      --radius-md: 6px;
+
+      --color-text-primary:   #292929;
+      --color-text-secondary: #525252;
+      --color-text-tertiary:  #a3a3a3;
+      --color-text-link:      #0c62fb;
+
+      --color-bg-primary:   #FFFFFF;
+      --color-bg-secondary: #f5f5f5;
+      --color-bg-tertiary:  #f8f9fa;
+
+      --color-border-primary:   #292929;
+      --color-border-secondary: #e0e0e0;
+      --color-border-tertiary:  #ebebeb;
+
+      --color-active-text:   #15803d;
+      --color-active-bg:     #f0fdf4;
+      --color-active-border: #bbf7d0;
+
+      --color-hold-text:   #92400e;
+      --color-hold-bg:     #fffbeb;
+      --color-hold-border: #fde68a;
+
+      --color-done-text:   #002faf;
+      --color-done-bg:     #d0e0fc;
+      --color-done-border: #88b7e6;
+
+      --color-progress-text:   #0c62fb;
+      --color-progress-bg:     #d0e0fc;
+      --color-progress-border: #88b7e6;
+    }
+
+    /* ─── Reset ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: var(--color-bg-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────────────── */
+    .ds-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .ds-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border-tertiary);
+      padding: 28px 0 40px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .ds-nav-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--color-border-tertiary);
+      margin-bottom: 16px;
+    }
+    .ds-nav-logo-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-brand);
+      letter-spacing: -0.02em;
+    }
+    .ds-nav-logo-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+    }
+
+    .ds-nav-group { margin-bottom: 20px; padding: 0 12px; }
+    .ds-nav-group-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-tertiary);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+    .ds-nav-item {
+      display: block;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      transition: background 0.1s, color 0.1s;
+    }
+    .ds-nav-item:hover {
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+    }
+    .ds-nav-item.active {
+      background: var(--color-brand-light);
+      color: var(--color-brand);
+      font-weight: 600;
+    }
+
+    .ds-content {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 56px 80px;
+      max-width: 900px;
+    }
+
+    /* ─── Page header ────────────────────────────────────────────────── */
+    .ds-page-header {
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 2px solid var(--color-brand);
+    }
+    .ds-page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--color-brand);
+      margin-bottom: 6px;
+    }
+    .ds-page-subtitle {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      max-width: 540px;
+      line-height: 1.6;
+    }
+    .ds-version {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-brand);
+      background: var(--color-brand-light);
+      border: 1px solid var(--color-brand-border);
+      border-radius: 100px;
+      padding: 2px 10px;
+      margin-top: 10px;
+    }
+
+    /* ─── Section ────────────────────────────────────────────────────── */
+    .ds-section {
+      margin-bottom: 72px;
+      scroll-margin-top: 32px;
+    }
+
+    .ds-section-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-brand);
+      margin-bottom: 6px;
+    }
+    .ds-section-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+      margin-bottom: 6px;
+    }
+    .ds-section-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-bottom: 32px;
+    }
+
+    .ds-subsection {
+      margin-bottom: 40px;
+    }
+    .ds-subsection-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+    .ds-subsection-desc {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin: 8px 0 16px;
+      line-height: 1.6;
+    }
+
+    /* ─── Canvas (specimen area) ─────────────────────────────────────── */
+    .ds-canvas {
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      margin-top: 12px;
+    }
+    .ds-canvas-white {
+      background: #fff;
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      margin-top: 12px;
+    }
+    .ds-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ds-col { display: flex; flex-direction: column; gap: 10px; }
+    .ds-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ds-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* ─── Do / Don't ─────────────────────────────────────────────────── */
+    .ds-do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .ds-do, .ds-dont {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .ds-do {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+    .ds-do strong { color: #15803d; display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+    .ds-dont {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+    .ds-dont strong { color: #dc2626; display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+
+    /* ─── Token table ────────────────────────────────────────────────── */
+    .ds-token-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+    .ds-token-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-tertiary);
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--color-border-secondary);
+    }
+    .ds-token-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--color-border-tertiary);
+      color: var(--color-text-secondary);
+      vertical-align: middle;
+    }
+    .ds-token-table td:first-child { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-primary); }
+    .ds-swatch {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.08);
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* ─── Label above specimen ───────────────────────────────────────── */
+    .ds-label {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .ds-spacer { margin-top: 20px; }
+
+    /* ════════════════════════════════════════════════════════════════════
+       COMPONENT STYLES — mirrors app CSS
+    ════════════════════════════════════════════════════════════════════ */
+
+    /* Buttons */
+    button {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--color-text-primary);
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    button:hover { background: var(--color-bg-secondary); }
+
+    .btn-primary { background: var(--color-brand); color: #fff; border-color: var(--color-brand); }
+    .btn-primary:hover { background: var(--color-brand-hover); border-color: var(--color-brand-hover); }
+    .btn-primary:disabled { background: #b0b8c4; border-color: #b0b8c4; cursor: not-allowed; }
+
+    .btn-danger-outline { color: #dc2626; border-color: #fca5a5; }
+    .btn-danger-outline:hover { background: #fef2f2; }
+
+    .btn-ghost { border-color: transparent; background: transparent; color: var(--color-text-secondary); }
+    .btn-ghost:hover { background: var(--color-bg-secondary); }
+
+    .btn-validate {
+      font-size: 13px; font-weight: 600;
+      color: #fff; background: var(--color-brand);
+      border: 1.5px solid var(--color-brand);
+      border-radius: var(--radius-sm); width: 100%;
+      padding: 11px 16px; text-align: center; cursor: pointer;
+    }
+    .btn-validate:hover { background: var(--color-brand-hover); }
+
+    .activity-edit-btn {
+      font-size: 13px; font-weight: 500; padding: 6px 14px;
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-primary); background: var(--color-bg-primary); cursor: pointer;
+    }
+    .activity-edit-btn:hover { background: var(--color-bg-secondary); }
+
+    .activity-unvalidate-btn {
+      font-size: 12px; font-weight: 600; padding: 6px 16px;
+      border: 1.5px solid var(--color-active-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-active-text); background: var(--color-active-bg); cursor: pointer;
+    }
+
+    /* Inputs */
+    input[type="text"], input[type="url"], input[type="search"], textarea, select {
+      font-family: var(--font-sans); font-size: 13px;
+      color: var(--color-text-primary); background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--radius-sm); padding: 7px 10px;
+      outline: none; width: 100%;
+      transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--color-border-primary); }
+    textarea { resize: vertical; line-height: 1.6; }
+    select { cursor: pointer; }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+      text-transform: uppercase; padding: 3px 8px;
+      border-radius: 100px; white-space: nowrap; border: 1px solid;
+    }
+    .status-active   { color: var(--color-active-text); background: var(--color-active-bg); border-color: var(--color-active-border); }
+    .status-on-hold  { color: var(--color-hold-text);   background: var(--color-hold-bg);   border-color: var(--color-hold-border); }
+    .status-completed{ color: var(--color-done-text);   background: var(--color-done-bg);   border-color: var(--color-done-border); }
+    .status-in-progress { color: var(--color-brand); background: var(--color-brand-light); border-color: var(--color-brand-border); }
+    .status-skipped  { color: var(--color-text-tertiary); background: var(--color-bg-secondary); border-color: var(--color-border-secondary); }
+
+    /* Tags */
+    .tag {
+      font-size: 11px; color: var(--color-text-secondary);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: 100px; padding: 2px 8px;
+    }
+
+    /* Phase badges */
+    .phase-badge {
+      display: inline-flex; align-items: center;
+      font-size: 13px; font-weight: 700; letter-spacing: -0.01em;
+      padding: 5px 12px; border-radius: var(--radius-sm);
+    }
+
+    /* Activity code */
+    .activity-code {
+      font-size: 10px; font-weight: 700; font-family: var(--font-mono);
+      color: var(--color-text-tertiary); background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-sm); padding: 2px 6px; white-space: nowrap;
+    }
+
+    /* Role chips */
+    .role-chip {
+      display: inline-flex; align-items: center; padding: 2px 8px;
+      border-radius: 100px; font-size: 11px; font-weight: 500; white-space: nowrap;
+    }
+    .role-chip-default { background: var(--color-bg-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-secondary); }
+    .role-chip-stakeholder { background: var(--color-brand-light); color: var(--color-brand); border: 1px solid var(--color-brand-border); }
+
+    /* Engagement chips */
+    .engagement-chip {
+      display: inline-flex; align-items: center; gap: 0;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      border: 1.5px solid var(--color-border-secondary);
+      background: transparent; white-space: nowrap;
+      color: var(--color-text-secondary); transition: all 0.15s;
+    }
+    .engagement-chip:hover { border-color: var(--color-brand); color: var(--color-brand); background: var(--color-brand-light); }
+    .engagement-chip-active {
+      padding: 3px 6px 3px 10px; gap: 6px;
+      background: var(--color-brand-light); border-color: var(--color-brand); color: var(--color-brand);
+    }
+    .engagement-chip-date {
+      font-size: 10px; opacity: 0.8; padding: 1px 5px;
+      border-radius: 100px; border: 1px solid currentColor;
+      background: transparent; cursor: pointer; color: inherit;
+    }
+    .engagement-chip-remove {
+      font-size: 12px; background: transparent; border: none;
+      color: inherit; opacity: 0.5; cursor: pointer;
+    }
+
+    /* Activity card */
+    .activity-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .activity-card-in-progress {
+      border-color: var(--color-brand-border);
+      box-shadow: 0 0 0 2px rgba(0,82,165,0.08);
+    }
+    .activity-card-validated {
+      background: var(--color-active-bg);
+      border-color: var(--color-active-border);
+    }
+    .activity-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 12px 14px;
+    }
+    .activity-header-left {
+      display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+    }
+    .activity-status-icon { font-size: 14px; flex-shrink: 0; line-height: 1; }
+    .activity-status-icon-empty       { color: #a3a3a3; }
+    .activity-status-icon-in-progress { color: var(--color-brand); }
+    .activity-status-icon-validated   { color: var(--color-active-text); }
+    .activity-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+    .activity-description { font-size: 12px; color: var(--color-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .activity-title-group { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .activity-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .activity-chevron { font-size: 9px; color: var(--color-text-tertiary); margin-left: 2px; }
+    .activity-body { padding: 0 14px 16px; border-top: 1px solid var(--color-border-tertiary); }
+    .activity-body-inner { padding-top: 14px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+    .activity-validate-section { border-top: 1px solid var(--color-border-tertiary); padding-top: 12px; margin-top: 14px; }
+
+    /* Project card */
+    .project-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .project-card:hover { border-color: var(--color-border-secondary); box-shadow: 0 1px 6px rgba(35,31,32,0.06); }
+    .project-card-title { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2px; }
+    .project-card-client { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; }
+    .project-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* Deliverable card */
+    .deliverable-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-sm);
+      background: var(--color-bg-primary);
+    }
+    .deliverable-icon {
+      font-size: 16px; flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--color-brand-light); color: var(--color-brand);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .deliverable-title { font-size: 13px; font-weight: 500; }
+    .deliverable-meta { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+
+    /* Sidebar section */
+    .sidebar-section {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+    .section-title { font-size: 13px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+    /* Alignment card */
+    .alignment-card {
+      padding: 14px 16px; border-radius: var(--radius-md);
+      border-left: 3px solid transparent;
+    }
+    .alignment-card-required { background: rgba(232,34,15,0.04); border-left-color: #fb923c; }
+    .alignment-card-optional { background: var(--color-bg-secondary); border-left-color: var(--color-border-secondary); }
+    .alignment-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 4px; }
+    .alignment-card-required .alignment-card-label { color: #fb923c; }
+    .alignment-card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .alignment-card-message { font-size: 12px; color: var(--color-text-secondary); line-height: 1.55; }
+
+    /* All-validated banner */
+    .all-validated-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 16px; background: var(--color-active-bg);
+      border: 1px solid var(--color-active-border); border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 500; color: var(--color-active-text);
+    }
+
+    /* Phase completion badge */
+    .phase-completion-badge {
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px;
+      background: var(--color-bg-secondary); color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-secondary);
+    }
+    .phase-completion-badge-done {
+      background: var(--color-active-bg); color: var(--color-active-text);
+      border-color: var(--color-active-border);
+    }
+
+    /* Rich toolbar */
+    .rich-editor { border: 1px solid var(--color-border-secondary); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .rich-toolbar { display: flex; align-items: center; gap: 4px; padding-bottom: 8px; border-bottom: 1px solid var(--color-border-tertiary); margin-bottom: 8px; flex-wrap: wrap; }
+    .rich-toolbar-btn {
+      display: flex; align-items: center; justify-content: center;
+      min-width: 26px; height: 26px; border: none; border-radius: var(--radius-sm);
+      background: transparent; color: var(--color-text-secondary); font-size: 12px; cursor: pointer; padding: 0 5px;
+    }
+    .rich-toolbar-btn:hover { background: var(--color-bg-secondary); color: var(--color-text-primary); }
+    .rich-toolbar-btn.active { background: var(--color-brand); color: #fff; }
+    .rich-style-select {
+      height: 26px; border: 1px solid var(--color-border-secondary); border-radius: var(--radius-sm);
+      background: var(--color-bg-primary); color: var(--color-text-secondary); font-size: 11px;
+      font-family: var(--font-sans); padding: 0 6px; cursor: pointer; outline: none;
+    }
+    .rich-toolbar-sep { width: 1px; height: 16px; background: var(--color-border-tertiary); margin: 0 3px; }
+    .rich-editor-body { font-size: 13px; color: var(--color-text-secondary); min-height: 40px; outline: none; }
+
+    /* Breadcrumb */
+    .breadcrumb-link {
+      background: none; border: none; padding: 0;
+      font-size: 13px; color: var(--color-text-secondary); cursor: pointer;
+    }
+    .breadcrumb-link:hover { color: var(--color-text-primary); }
+
+    /* Form field */
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+    .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+    /* Phase row */
+    .phase-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--radius-md); background: var(--color-bg-primary);
+      transition: border-color 0.15s;
+    }
+    .phase-row:hover { border-color: var(--color-border-secondary); }
+    .phase-row-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-sm); flex-shrink: 0; }
+    .phase-row-label { font-size: 13px; font-weight: 600; }
+    .phase-row-desc { font-size: 12px; color: var(--color-text-tertiary); margin-top: 1px; }
+    .phase-row-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 3rem 2rem;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      border: 1.5px dashed var(--color-border-secondary); border-radius: var(--radius-md);
+    }
+    .empty-state-title { font-size: 15px; font-weight: 600; color: var(--color-text-secondary); }
+    .empty-state-body  { font-size: 13px; color: var(--color-text-tertiary); max-width: 300px; }
+
+    /* Add activity btn */
+    .add-activity-btn {
+      display: block; width: 100%; padding: 10px 16px;
+      background: none; border: 1.5px dashed var(--color-border-secondary);
+      border-radius: var(--radius-sm); color: var(--color-text-tertiary);
+      font-size: 13px; cursor: pointer; text-align: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-activity-btn:hover { border-color: var(--color-brand); color: var(--color-brand); }
+
+    /* Typography specimens */
+    .type-specimen { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary); }
+    .type-specimen:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .type-meta { font-size: 11px; color: var(--color-text-tertiary); font-family: var(--font-mono); margin-bottom: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="ds-shell">
+
+  <!-- ── Sidebar nav ──────────────────────────────────────────────── -->
+  <nav class="ds-nav">
+    <div class="ds-nav-logo">
+      <div class="ds-nav-logo-name">Slalom Design Delivery</div>
+      <div class="ds-nav-logo-sub">Design System</div>
+    </div>
+
+    <div class="ds-nav-group">
+      <div class="ds-nav-group-label">Foundation</div>
+      <a class="ds-nav-item" href="#tokens">Design Tokens</a>
+      <a class="ds-nav-item" href="#typography">Typography</a>
+    </div>
+
+    <div class="ds-nav-group">
+      <div class="ds-nav-group-label">Atoms</div>
+      <a class="ds-nav-item" href="#buttons">Buttons</a>
+      <a class="ds-nav-item" href="#inputs">Form Inputs</a>
+      <a class="ds-nav-item" href="#badges">Badges &amp; Tags</a>
+      <a class="ds-nav-item" href="#chips">Chips</a>
+    </div>
+
+    <div class="ds-nav-group">
+      <div class="ds-nav-group-label">Molecules</div>
+      <a class="ds-nav-item" href="#form-fields">Form Fields</a>
+      <a class="ds-nav-item" href="#toolbar">Rich Text Toolbar</a>
+      <a class="ds-nav-item" href="#deliverable-card">Deliverable Card</a>
+      <a class="ds-nav-item" href="#phase-row">Phase Row</a>
+    </div>
+
+    <div class="ds-nav-group">
+      <div class="ds-nav-group-label">Organisms</div>
+      <a class="ds-nav-item" href="#activity-card">Activity Card</a>
+      <a class="ds-nav-item" href="#project-card">Project Card</a>
+      <a class="ds-nav-item" href="#sidebar-section">Sidebar Section</a>
+      <a class="ds-nav-item" href="#alignment-card">Alignment Card</a>
+      <a class="ds-nav-item" href="#empty-state">Empty States</a>
+    </div>
+
+    <div class="ds-nav-group">
+      <div class="ds-nav-group-label">Templates</div>
+      <a class="ds-nav-item" href="#dashboard-tmpl">Dashboard</a>
+      <a class="ds-nav-item" href="#phase-tmpl">Phase View</a>
+    </div>
+  </nav>
+
+  <!-- ── Main content ─────────────────────────────────────────────── -->
+  <main class="ds-content">
+
+    <div class="ds-page-header">
+      <div class="ds-page-title">Slalom Design Delivery</div>
+      <div class="ds-page-subtitle">Component library and usage guidelines for the CX &amp; XD project tracker. Organised by Atomic Design — from raw tokens to assembled page templates.</div>
+      <div class="ds-version">v1.0 · April 2026</div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         FOUNDATION — TOKENS
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="tokens">
+      <div class="ds-section-eyebrow">Foundation</div>
+      <div class="ds-section-title">Design Tokens</div>
+      <div class="ds-section-desc">All visual decisions are expressed as CSS custom properties. Components reference these variables directly — never hardcoded values.</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Brand</div>
+        <table class="ds-token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td>--color-brand</td><td><span class="ds-swatch" style="background:#0c62fb"></span>#0c62fb</td><td>Primary actions, links, active state, app title</td></tr>
+            <tr><td>--color-brand-hover</td><td><span class="ds-swatch" style="background:#002faf"></span>#002faf</td><td>Button hover</td></tr>
+            <tr><td>--color-brand-light</td><td><span class="ds-swatch" style="background:#d0e0fc"></span>#d0e0fc</td><td>Tinted backgrounds for active chips, badges</td></tr>
+            <tr><td>--color-brand-border</td><td><span class="ds-swatch" style="background:#88b7e6"></span>#88b7e6</td><td>Borders on brand-tinted surfaces</td></tr>
+          </tbody>
+        </table>
+        <div class="ds-subsection" style="margin-top:16px">
+          <div class="ds-label">Signature gradient</div>
+          <div style="height:8px;border-radius:4px;background:linear-gradient(90deg,#0c62fb 0%,#1be1f2 20%,#ff4d5f 40%,#c7b9ff 60%,#deff4d 80%,#0c62fb 100%);margin:8px 0 6px"></div>
+          <p style="font-size:12px;color:var(--color-text-secondary)">Used in hero sections and decorative borders. Sequence: Blue → Cyan → Coral → Lavender → Chartreuse. Do not use on interactive elements.</p>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Text</div>
+        <table class="ds-token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td>--color-text-primary</td><td><span class="ds-swatch" style="background:#292929"></span>#292929</td><td>Body text, headings, labels</td></tr>
+            <tr><td>--color-text-secondary</td><td><span class="ds-swatch" style="background:#525252"></span>#525252</td><td>Descriptions, sub-labels, less critical content</td></tr>
+            <tr><td>--color-text-tertiary</td><td><span class="ds-swatch" style="background:#a3a3a3;border:1px solid #ddd"></span>#a3a3a3</td><td>Placeholders, hints, timestamps</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Surfaces &amp; Borders</div>
+        <table class="ds-token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td>--color-bg-primary</td><td><span class="ds-swatch" style="background:#fff;border:1px solid #ddd"></span>#FFFFFF</td><td>Card backgrounds, inputs</td></tr>
+            <tr><td>--color-bg-secondary</td><td><span class="ds-swatch" style="background:#f5f5f5"></span>#f5f5f5</td><td>Hover states, code pills, nav backgrounds</td></tr>
+            <tr><td>--color-bg-tertiary</td><td><span class="ds-swatch" style="background:#FAFAFA"></span>#FAFAFA</td><td>Page canvas, form containers</td></tr>
+            <tr><td>--color-border-secondary</td><td><span class="ds-swatch" style="background:#e0e0e0"></span>#e0e0e0</td><td>Default input and card borders</td></tr>
+            <tr><td>--color-border-tertiary</td><td><span class="ds-swatch" style="background:#EBEBEB"></span>#EBEBEB</td><td>Dividers, subtle separators</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Status</div>
+        <table class="ds-token-table">
+          <thead><tr><th>Status</th><th>Text</th><th>Background</th><th>Border</th></tr></thead>
+          <tbody>
+            <tr><td>Active / Validated</td><td><span class="ds-swatch" style="background:#15803d"></span>#15803d</td><td><span class="ds-swatch" style="background:#f0fdf4"></span>#f0fdf4</td><td><span class="ds-swatch" style="background:#bbf7d0"></span>#bbf7d0</td></tr>
+            <tr><td>In Progress</td><td><span class="ds-swatch" style="background:#0c62fb"></span>#0c62fb</td><td><span class="ds-swatch" style="background:#d0e0fc"></span>#d0e0fc</td><td><span class="ds-swatch" style="background:#88b7e6"></span>#88b7e6</td></tr>
+            <tr><td>On Hold</td><td><span class="ds-swatch" style="background:#92400e"></span>#92400e</td><td><span class="ds-swatch" style="background:#fffbeb"></span>#fffbeb</td><td><span class="ds-swatch" style="background:#fde68a"></span>#fde68a</td></tr>
+            <tr><td>Completed</td><td><span class="ds-swatch" style="background:#1d4ed8"></span>#1d4ed8</td><td><span class="ds-swatch" style="background:#eff6ff"></span>#eff6ff</td><td><span class="ds-swatch" style="background:#bfdbfe"></span>#bfdbfe</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Radius &amp; Spacing</div>
+        <table class="ds-token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td>--radius-sm</td><td>4px</td><td>Buttons, inputs, code pills, chips</td></tr>
+            <tr><td>--radius-md / --radius-lg</td><td>6px</td><td>Cards, panels, dialogs — unified</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         FOUNDATION — TYPOGRAPHY
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="typography">
+      <div class="ds-section-eyebrow">Foundation</div>
+      <div class="ds-section-title">Typography</div>
+      <div class="ds-section-desc">Font stack: <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-bg-secondary);padding:1px 5px;border-radius:3px">'Slalom Sans', 'Inter', system-ui</code>. Slalom Sans renders if installed locally; Inter loads from Google Fonts as the web fallback.</div>
+
+      <div class="ds-canvas-white">
+        <div class="type-specimen">
+          <div class="type-meta">22px · weight 700 · tracking -0.02em · color-brand — App title</div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--color-brand)">Slalom Design Delivery</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">18px · weight 700 · tracking -0.02em — Project name</div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em">NHS Patient Portal Redesign</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">15px · weight 600 — Form title, card title</div>
+          <div style="font-size:15px;font-weight:600">Create new project</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">14px · weight 600 — Activity title</div>
+          <div style="font-size:14px;font-weight:600;letter-spacing:-0.01em">Stakeholder kickoff</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">13px · weight 400 — Body / descriptions</div>
+          <div style="font-size:13px;color:var(--color-text-secondary)">Structured interview to capture goals, risks, non-negotiables, and definition of success.</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">13px · weight 600 — Section title</div>
+          <div style="font-size:13px;font-weight:600">Deliverables</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">12px · weight 400 · color-text-tertiary — Hints, timestamps</div>
+          <div style="font-size:12px;color:var(--color-text-tertiary)">Added 7 Apr 2026 · Auto-saved</div>
+        </div>
+        <div class="type-specimen">
+          <div class="type-meta">11px · weight 700 · uppercase · tracking 0.06em — Eyebrows, labels</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-text-tertiary)">Engaged with</div>
+        </div>
+        <div class="type-specimen" style="border-bottom:none;margin-bottom:0">
+          <div class="type-meta">11px · font-mono — Code pills</div>
+          <div style="font-size:11px;font-family:var(--font-mono)">01-A · p-ctx-kickoff</div>
+        </div>
+      </div>
+
+      <div class="ds-do-dont">
+        <div class="ds-do"><strong>Do</strong>Use weight 700 only for page titles and primary headings. Use 600 for section/card titles. Use 400/500 for body and labels.</div>
+        <div class="ds-dont"><strong>Don't</strong>Mix more than three type sizes in a single card. Don't use uppercase beyond eyebrows and badge labels — it reduces readability at body scale.</div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ATOMS
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="buttons">
+      <div class="ds-section-eyebrow">Atoms</div>
+      <div class="ds-section-title">Buttons</div>
+      <div class="ds-section-desc">Four variants covering the full action hierarchy. Always use the lowest-weight variant that still communicates the importance of the action.</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Variants</div>
+        <div class="ds-canvas">
+          <div class="ds-label">Primary — main call-to-action per view</div>
+          <div class="ds-row">
+            <button class="btn-primary">+ New Project</button>
+            <button class="btn-primary">Save</button>
+            <button class="btn-primary" disabled>Disabled</button>
+          </div>
+
+          <div class="ds-spacer"></div>
+          <div class="ds-label">Secondary — supporting actions, equal to "Cancel"</div>
+          <div class="ds-row">
+            <button>Cancel</button>
+            <button>+ Add</button>
+            <button>Edit</button>
+          </div>
+
+          <div class="ds-spacer"></div>
+          <div class="ds-label">Ghost — low-emphasis, inline actions</div>
+          <div class="ds-row">
+            <button class="btn-ghost">← Project name</button>
+            <button class="btn-ghost">Reopen</button>
+          </div>
+
+          <div class="ds-spacer"></div>
+          <div class="ds-label">Danger outline — destructive actions</div>
+          <div class="ds-row">
+            <button class="btn-danger-outline">Delete project</button>
+          </div>
+
+          <div class="ds-spacer"></div>
+          <div class="ds-label">Validate CTA — full-width, primary action within activity card</div>
+          <div style="max-width:400px">
+            <button class="btn-validate">Human review — mark as validated ✓</button>
+          </div>
+
+          <div class="ds-spacer"></div>
+          <div class="ds-label">Reopen — tinted green, used on validated activities</div>
+          <div class="ds-row">
+            <button class="activity-unvalidate-btn">Reopen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-do-dont">
+        <div class="ds-do"><strong>Do</strong>One Primary button per screen region. Pair it with a Secondary or Ghost for cancel/back. The Validate CTA is only used inside expanded activity cards.</div>
+        <div class="ds-dont"><strong>Don't</strong>Use Primary for every action — it loses hierarchy. Don't use Danger Outline for confirmation steps; reserve it for genuinely destructive, irreversible actions.</div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="inputs">
+      <div class="ds-section-eyebrow">Atoms</div>
+      <div class="ds-section-title">Form Inputs</div>
+      <div class="ds-section-desc">All inputs share the same base: 1px border, radius-sm, focus ring via border-primary. Width is always 100% within their container.</div>
+
+      <div class="ds-canvas-white">
+        <div class="ds-grid-2" style="gap:16px">
+          <div>
+            <div class="ds-label">Text input — default</div>
+            <input type="text" placeholder="Project name" />
+          </div>
+          <div>
+            <div class="ds-label">Text input — focused</div>
+            <input type="text" value="NHS Portal Redesign" style="border-color:#292929" />
+          </div>
+          <div>
+            <div class="ds-label">Select</div>
+            <select>
+              <option>◑ In progress</option>
+              <option>○ Not started</option>
+              <option>● Completed</option>
+              <option>— Skipped</option>
+            </select>
+          </div>
+          <div>
+            <div class="ds-label">URL input</div>
+            <input type="url" placeholder="https://figma.com/file/..." />
+          </div>
+          <div style="grid-column:span 2">
+            <div class="ds-label">Textarea</div>
+            <textarea rows="3" placeholder="Blockers, open questions, general context…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-do-dont">
+        <div class="ds-do"><strong>Do</strong>Always pair inputs with a visible label (form-field pattern). Use placeholder text as a format hint, not a label substitute.</div>
+        <div class="ds-dont"><strong>Don't</strong>Use placeholder text as the only label — it disappears on focus and fails accessibility requirements.</div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="badges">
+      <div class="ds-section-eyebrow">Atoms</div>
+      <div class="ds-section-title">Badges &amp; Tags</div>
+      <div class="ds-section-desc">Status badges communicate project or phase state. Tags carry metadata. Phase badges identify the delivery phase with a colour-coded tint.</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Status badges — project level</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="status-badge status-active">Active</span>
+            <span class="status-badge status-in-progress">In progress</span>
+            <span class="status-badge status-on-hold">On Hold</span>
+            <span class="status-badge status-completed">Completed</span>
+            <span class="status-badge status-skipped">Skipped</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Phase badges — blue tint scale</div>
+        <div class="ds-subsection-desc">Six phases progress from lightest to most saturated. The Utility phase uses a neutral tint.</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="phase-badge" style="background:#d0e0fc;color:#002faf">01 Context</span>
+            <span class="phase-badge" style="background:#acd2ed;color:#002faf">02 Capabilities</span>
+            <span class="phase-badge" style="background:#ACCEED;color:#002870">03 Objects</span>
+            <span class="phase-badge" style="background:#6da1fd;color:#0f1c41">04 Interactions</span>
+            <span class="phase-badge" style="background:#5A9DD5;color:#fff">05 Alignment</span>
+            <span class="phase-badge" style="background:#0c62fb;color:#fff">06 Build</span>
+            <span class="phase-badge" style="background:#f5f5f5;color:#697070">U Utility</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Phase completion badge</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="phase-completion-badge">2/4 validated</span>
+            <span class="phase-completion-badge phase-completion-badge-done">✓ All validated</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Tag pills — metadata</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="tag">cx</span>
+            <span class="tag">xd</span>
+            <span class="tag">consulting</span>
+            <span class="tag">q2-2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Activity code pill</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="activity-code">01-A</span>
+            <span class="activity-code">04-D</span>
+            <span class="activity-code">U-02</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="chips">
+      <div class="ds-section-eyebrow">Atoms</div>
+      <div class="ds-section-title">Chips</div>
+      <div class="ds-section-desc">Two chip types: role chips for team context in alignment cards; engagement chips for recording who was consulted during an activity.</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Role chips</div>
+        <div class="ds-subsection-desc">Neutral for most roles; brand-tinted for Stakeholders to indicate external involvement.</div>
+        <div class="ds-canvas">
+          <div class="ds-row">
+            <span class="role-chip role-chip-default">Designer</span>
+            <span class="role-chip role-chip-default">Engineer</span>
+            <span class="role-chip role-chip-default">PM</span>
+            <span class="role-chip role-chip-default">Researcher</span>
+            <span class="role-chip role-chip-default">Business</span>
+            <span class="role-chip role-chip-stakeholder">Stakeholder</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Engagement chips</div>
+        <div class="ds-subsection-desc">Used inside activity cards to record who was engaged during the work. Inactive chips are toggled on with a single click; active chips show the team name, an optional date, and a remove button.</div>
+        <div class="ds-canvas">
+          <div class="ds-label">Inactive — not yet engaged</div>
+          <div class="ds-row" style="margin-bottom:16px">
+            <button class="engagement-chip">Stakeholders</button>
+            <button class="engagement-chip">Delivery team</button>
+            <button class="engagement-chip">PM team</button>
+            <button class="engagement-chip">Other</button>
+          </div>
+          <div class="ds-label">Active — engaged, with and without timestamp</div>
+          <div class="ds-row">
+            <div class="engagement-chip engagement-chip-active">
+              <span style="font-size:11px;font-weight:600">✓ Stakeholders</span>
+              <button class="engagement-chip-date">7 Apr</button>
+              <button class="engagement-chip-remove">×</button>
+            </div>
+            <div class="engagement-chip engagement-chip-active">
+              <span style="font-size:11px;font-weight:600">✓ PM team</span>
+              <button class="engagement-chip-date">+ date</button>
+              <button class="engagement-chip-remove">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-do-dont">
+        <div class="ds-do"><strong>Do</strong>Log dates whenever the engagement was a formal review or sign-off moment — it creates a lightweight audit trail.</div>
+        <div class="ds-dont"><strong>Don't</strong>Pre-populate engagement chips — they must be set intentionally by the user to be meaningful.</div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         MOLECULES
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="form-fields">
+      <div class="ds-section-eyebrow">Molecules</div>
+      <div class="ds-section-title">Form Fields</div>
+      <div class="ds-section-desc">A label + input pair. The form-field wrapper maintains consistent vertical rhythm and label sizing. Form actions always sit right-aligned at the bottom.</div>
+
+      <div class="ds-canvas-white">
+        <div class="ds-grid-2" style="gap:16px">
+          <div class="form-field">
+            <label>Project name</label>
+            <input type="text" placeholder="e.g. NHS Patient Portal" />
+          </div>
+          <div class="form-field">
+            <label>Client</label>
+            <input type="text" placeholder="e.g. NHS England" />
+          </div>
+          <div class="form-field" style="grid-column:span 2">
+            <label>Description</label>
+            <textarea rows="2" placeholder="What is this project trying to achieve?"></textarea>
+          </div>
+          <div class="form-field">
+            <label>Status</label>
+            <select><option>Active</option><option>On Hold</option><option>Completed</option></select>
+          </div>
+          <div class="form-field">
+            <label>Tags</label>
+            <input type="text" placeholder="cx, xd, consulting" />
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:16px">
+          <button>Cancel</button>
+          <button class="btn-primary">Create project</button>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="toolbar">
+      <div class="ds-section-eyebrow">Molecules</div>
+      <div class="ds-section-title">Rich Text Toolbar</div>
+      <div class="ds-section-desc">Appears above all large text inputs. Provides text style (heading/body), inline formatting, list types, and link creation. Active state uses the brand blue fill.</div>
+
+      <div class="ds-canvas-white">
+        <div class="rich-editor">
+          <div class="rich-toolbar">
+            <select class="rich-style-select"><option>Body</option><option>Heading 1</option><option>Heading 2</option><option>Heading 3</option></select>
+            <span class="rich-toolbar-sep"></span>
+            <button class="rich-toolbar-btn active">B</button>
+            <button class="rich-toolbar-btn" style="font-style:italic">I</button>
+            <button class="rich-toolbar-btn" style="text-decoration:underline">U</button>
+            <span class="rich-toolbar-sep"></span>
+            <button class="rich-toolbar-btn">≡</button>
+            <button class="rich-toolbar-btn">1.</button>
+            <span class="rich-toolbar-sep"></span>
+            <button class="rich-toolbar-btn">⛓</button>
+          </div>
+          <div class="rich-editor-body" contenteditable="true">
+            <p><strong>Stakeholder feedback</strong> from 7 April session. Key themes:</p>
+            <ul style="margin:6px 0 0 18px;padding:0"><li>Scope is confirmed as the onboarding flow</li><li>Engineering flagged API latency as a risk</li></ul>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="ds-label">Toolbar button states</div>
+          <div class="ds-row" style="margin-top:6px">
+            <button class="rich-toolbar-btn">B</button>
+            <span style="font-size:11px;color:var(--color-text-tertiary)">Default</span>
+            <button class="rich-toolbar-btn active" style="margin-left:16px">B</button>
+            <span style="font-size:11px;color:var(--color-text-tertiary)">Active (format applied)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="deliverable-card">
+      <div class="ds-section-eyebrow">Molecules</div>
+      <div class="ds-section-title">Deliverable Card</div>
+      <div class="ds-section-desc">Compact card used in the sidebar to list linked or uploaded deliverables. Icon area uses a brand-tinted square; metadata shows type and date.</div>
+
+      <div class="ds-canvas">
+        <div class="ds-col" style="max-width:360px">
+          <div class="deliverable-card">
+            <div class="deliverable-icon">◈</div>
+            <div>
+              <div class="deliverable-title">Patient journey wireframes</div>
+              <div class="deliverable-meta">Figma · Added 2 Apr 2026</div>
+            </div>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">☰</div>
+            <div>
+              <div class="deliverable-title">Stakeholder kickoff notes</div>
+              <div class="deliverable-meta">Document · Added 1 Apr 2026</div>
+            </div>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">▤</div>
+            <div>
+              <div class="deliverable-title">Discovery presentation</div>
+              <div class="deliverable-meta">Slides · Added 28 Mar 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="phase-row">
+      <div class="ds-section-eyebrow">Molecules</div>
+      <div class="ds-section-title">Phase Row</div>
+      <div class="ds-section-desc">Used in the Project view to list all phases with their status and a quick-access button. The badge uses the phase's colour token.</div>
+
+      <div class="ds-canvas">
+        <div class="ds-col">
+          <div class="phase-row">
+            <span class="phase-row-badge" style="background:#d0e0fc;color:#002faf">01</span>
+            <div>
+              <div class="phase-row-label">Context</div>
+              <div class="phase-row-desc">Understand the project, its users, and its constraints</div>
+            </div>
+            <div class="phase-row-right">
+              <span class="status-badge status-completed">Completed</span>
+              <button>Open →</button>
+            </div>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-badge" style="background:#acd2ed;color:#002faf">02</span>
+            <div>
+              <div class="phase-row-label">Capabilities</div>
+              <div class="phase-row-desc">Define what users need to be able to do</div>
+            </div>
+            <div class="phase-row-right">
+              <span class="status-badge status-in-progress">In Progress</span>
+              <button>Open →</button>
+            </div>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-badge" style="background:#ACCEED;color:#002870">03</span>
+            <div>
+              <div class="phase-row-label">Objects</div>
+              <div class="phase-row-desc">Identify and agree core entities the product acts on</div>
+            </div>
+            <div class="phase-row-right">
+              <span class="status-badge status-skipped" style="color:#a3a3a3;background:#f5f5f5;border-color:#e0e0e0">Not started</span>
+              <button>Open →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ORGANISMS
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="activity-card">
+      <div class="ds-section-eyebrow">Organisms</div>
+      <div class="ds-section-title">Activity Card</div>
+      <div class="ds-section-desc">The primary unit of work within a phase. Three states: empty, in-progress, and validated. The card is always collapsible; the expanded body contains content, the rich text editor, provenance, engagement chips, and the validate CTA.</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Empty state</div>
+        <div class="ds-canvas-white">
+          <div class="activity-card">
+            <div class="activity-header">
+              <div class="activity-header-left">
+                <span class="activity-status-icon activity-status-icon-empty">○</span>
+                <span class="activity-code">01-C</span>
+                <div class="activity-title-group">
+                  <span class="activity-title">Heuristic audit</span>
+                  <span class="activity-description">Evaluate existing product against recognised UX principles</span>
+                </div>
+              </div>
+              <div class="activity-header-right">
+                <button class="btn-primary" style="font-size:12px;padding:6px 16px;font-weight:600">Get started</button>
+                <span class="activity-chevron">▼</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">In-progress state — expanded</div>
+        <div class="ds-canvas-white">
+          <div class="activity-card activity-card-in-progress">
+            <div class="activity-header">
+              <div class="activity-header-left">
+                <span class="activity-status-icon activity-status-icon-in-progress">◑</span>
+                <span class="activity-code">02-C</span>
+                <div class="activity-title-group">
+                  <span class="activity-title">Persona &amp; segment definition</span>
+                </div>
+              </div>
+              <div class="activity-header-right">
+                <button class="activity-edit-btn">Edit</button>
+                <span class="activity-chevron">▲</span>
+              </div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-body-inner">
+                <p>Defined three archetypes: <strong>Clinical admin</strong>, <strong>Ward nurse</strong>, and <strong>Consultant</strong>. Each has distinct scheduling needs and risk thresholds. Research conducted with 8 participants across 2 NHS trusts.</p>
+              </div>
+              <!-- Provenance -->
+              <div style="margin-top:12px;padding:10px 12px;background:var(--color-bg-secondary);border-radius:var(--radius-sm);font-size:12px;color:var(--color-text-secondary)">
+                <div style="display:flex;gap:20px;flex-wrap:wrap">
+                  <span><span style="color:var(--color-text-tertiary)">Source</span> &nbsp;✏ Written manually</span>
+                  <span><span style="color:var(--color-text-tertiary)">Last updated</span> &nbsp;7 Apr 2026</span>
+                </div>
+              </div>
+              <!-- Engagement -->
+              <div style="display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--color-border-tertiary);flex-wrap:wrap">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--color-text-tertiary);flex-shrink:0">Engaged with</span>
+                <div class="engagement-chip engagement-chip-active">
+                  <span style="font-size:11px;font-weight:600">✓ Stakeholders</span>
+                  <button class="engagement-chip-date">3 Apr</button>
+                  <button class="engagement-chip-remove">×</button>
+                </div>
+                <button class="engagement-chip">Delivery team</button>
+                <button class="engagement-chip">PM team</button>
+                <button class="engagement-chip">Other</button>
+              </div>
+              <!-- Validate -->
+              <div class="activity-validate-section">
+                <button class="btn-validate">Human review — mark as validated ✓</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Validated state</div>
+        <div class="ds-canvas-white">
+          <div class="activity-card activity-card-validated">
+            <div class="activity-header">
+              <div class="activity-header-left">
+                <span class="activity-status-icon activity-status-icon-validated">●</span>
+                <span class="activity-code">01-A</span>
+                <div class="activity-title-group">
+                  <span class="activity-title">Stakeholder kickoff</span>
+                  <span class="activity-description" style="color:var(--color-active-text)">✓ Validated 1 Apr 2026</span>
+                </div>
+              </div>
+              <div class="activity-header-right">
+                <button class="activity-unvalidate-btn">Reopen</button>
+                <button class="activity-edit-btn">Edit</button>
+                <span class="activity-chevron">▼</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-do-dont">
+        <div class="ds-do"><strong>Do</strong>Keep activities collapsed by default once they have content. Expand only the one being actively worked on. Validated cards collapse by default.</div>
+        <div class="ds-dont"><strong>Don't</strong>Mark an activity as validated without content — the button is only shown when content exists. The validated state must carry a timestamp.</div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="project-card">
+      <div class="ds-section-eyebrow">Organisms</div>
+      <div class="ds-section-title">Project Card</div>
+      <div class="ds-section-desc">Used in the Dashboard to represent a single project. Contains name, client, status badge, tags, and a phase progress indicator.</div>
+
+      <div class="ds-canvas">
+        <div class="ds-grid-2">
+          <div class="project-card" style="cursor:pointer">
+            <div class="project-card-title">NHS Patient Portal</div>
+            <div class="project-card-client">NHS England · Consulting</div>
+            <div style="font-size:12px;color:var(--color-text-tertiary);line-height:1.5;margin-bottom:10px">End-to-end redesign of the patient scheduling and messaging portal.</div>
+            <div class="project-card-meta">
+              <span class="status-badge status-active">Active</span>
+              <span class="tag">cx</span>
+              <span class="tag">nhs</span>
+            </div>
+            <div style="margin-top:12px;font-size:11px;color:var(--color-text-tertiary)">3 of 7 phases · Updated 7 Apr</div>
+          </div>
+          <div class="project-card" style="cursor:pointer">
+            <div class="project-card-title">Retail Checkout Optimisation</div>
+            <div class="project-card-client">Marks &amp; Spencer · XD</div>
+            <div style="font-size:12px;color:var(--color-text-tertiary);line-height:1.5;margin-bottom:10px">Reduce cart abandonment through improved checkout flow design.</div>
+            <div class="project-card-meta">
+              <span class="status-badge status-on-hold">On Hold</span>
+              <span class="tag">ecommerce</span>
+            </div>
+            <div style="margin-top:12px;font-size:11px;color:var(--color-text-tertiary)">1 of 7 phases · Updated 2 Mar</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="sidebar-section">
+      <div class="ds-section-eyebrow">Organisms</div>
+      <div class="ds-section-title">Sidebar Section</div>
+      <div class="ds-section-desc">Reusable panel used in the Phase view sidebar. Contains a section-header (title + action button) followed by its content. Used for Deliverables, Phase notes, and Alignment suggestions.</div>
+
+      <div class="ds-canvas-white" style="max-width:300px">
+        <div class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title">Deliverables</span>
+            <button>+ Add</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+            <span style="font-size:11px;padding:3px 9px;border-radius:100px;border:1px solid var(--color-border-secondary);color:var(--color-text-tertiary)">Project brief</span>
+            <span style="font-size:11px;padding:3px 9px;border-radius:100px;border:1px solid var(--color-active-border);color:var(--color-active-text);background:var(--color-active-bg);text-decoration:line-through">Heuristic audit report</span>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">◈</div>
+            <div>
+              <div class="deliverable-title">Wireframes v2</div>
+              <div class="deliverable-meta">Figma · 7 Apr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="alignment-card">
+      <div class="ds-section-eyebrow">Organisms</div>
+      <div class="ds-section-title">Alignment Card</div>
+      <div class="ds-section-desc">Used in the project and phase views to surface rule-based alignment prompts. Two variants: Required (left border accent, amber tint) and Consider (neutral).</div>
+
+      <div class="ds-canvas">
+        <div class="ds-col">
+          <div class="alignment-card alignment-card-required">
+            <div class="alignment-card-label">⚠ Required</div>
+            <div class="alignment-card-title">Business stakeholders must review capability prioritisation</div>
+            <p class="alignment-card-message">Your project includes business stakeholders. Outcome prioritisation decisions need their sign-off before moving to object modelling.</p>
+            <button style="margin-top:10px;font-size:12px">Mark as aligned →</button>
+          </div>
+          <div class="alignment-card alignment-card-optional">
+            <div class="alignment-card-label">↗ Consider</div>
+            <div class="alignment-card-title">Engineering should be present for entity discovery</div>
+            <p class="alignment-card-message">Entity naming has direct implications for data modelling. Including engineering early prevents expensive rework later.</p>
+            <button style="margin-top:10px;font-size:12px">Mark as aligned →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="empty-state">
+      <div class="ds-section-eyebrow">Organisms</div>
+      <div class="ds-section-title">Empty States</div>
+      <div class="ds-section-desc">Two variants: full-page (centred, for empty dashboard) and inline (within a panel or list when no items exist yet).</div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Full-page empty state</div>
+        <div class="ds-canvas">
+          <div class="empty-state">
+            <div class="empty-state-title">No projects yet</div>
+            <div class="empty-state-body">Create your first project to start tracking CX and XD delivery.</div>
+            <button class="btn-primary" style="margin-top:4px">+ New project</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Inline empty state + add-activity button</div>
+        <div class="ds-canvas-white">
+          <div style="font-size:13px;color:var(--color-text-tertiary);padding:12px 0;border-top:1px solid var(--color-border-tertiary)">No deliverables linked yet.</div>
+          <button class="add-activity-btn" style="margin-top:8px">+ Add activity</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TEMPLATES
+    ══════════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="dashboard-tmpl">
+      <div class="ds-section-eyebrow">Templates</div>
+      <div class="ds-section-title">Dashboard Template</div>
+      <div class="ds-section-desc">Single-column layout. Header contains the app title + "New Project" primary action. Filter bar below for status and search. Project cards in a 2-column grid on desktop, single column on mobile.</div>
+
+      <div class="ds-canvas" style="padding:0;overflow:hidden;border-radius:var(--radius-md)">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;color:var(--color-brand)">Slalom Design Delivery</div>
+            <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">CX &amp; XD project tracker for client engagements</div>
+          </div>
+          <button class="btn-primary">+ New Project</button>
+        </div>
+        <div style="padding:16px 24px;border-bottom:1px solid var(--color-border-tertiary);display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-primary" style="font-size:12px;padding:4px 12px">All</button>
+          <button style="font-size:12px;padding:4px 12px">Active</button>
+          <button style="font-size:12px;padding:4px 12px">On Hold</button>
+          <button style="font-size:12px;padding:4px 12px">Completed</button>
+        </div>
+        <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="project-card" style="cursor:pointer">
+            <div class="project-card-title">NHS Patient Portal</div>
+            <div class="project-card-client">NHS England</div>
+            <div class="project-card-meta" style="margin-top:8px">
+              <span class="status-badge status-active">Active</span>
+              <span class="tag">cx</span>
+            </div>
+          </div>
+          <div class="project-card" style="cursor:pointer">
+            <div class="project-card-title">Checkout Redesign</div>
+            <div class="project-card-client">Marks &amp; Spencer</div>
+            <div class="project-card-meta" style="margin-top:8px">
+              <span class="status-badge status-on-hold">On Hold</span>
+              <span class="tag">xd</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="ds-label">Layout rules</div>
+        <table class="ds-token-table" style="margin-top:8px">
+          <thead><tr><th>Breakpoint</th><th>Layout</th></tr></thead>
+          <tbody>
+            <tr><td>≥ 640px</td><td>2-column project grid</td></tr>
+            <tr><td>&lt; 640px</td><td>Single-column, header stacks vertically</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="ds-section" id="phase-tmpl">
+      <div class="ds-section-eyebrow">Templates</div>
+      <div class="ds-section-title">Phase View Template</div>
+      <div class="ds-section-desc">Two-column layout: main column (activities + custom activity form) and sidebar (deliverables, phase notes, alignment). On mobile the sidebar stacks above the activity list.</div>
+
+      <div class="ds-canvas" style="padding:0;overflow:hidden;border-radius:var(--radius-md)">
+        <!-- Header -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--color-border-tertiary)">
+          <div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:10px">← NHS Patient Portal</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="phase-badge" style="background:#acd2ed;color:#002faf">02 Capabilities</span>
+            <select style="width:auto;font-size:12px;padding:3px 8px;border-radius:100px">
+              <option>◑ In progress</option>
+            </select>
+            <span class="phase-completion-badge">1/4 validated</span>
+          </div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Define what users need to be able to do — in outcomes, not features</div>
+        </div>
+        <!-- Two columns -->
+        <div style="display:grid;grid-template-columns:1fr 260px;gap:0">
+          <!-- Main -->
+          <div style="padding:16px 20px;border-right:1px solid var(--color-border-tertiary)">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="activity-card activity-card-validated">
+                <div class="activity-header" style="padding:10px 12px">
+                  <div class="activity-header-left">
+                    <span class="activity-status-icon activity-status-icon-validated" style="font-size:12px">●</span>
+                    <span class="activity-code">02-A</span>
+                    <div class="activity-title-group"><span class="activity-title" style="font-size:13px">Jobs-to-be-done</span><span class="activity-description" style="color:var(--color-active-text);font-size:11px">✓ Validated 3 Apr</span></div>
+                  </div>
+                  <div class="activity-header-right"><button class="activity-unvalidate-btn" style="font-size:11px;padding:4px 10px">Reopen</button><span class="activity-chevron">▼</span></div>
+                </div>
+              </div>
+              <div class="activity-card activity-card-in-progress">
+                <div class="activity-header" style="padding:10px 12px">
+                  <div class="activity-header-left">
+                    <span class="activity-status-icon activity-status-icon-in-progress" style="font-size:12px">◑</span>
+                    <span class="activity-code">02-B</span>
+                    <div class="activity-title-group"><span class="activity-title" style="font-size:13px">Outcome prioritisation</span></div>
+                  </div>
+                  <div class="activity-header-right"><button class="activity-edit-btn" style="font-size:12px;padding:4px 10px">Edit</button><span class="activity-chevron">▲</span></div>
+                </div>
+              </div>
+              <div class="activity-card">
+                <div class="activity-header" style="padding:10px 12px">
+                  <div class="activity-header-left">
+                    <span class="activity-status-icon activity-status-icon-empty" style="font-size:12px">○</span>
+                    <span class="activity-code">02-C</span>
+                    <div class="activity-title-group"><span class="activity-title" style="font-size:13px">Persona definition</span><span class="activity-description">Consolidate research into archetypes</span></div>
+                  </div>
+                  <div class="activity-header-right"><button class="btn-primary" style="font-size:11px;padding:4px 10px">Get started</button><span class="activity-chevron">▼</span></div>
+                </div>
+              </div>
+              <button class="add-activity-btn">+ Add activity</button>
+            </div>
+          </div>
+          <!-- Sidebar -->
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--color-bg-tertiary)">
+            <div class="sidebar-section">
+              <div class="section-header"><span class="section-title">Deliverables</span><button style="font-size:12px;padding:3px 8px">+ Add</button></div>
+              <div class="deliverable-card" style="margin-top:4px">
+                <div class="deliverable-icon" style="width:26px;height:26px;font-size:13px">◈</div>
+                <div><div class="deliverable-title" style="font-size:12px">Capability map</div><div class="deliverable-meta">Figma · 5 Apr</div></div>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <div class="section-header"><span class="section-title">Phase notes</span></div>
+              <div style="font-size:12px;color:var(--color-text-tertiary);padding:8px 0">Waiting on research readout before finalising personas.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="ds-label">Layout rules</div>
+        <table class="ds-token-table" style="margin-top:8px">
+          <thead><tr><th>Breakpoint</th><th>Layout</th></tr></thead>
+          <tbody>
+            <tr><td>≥ 640px</td><td>Main column + 260px sidebar (grid)</td></tr>
+            <tr><td>&lt; 640px</td><td>Single column — sidebar stacks above activity list</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

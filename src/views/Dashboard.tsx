@@ -15,17 +15,14 @@ interface Props {
   projects: Project[];
   onOpenProject: (id: string) => void;
   onAddProject: (name: string, client: string, description: string, tags: string[]) => void;
-  onEditProject: (id: string, changes: Partial<Pick<Project, 'name' | 'client' | 'description' | 'status' | 'tags'>>) => void;
-  onDeleteProject: (id: string) => void;
 }
 
 const EMPTY_DRAFT = { name: '', client: '', description: '', tags: '' };
 
-export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject, onDeleteProject }: Props) {
+export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
-  const [editingId, setEditingId] = useState<string | null>(null);
 
   const filtered = filter === 'all' ? projects : projects.filter(p => p.status === filter);
 
@@ -33,25 +30,13 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
     e.preventDefault();
     if (!draft.name.trim()) return;
     const tags = draft.tags.split(',').map(t => t.trim()).filter(Boolean);
-    if (editingId) {
-      onEditProject(editingId, { name: draft.name.trim(), client: draft.client.trim(), description: draft.description.trim(), tags });
-      setEditingId(null);
-    } else {
-      onAddProject(draft.name.trim(), draft.client.trim(), draft.description.trim(), tags);
-    }
+    onAddProject(draft.name.trim(), draft.client.trim(), draft.description.trim(), tags);
     setDraft(EMPTY_DRAFT);
     setShowForm(false);
   }
 
-  function startEdit(p: Project) {
-    setDraft({ name: p.name, client: p.client, description: p.description, tags: p.tags.join(', ') });
-    setEditingId(p.id);
-    setShowForm(true);
-  }
-
   function cancelForm() {
     setDraft(EMPTY_DRAFT);
-    setEditingId(null);
     setShowForm(false);
   }
 
@@ -70,7 +55,7 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
           <h1 className="app-title">Slalom Design Delivery</h1>
           <p className="app-subtitle">CX & XD project tracker for client engagements</p>
         </div>
-        <button className="btn-primary" onClick={() => { setEditingId(null); setDraft(EMPTY_DRAFT); setShowForm(true); }}>
+        <button className="btn-primary" onClick={() => { setDraft(EMPTY_DRAFT); setShowForm(true); }}>
           + New Project
         </button>
       </div>
@@ -78,7 +63,7 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
       {/* New / Edit project form */}
       {showForm && (
         <form className="project-form" onSubmit={handleSubmit}>
-          <h3 className="form-title">{editingId ? 'Edit project' : 'New project'}</h3>
+          <h3 className="form-title">New project</h3>
           <div className="form-row">
             <div className="form-field">
               <label>Project name *</label>
@@ -121,7 +106,7 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
           <div className="form-actions">
             <button type="button" onClick={cancelForm}>Cancel</button>
             <button type="submit" className="btn-primary" disabled={!draft.name.trim()}>
-              {editingId ? 'Save changes' : 'Create project'}
+              Create project
             </button>
           </div>
         </form>
@@ -161,10 +146,6 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
               key={project.id}
               project={project}
               onOpen={() => onOpenProject(project.id)}
-              onEdit={() => startEdit(project)}
-              onDelete={() => {
-                if (confirm(`Delete "${project.name}"? This cannot be undone.`)) onDeleteProject(project.id);
-              }}
             />
           ))}
         </div>
@@ -173,11 +154,9 @@ export function Dashboard({ projects, onOpenProject, onAddProject, onEditProject
   );
 }
 
-function ProjectCard({ project, onOpen, onEdit, onDelete }: {
+function ProjectCard({ project, onOpen }: {
   project: Project;
   onOpen: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
 }) {
   const completedPhases = project.phases.filter(p => p.status === 'completed').length;
   const totalCheckpoints = project.phases.reduce((n, p) => n + p.checkpoints.length, 0);
@@ -190,18 +169,8 @@ function ProjectCard({ project, onOpen, onEdit, onDelete }: {
           <h3 className="project-card-name">{project.name}</h3>
           {project.client && <span className="project-card-client">{project.client}</span>}
         </div>
-        <div className="project-card-actions" onClick={e => e.stopPropagation()}>
+        <div className="project-card-actions">
           <span className={`status-badge status-${project.status}`}>{STATUS_LABELS[project.status]}</span>
-          <button className="icon-btn" title="Edit" onClick={onEdit}>
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 2L12 4L5 11H3V9L10 2Z"/>
-            </svg>
-          </button>
-          <button className="icon-btn icon-btn-danger" title="Delete" onClick={onDelete}>
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="2,4 12,4"/><path d="M5 4V2h4v2"/><path d="M3 4l1 8h6l1-8"/>
-            </svg>
-          </button>
         </div>
       </div>
 

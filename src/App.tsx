@@ -260,8 +260,6 @@ export default function App() {
           projects={projects}
           onOpenProject={openProject}
           onAddProject={addProject}
-          onEditProject={editProject}
-          onDeleteProject={deleteProject}
         />
       )}
       {view === 'project' && activeProject && (
