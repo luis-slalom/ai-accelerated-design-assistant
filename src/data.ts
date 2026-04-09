@@ -15,12 +15,15 @@ export const ACTIVITY_DEFS: ActivityDef[] = [
   { id: 'ctx-research',   code: '01-B', phaseCode: '01', title: 'User research digest',         description: 'Synthesise existing research or lightweight interviews into a 1-page insight brief',       promptId: 'p-ctx-research' },
   { id: 'ctx-heuristic',  code: '01-C', phaseCode: '01', title: 'Heuristic audit',              description: 'Evaluate existing product or touchpoints against recognised UX principles; produce a scored issue list with severity ratings', promptId: 'p-ctx-heuristic' },
   { id: 'ctx-competitive',code: '01-D', phaseCode: '01', title: 'Competitive & analogous review', description: 'Benchmark 3–5 competitors and 2–3 analogous experiences to identify patterns, gaps, and opportunities', promptId: 'p-ctx-competitive' },
+  { id: 'ctx-assumptions',code: '01-E', phaseCode: '01', title: 'Assumptions mapping',           description: 'Document and rank all project assumptions before research begins to prevent untested beliefs from driving design decisions', promptId: 'p-ctx-assumptions' },
 
   // 02 Capabilities — define user outcomes, not features
   { id: 'cap-jtbd',       code: '02-A', phaseCode: '02', title: 'Jobs-to-be-done mapping',    description: 'For each user type: the job, desired outcome, current pain point, and definition of done', promptId: 'p-cap-jtbd' },
   { id: 'cap-priority',   code: '02-B', phaseCode: '02', title: 'Outcome prioritisation',     description: 'MoSCoW or impact/effort sort with stakeholders; produces a ranked list of user outcomes',  promptId: 'p-cap-priority' },
   { id: 'cap-personas',   code: '02-C', phaseCode: '02', title: 'Persona & segment definition', description: 'Consolidate research into 2–4 validated archetypes with goals, frustrations, and behavioural tendencies', promptId: 'p-cap-personas' },
   { id: 'cap-blueprint',  code: '02-D', phaseCode: '02', title: 'Service blueprint (as-is)',   description: 'Map the current end-to-end experience across frontstage actions, backstage processes, and supporting systems', promptId: 'p-cap-blueprint' },
+  { id: 'cap-hmw',        code: '02-E', phaseCode: '02', title: 'How Might We framing',        description: 'Reframe research insights as design opportunities using HMW statements to bridge Define and Ideate', promptId: 'p-cap-hmw' },
+  { id: 'cap-principles', code: '02-F', phaseCode: '02', title: 'Design principles',            description: 'Establish 3–5 project-specific principles derived from user values that guide every design decision', promptId: 'p-cap-principles' },
 
   // 03 Objects — identify core entities and relationships
   { id: 'obj-discovery',  code: '03-A', phaseCode: '03', title: 'Entity discovery workshop', description: 'Collaborative session to name core things the product creates, stores, or acts on',       promptId: 'p-obj-discovery' },
@@ -34,6 +37,8 @@ export const ACTIVITY_DEFS: ActivityDef[] = [
   { id: 'int-wireframes', code: '04-C', phaseCode: '04', title: 'Wireframe / concept review', description: 'Present low-fidelity concepts to stakeholders and capture structured feedback before moving to high-fidelity', promptId: 'p-int-wireframes' },
   { id: 'int-a11y',       code: '04-D', phaseCode: '04', title: 'Accessibility & inclusion check', description: 'Audit flows against WCAG 2.2 AA criteria and document barriers for assistive technology or diverse user needs', promptId: 'p-int-a11y' },
   { id: 'int-usability',  code: '04-E', phaseCode: '04', title: 'Usability test synthesis',  description: 'Run or analyse 5+ task-based sessions and distil findings into a ranked list of friction points with design recommendations', promptId: 'p-int-usability' },
+  { id: 'int-ideation',   code: '04-F', phaseCode: '04', title: 'Ideation workshop',          description: 'Generate a wide range of design concepts before committing to a direction; score and select concepts to take forward', promptId: 'p-int-ideation' },
+  { id: 'int-concept',    code: '04-G', phaseCode: '04', title: 'Concept testing',            description: 'Validate early-stage concepts with real users before investing in high-fidelity design', promptId: 'p-int-concept' },
 
   // 05 Alignment — agree data contracts and API shapes
   { id: 'aln-manifest',   code: '05-A', phaseCode: '05', title: 'Data contract review',        description: 'Design presents what the UI needs per screen; engineering confirms what is available, missing, or costly', promptId: 'p-aln-manifest' },
@@ -60,10 +65,10 @@ export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' 
 
 // Expected deliverables per phase — shown as hints in the sidebar
 export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
-  '01': ['Project brief', 'Assumption register', 'Heuristic audit report', 'Competitive review'],
-  '02': ['Capability map', 'Out-of-scope log', 'Personas', 'As-is service blueprint'],
+  '01': ['Project brief', 'Assumption register', 'Heuristic audit report', 'Competitive review', 'Assumptions map'],
+  '02': ['Capability map', 'Out-of-scope log', 'Personas', 'As-is service blueprint', 'HMW statements', 'Design principles'],
   '03': ['Object model', 'Domain glossary', 'Content inventory', 'Mental model diagram'],
-  '04': ['Flow diagrams', 'State inventory', 'Wireframes', 'Accessibility audit', 'Usability report'],
+  '04': ['Flow diagrams', 'State inventory', 'Wireframes', 'Accessibility audit', 'Usability report', 'Ideation outputs', 'Concept test report'],
   '05': ['Screen data manifest', 'Contract spec', 'Design tokens', 'Prototype sign-off notes'],
   '06': ['Annotated design specs', 'Deviation log', 'Live UX review report', 'Analytics setup doc'],
   'U':  [],
@@ -246,6 +251,49 @@ Are there analogous industries or products we've missed that are more relevant?
 Reply YES to confirm, or add missing products before we proceed.`,
   },
 
+  {
+    id: 'p-ctx-assumptions',
+    level: '01 Context',
+    code: '01-E',
+    title: 'Assumptions mapping',
+    description: 'Document and rank all project assumptions before research begins to prevent untested beliefs from driving design decisions.',
+    tags: ['assumptions', 'hypotheses', 'discovery'],
+    body: `Before research begins, make all assumptions explicit so we can validate or invalidate them — not design around them unknowingly.
+
+Project name / brief: [FILL — paste from kickoff summary]
+Phase we're entering: [FILL]
+
+STEP 1 — Assumption harvest
+List every assumption the team is currently making about:
+- **Users** — who they are, what they want, how they behave
+- **Business** — goals, constraints, what success looks like
+- **Technology** — what is technically feasible or already built
+- **Market** — competitive dynamics, user expectations, timing
+- **Process** — how the team will work, what approvals look like
+
+Assumptions identified: [FILL — brainstorm freely, one per line]
+
+STEP 2 — Classification & ranking
+For each assumption:
+
+| Assumption | Category (user / business / tech / market / process) | Confidence (H/M/L) | Impact if wrong (H/M/L) | How to validate |
+|------------|------------------------------------------------------|-------------------|-------------------------|-----------------|
+
+STEP 3 — Priority action list
+Sort by: Low confidence × High impact = most dangerous assumptions.
+
+For each high-priority assumption:
+- What do we need to learn to confirm or disprove it?
+- What research activity will give us that evidence?
+- When do we need the answer by?
+
+---
+⛔ CHECKPOINT 01-E
+Have we surfaced assumptions from every discipline — design, engineering, product, business?
+Are the high-impact, low-confidence assumptions covered in our research plan?
+Reply YES to confirm, or add missing assumptions before research begins.`,
+  },
+
   // ── 02 Capabilities ────────────────────────────────────────────────────
 
   {
@@ -388,6 +436,92 @@ Where does the experience break down most severely — and why?
 Does this blueprint accurately reflect the current experience — not the ideal one?
 Have we validated it with someone who lives this process daily?
 Reply YES to confirm, or correct inaccuracies before we proceed.`,
+  },
+
+  {
+    id: 'p-cap-hmw',
+    level: '02 Capabilities',
+    code: '02-E',
+    title: 'How Might We framing',
+    description: 'Reframe research insights as design opportunities using HMW statements to bridge Define and Ideate.',
+    tags: ['HMW', 'ideation', 'opportunities', 'design thinking'],
+    body: `Reframe the insights and frustrations from research as design opportunities using How Might We (HMW) statements.
+
+Research insights to reframe: [FILL — paste from 01-B insight brief or research synthesis]
+User frustrations / pain points to reframe: [FILL — paste key themes]
+Jobs to be done: [FILL — paste from 02-A]
+
+HOW TO WRITE HMW STATEMENTS
+- Start with "How might we…"
+- Address one problem at a time (not too broad, not too narrow)
+- Imply possibility without prescribing a solution
+- Test: if the answer is obvious, the HMW is too narrow; if anything would answer it, it's too broad
+
+For each major insight or frustration, generate 3–5 HMW statements at different levels of abstraction:
+
+## [Insight or frustration title]
+**Insight:** [one sentence summary]
+- HMW [narrow reframe] — specific to this pain point
+- HMW [mid-level reframe] — addresses the underlying need
+- HMW [broad reframe] — opens up systemic opportunity
+- HMW [alternative angle] — reframes who or what is the focus
+- HMW [provocative reframe] — challenges an assumption
+
+After generating all HMWs:
+
+## HMW prioritisation
+Select the 5–8 most promising HMW statements to take into ideation:
+- Most likely to unlock a differentiated solution
+- Directly tied to a must-have user outcome from Phase 02
+- Within our sphere of influence to address
+
+---
+⛔ CHECKPOINT 02-E
+Do these HMW statements reflect the real user problems — not our preferred solutions?
+Have we picked HMWs that challenge assumptions rather than confirm existing plans?
+Reply YES to confirm, or refine before we move into ideation.`,
+  },
+
+  {
+    id: 'p-cap-principles',
+    level: '02 Capabilities',
+    code: '02-F',
+    title: 'Design principles',
+    description: 'Establish 3–5 project-specific principles derived from user values that guide every design decision.',
+    tags: ['design principles', 'criteria', 'vision'],
+    body: `Establish the design principles that will guide every decision made on this project — from concept to delivery.
+
+Research and insight sources: [FILL — paste from insight brief, JTBD map, and personas]
+Product context: [FILL — transactional / emotional / informational / collaborative]
+Stakeholder priorities: [FILL — from kickoff summary]
+
+WHAT MAKES A GOOD DESIGN PRINCIPLE
+- Actionable: it helps us make a decision (not just a value statement)
+- Specific to this project: reflects what we learned from users, not generic good design
+- Testable: we can evaluate a design decision against it
+- Memorable: 3–5 words with a short explanation
+
+For each principle, produce:
+
+## [Principle name — short, memorable phrase]
+**In practice:** [2–3 sentences describing what this means for design decisions]
+**This means we will:** [2–3 concrete examples of decisions this principle guides]
+**This means we won't:** [1–2 things this principle rules out]
+**Derived from:** [which user insight or stakeholder priority informed this]
+
+After all principles:
+
+## Principle tensions
+Where do the principles pull in different directions? How do we resolve conflicts between them?
+
+## Principle test
+For each principle: apply it to a concrete design problem we're already facing. Does it give useful guidance?
+
+---
+⛔ CHECKPOINT 02-F
+Are these principles grounded in research — not just values we already held?
+Would a designer new to the project be able to use these to make the right call?
+Reply YES to confirm, or refine before they become the guiding criteria for the project.`,
   },
 
   // ── 03 Objects ─────────────────────────────────────────────────────────
@@ -767,6 +901,137 @@ Document what performed well — so we don't accidentally remove it.
 Do the recommendations address root causes — not just surface symptoms?
 Has the client reviewed and agreed to the priority rankings?
 Reply YES to confirm the synthesis is actionable and approved.`,
+  },
+
+  {
+    id: 'p-int-ideation',
+    level: '04 Interactions',
+    code: '04-F',
+    title: 'Ideation workshop',
+    description: 'Generate a wide range of design concepts before committing to a direction; score and select concepts to take forward.',
+    tags: ['ideation', 'concepts', 'design thinking', 'workshop'],
+    body: `Generate a wide range of design concepts before committing to any direction. Quantity before quality — defer judgement until after generation.
+
+HMW statements to ideate against: [FILL — paste top 5–8 HMWs from 02-E]
+Design principles: [FILL — paste from 02-F]
+Constraints to design within: [FILL — technical, time, budget, regulatory]
+Participants: [FILL — roles in the room]
+
+PART 1 — WARM-UP (10 min)
+Run a quick non-judgement exercise: generate 10 ideas in 5 minutes for a completely different problem.
+Goal: get people out of analytical mode and into generative mode.
+Ground rule for the whole session: no evaluation, no feasibility filtering, no "but" — defer all judgement.
+
+PART 2 — CONCEPT GENERATION (50 min)
+Run 2–3 of the following techniques. Mix individual and group modes. Pick techniques that suit the problem type.
+
+TECHNIQUE A — Crazy 8s (8 min)
+Each person folds a sheet of paper into 8 panels.
+Set a timer: 1 minute per panel.
+Sketch one distinct concept per panel — no words unless essential.
+Goal: volume and speed. Silence the inner critic.
+
+TECHNIQUE B — Analogous world (10 min)
+Pick 2–3 industries or domains with a structurally similar challenge.
+For each analogy: "How would a [hospital / airline / video game / bank] solve our HMW?"
+For each analogy, name the mechanism, then translate it directly to our context.
+Strong analogies produce concepts that are familiar in feel but novel in application.
+
+TECHNIQUE C — Worst possible idea (8 min)
+Generate the worst, most user-hostile, most catastrophic versions of the product.
+For each terrible idea, write the direct inversion: what is the exact opposite?
+This technique unlocks concepts conventional thinking would skip.
+
+TECHNIQUE D — SCAMPER remix (10 min)
+Take an existing product, flow, or concept and systematically apply:
+S — Substitute: replace a key element with something else
+C — Combine: merge two existing ideas or flows
+A — Adapt: borrow a mechanism from another domain
+M — Modify / Magnify: exaggerate or minimise one feature
+P — Put to other use: repurpose for a different user or moment
+E — Eliminate: remove the biggest source of friction entirely
+R — Reverse: flip the direction of the interaction or relationship
+
+TECHNIQUE E — "Yes, and…" build (10 min)
+Start with one rough concept. Each person adds to it with "yes, and…" — never "but" or "what if instead."
+Run for 3 rounds. Document the evolution of the concept after each round.
+This technique develops depth rather than breadth — use it on a promising seed concept.
+
+PART 3 — SHARE & BUILD (20 min)
+For each concept shared:
+- Name the concept (one phrase)
+- Describe it in one sentence
+- How does it address the HMW?
+Note any concepts that spark new ideas or combinations.
+
+PART 4 — CONCEPT CATALOGUE
+After sharing, catalogue all concepts:
+| Concept name | Technique used | HMW it addresses | Core mechanic (how it works) | What's novel | Rough feasibility |
+|--------------|----------------|------------------|------------------------------|--------------|-------------------|
+
+PART 5 — SELECTION & REFINEMENT
+Score each concept against the design principles (1–3 per principle).
+Select 2–3 concepts to develop further:
+- Reason for selection
+- What makes this concept worth exploring
+- What assumptions it relies on that need testing
+
+---
+⛔ CHECKPOINT 04-F
+Have we used at least two different generation techniques — not just one mode of thinking?
+Have the selected concepts been chosen for their potential, not their familiarity?
+Reply YES to confirm, or run another technique before narrowing.`,
+  },
+
+  {
+    id: 'p-int-concept',
+    level: '04 Interactions',
+    code: '04-G',
+    title: 'Concept testing',
+    description: 'Validate early-stage concepts with real users before investing in high-fidelity design.',
+    tags: ['concept testing', 'user research', 'validation'],
+    body: `Test 2–3 early-stage concepts with real users before committing to high-fidelity design. The goal is to learn which concept direction works — not to validate a finished design.
+
+Concepts to test: [FILL — names and brief descriptions, or attach sketches/lo-fi representations]
+HMW statements they address: [FILL — from 02-E]
+User archetype to test with: [FILL — from 02-C, minimum 5 participants]
+Key questions we need to answer: [FILL — 3–5 specific questions about concept viability]
+
+SESSION STRUCTURE (45–60 min per participant)
+
+PART 1 — Context setting (5 min)
+- Brief the participant on the problem space (not the solution)
+- Confirm their relevance to the user archetype
+- Set expectations: we're testing early ideas, not finished designs — their honest reaction is the goal
+
+PART 2 — Concept reaction (10–15 min per concept, randomise order)
+For each concept:
+- First impression (no prompting — what do they notice first?)
+- "Tell me what you think this is for"
+- "Walk me through how you'd use this"
+- "What would make this more useful? What would make it worse?"
+- Probe on the specific HMW questions
+
+PART 3 — Concept comparison (10 min)
+- "If you had to choose one of these to exist, which would you choose and why?"
+- "What would the ideal version look like — could you take parts from each?"
+
+PART 4 — SYNTHESIS
+After all sessions:
+| Concept | # who understood it | # who preferred it | Key strengths | Key concerns | Critical assumption |
+|---------|--------------------|--------------------|---------------|--------------|---------------------|
+
+## Decision recommendation
+Based on testing:
+- Which concept(s) to take forward
+- What to change or combine before moving to wireframes
+- What assumptions remain unvalidated and need further testing
+
+---
+⛔ CHECKPOINT 04-G
+Has the concept direction been confirmed with at least 5 participants?
+Are we moving forward because the concept performed well — not because we prefer it?
+Reply YES to confirm, or run more sessions if the signal is unclear.`,
   },
 
   // ── 05 Alignment ───────────────────────────────────────────────────────
@@ -1233,5 +1498,117 @@ Format this as a handoff note that a team member who wasn't present could read a
 Is this summary accurate and complete?
 Would someone new to the project be able to continue from here without losing any context?
 Reply YES to confirm. This summary will be saved as the entry point for the next session.`,
+  },
+
+  {
+    id: 'p-u-stakeholder-map',
+    level: 'Utility',
+    code: 'U-05',
+    title: 'Stakeholder map & comms plan',
+    description: 'Map all stakeholders by influence and interest; define how and when to engage each group throughout the project.',
+    tags: ['stakeholders', 'communications', 'alignment'],
+    body: `Map all stakeholders on this project by influence and interest, and define how to engage each group throughout.
+
+Project name: [FILL]
+Project phase: [FILL — or "whole project"]
+Stakeholders identified so far: [FILL — list names and roles]
+
+PART 1 — STAKEHOLDER INVENTORY
+For each stakeholder:
+| Name | Role / organisation | Relationship to project | Communication preference | Availability |
+|------|--------------------|-----------------------|--------------------------|--------------|
+
+PART 2 — INFLUENCE / INTEREST MAPPING
+Classify each stakeholder:
+
+**High influence, high interest** — Manage closely. Involve in key decisions.
+**High influence, low interest** — Keep satisfied. Don't overwhelm with detail.
+**Low influence, high interest** — Keep informed. They're your advocates.
+**Low influence, low interest** — Monitor. Minimal effort unless they move quadrants.
+
+| Stakeholder | Influence (H/M/L) | Interest (H/M/L) | Quadrant | Engagement strategy |
+|-------------|------------------|-----------------|----------|---------------------|
+
+PART 3 — COMMUNICATION PLAN
+For each stakeholder group, define:
+- **Cadence** — how often to communicate
+- **Format** — meeting / email / Slack / shared doc
+- **Content** — what they need to know at each stage
+- **Decision rights** — what they approve vs. what they are informed about
+- **Risk of misalignment** — what happens if we don't manage them well
+
+PART 4 — OBJECTION REGISTER
+Who is most likely to push back, and what will they say?
+For each high-risk stakeholder: the most likely objection and a prepared response.
+
+---
+⛔ CHECKPOINT U-05
+Have we identified every person who could block or derail this project?
+Does everyone on the team know who to escalate to and when?
+Reply YES to confirm, or add missing stakeholders.`,
+  },
+
+  {
+    id: 'p-u-discussion-guide',
+    level: 'Utility',
+    code: 'U-06',
+    title: 'Discussion guide builder',
+    description: 'Create a structured interview or workshop guide with screener criteria, warm-up questions, and task scenarios.',
+    tags: ['research', 'interview', 'facilitation', 'discussion guide'],
+    body: `Create a structured discussion guide for a user research session — interviews, usability tests, or co-design workshops.
+
+Research objective: [FILL — what question(s) are we trying to answer?]
+Session type: [FILL — depth interview / usability test / co-design workshop]
+Participant profile / screener: [FILL — who are we recruiting and why?]
+Session length: [FILL — recommended 45–60 min for interviews, 60–90 min for usability]
+Number of sessions: [FILL — minimum 5 for generative research]
+
+PART 1 — RECRUITMENT SCREENER
+Qualifying criteria (must meet all):
+- [FILL — role, behaviour, or experience that qualifies them]
+
+Disqualifying criteria:
+- [FILL — e.g. "works at a competitor", "already involved in our product"]
+
+Screener questions (3–5 short-answer or multiple choice):
+1. [FILL]
+2. [FILL]
+3. [FILL]
+
+PART 2 — SESSION GUIDE
+
+**Warm-up (5–10 min)**
+Build rapport and gather context. Do not lead.
+- Tell me about your role and what a typical day looks like for you.
+- How do you currently handle [topic area]?
+- [FILL — 1–2 more open context questions]
+
+**Core exploration (25–35 min)**
+Dig into the research questions. Use probes, not leading questions.
+- [FILL — 4–6 main questions, starting broad and going deeper]
+- Key probes: "Tell me more about that", "What did you do next?", "How did that make you feel?", "Can you show me?"
+
+**Task scenarios** (if usability test, 15–20 min)
+For each task:
+- Scenario setup (context without leading to the answer)
+- Task prompt (what to do, not how)
+- Observation focus (what to watch for)
+
+**Closing (5–10 min)**
+- Is there anything about [topic] I haven't asked that you think is important?
+- If you could change one thing about how you currently [topic], what would it be?
+- Can you recommend anyone else we should speak to?
+
+PART 3 — FACILITATION NOTES
+- What to do if a participant goes off-topic
+- How to handle strong opinions or emotional responses
+- How to handle silence (don't fill it)
+- Priming phrases to actively avoid
+
+---
+⛔ CHECKPOINT U-06
+Has the discussion guide been piloted with one internal team member before going live?
+Are all questions open-ended and free of leading language?
+Reply YES to confirm, or revise before sessions begin.`,
   },
 ];
