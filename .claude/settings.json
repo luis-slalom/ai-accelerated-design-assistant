@@ -24,10 +24,12 @@
       "Bash(curl -sL \"https://www.slalom.com/etc.clientlibs/slalom/clientlibs/clientlib-site.lc-31966ad337bde93f64a888326caa536d-lc.min.css\")",
       "Bash(grep -oE '#[0-9a-fA-F]{3,8}')",
       "Bash(curl -sL \"https://www.slalom.com/etc.clientlibs/slalom/clientlibs/clientlib-base.lc-5e7e9c2186af105173b6c90385b028ef-lc.min.css\" -o /tmp/slalom-base.css)",
-      "Bash(grep -oE '--[a-zA-Z0-9_-]+:[^;}]+' /tmp/slalom-site.css)"
+      "Bash(grep -oE '--[a-zA-Z0-9_-]+:[^;}]+' /tmp/slalom-site.css)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
     ],
     "additionalDirectories": [
-      "/tmp"
+      "/tmp",
+      "/Users/luishermosillaslalom/Code/ai-accelerated-design-assistant"
     ]
   }
 }
