@@ -2,5 +2,8 @@
   "buildCommand": "npm run build",
   "devCommand": "vite",
   "installCommand": "npm install",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/design-system", "destination": "/design-system.html" }
+  ]
 }
