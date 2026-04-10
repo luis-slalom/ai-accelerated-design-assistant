@@ -82,7 +82,7 @@ export function PhaseView({
   const [notesValue, setNotesValue] = useState(phase.notes);
   const notesTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isUtility = phase.code === 'U';
+  const isUtility = phase.code === '00';
   const phaseSuggestions = computeSuggestions(project).filter(
     s => !s.phaseContext || s.phaseContext === phase.code
   );
@@ -140,7 +140,7 @@ export function PhaseView({
       <div className="phase-view-header">
         <div className="phase-view-title-row">
           <div className="phase-view-badge" style={{ background: phaseColor.bg, color: phaseColor.text }}>
-            {phase.code === 'U' ? 'U' : `0${phase.code}`} {phase.label}
+            {`0${phase.code}`} {phase.label}
           </div>
           <select
             className={`phase-status-select phase-status-select-${phase.status}`}

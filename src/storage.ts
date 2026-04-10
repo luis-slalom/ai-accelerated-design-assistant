@@ -19,19 +19,34 @@ function migratePhaseActivities(ph: any): ActivityState[] {
   });
 }
 
+const PHASE_ORDER = ['00', '01', '02', '03', '04', '05', '06'];
+
 export function migrateProject(p: any): Project {
-  return {
-    ...p,
-    team: p.team ?? [],
-    alignmentLog: p.alignmentLog ?? [],
-    phases: (p.phases || []).map((ph: any) => ({
+  const phases = (p.phases || []).map((ph: any) => {
+    const code = ph.code === 'U' ? '00' : ph.code;
+    return {
       ...ph,
-      activities: migratePhaseActivities(ph),
+      code,
+      activities: migratePhaseActivities({ ...ph, code }),
       checkpoints: ph.checkpoints ?? [],
       deliverables: ph.deliverables ?? [],
       customActivities: (ph.customActivities ?? []) as CustomActivity[],
       notes: ph.notes ?? '',
-    })),
+    };
+  });
+
+  // Ensure phases are in canonical order (handles old projects where Utility was last)
+  phases.sort((a: any, b: any) => {
+    const ai = PHASE_ORDER.indexOf(a.code);
+    const bi = PHASE_ORDER.indexOf(b.code);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  return {
+    ...p,
+    team: p.team ?? [],
+    alignmentLog: p.alignmentLog ?? [],
+    phases,
   };
 }
 

@@ -54,13 +54,13 @@ export const ACTIVITY_DEFS: ActivityDef[] = [
 ];
 
 export const PHASE_TEMPLATES: Omit<Phase, 'id' | 'deliverables' | 'checkpoints' | 'activities' | 'customActivities' | 'notes' | 'status' | 'startedAt' | 'completedAt'>[] = [
+  { code: '00', label: 'Utility',      description: 'Cross-cutting: research synthesis, decision logs, risk register, retrospectives' },
   { code: '01', label: 'Context',      description: 'Understand the project, its users, and its constraints before any design work begins' },
   { code: '02', label: 'Capabilities', description: 'Define what users need to be able to do — in outcomes, not features' },
   { code: '03', label: 'Objects',      description: 'Identify and agree the core entities the product creates, stores, and acts on' },
   { code: '04', label: 'Interactions', description: 'Map user flows, component states, and edge cases end-to-end' },
   { code: '05', label: 'Alignment',    description: 'Agree data contracts and API shapes between design and engineering before build' },
   { code: '06', label: 'Build',        description: 'Generate and review code only within the scope that has been designed and contracted' },
-  { code: 'U',  label: 'Utility',      description: 'Cross-cutting: research synthesis, decision logs, risk register, retrospectives' },
 ];
 
 // Expected deliverables per phase — shown as hints in the sidebar
@@ -71,7 +71,7 @@ export const PHASE_DELIVERABLE_HINTS: Record<string, string[]> = {
   '04': ['Flow diagrams', 'State inventory', 'Wireframes', 'Accessibility audit', 'Usability report', 'Ideation outputs', 'Concept test report'],
   '05': ['Screen data manifest', 'Contract spec', 'Design tokens', 'Prototype sign-off notes'],
   '06': ['Annotated design specs', 'Deviation log', 'Live UX review report', 'Analytics setup doc'],
-  'U':  [],
+  '00': [],
 };
 
 // Phase badge colors — Slalom Blue progression (sourced from slalom.com)
@@ -82,7 +82,8 @@ export const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   '04': { bg: '#6da1fd', text: '#0f1c41' },
   '05': { bg: '#5579e7', text: '#ffffff' },
   '06': { bg: '#0c62fb', text: '#ffffff' },
-  'U':  { bg: '#f5f5f5', text: '#697070' },
+  '00': { bg: '#f5f5f5', text: '#697070' },
+  'U':  { bg: '#f5f5f5', text: '#697070' }, // fallback for unmigrated projects
 };
 
 

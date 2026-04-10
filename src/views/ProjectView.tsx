@@ -73,7 +73,7 @@ export function ProjectView({
     lines.push(`- ${totalDeliverables} deliverable${totalDeliverables !== 1 ? 's' : ''}`, ``);
 
     for (const phase of project.phases) {
-      const phaseLabel = phase.code === 'U' ? 'Utility' : `${phase.code} ${phase.label}`;
+      const phaseLabel = `0${phase.code} ${phase.label}`;
       lines.push(`---`, ``, `## Phase ${phaseLabel}`, ``);
       lines.push(`**Status:** ${PHASE_STATUS_LABELS[phase.status]}`);
       if (phase.startedAt) lines.push(`**Started:** ${formatDate(phase.startedAt)}`);
@@ -347,7 +347,7 @@ function PhaseRow({ phase, onOpen, onStatusChange }: {
   return (
     <div className={`phase-row phase-row-${phase.status}`}>
       <div className="phase-row-badge" style={{ background: color.bg, color: color.text }}>
-        {phase.code === 'U' ? 'U' : `0${phase.code}`}
+        {`0${phase.code}`}
       </div>
       <div className="phase-row-info">
         <div className="phase-row-name">{phase.label}</div>

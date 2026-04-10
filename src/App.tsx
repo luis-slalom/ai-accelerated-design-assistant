@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import type { Project, Phase, Checkpoint, Deliverable, Prompt, PhaseStatus, ActivityState, AlignmentEvent, CustomActivity } from './types';
 import { loadPrompts, generateId } from './storage';
 import * as api from './api';
-import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS } from './data';
+import { DEFAULT_PROMPTS, PHASE_TEMPLATES, ACTIVITY_DEFS, PHASE_COLORS } from './data';
+import logoUrl from '../assets/main-logo-final.svg';
 import { Dashboard } from './views/Dashboard';
 import { ProjectView } from './views/ProjectView';
 import { PhaseView } from './views/PhaseView';
+import { PromptLibrary } from './views/PromptLibrary';
 
-type View = 'dashboard' | 'project' | 'phase';
+type View = 'dashboard' | 'project' | 'phase' | 'library';
 
 function buildNewProject(name: string, client: string, description: string, tags: string[]): Project {
   return {
@@ -126,7 +128,7 @@ export default function App() {
     }));
   }
 
-  // ── Checkpoints (used by Utility phase) ──────────────────────────────────
+  // ── Checkpoints ───────────────────────────────────────────────────────────
 
   function addCheckpoint(projectId: string, phaseId: string, data: Omit<Checkpoint, 'id' | 'createdAt'>) {
     const checkpoint: Checkpoint = { ...data, id: generateId(), createdAt: new Date().toISOString() };
@@ -227,69 +229,184 @@ export default function App() {
     setActiveProjectId(id);
     setActivePhaseId(null);
     setView('project');
+    setSidebarOpen(false);
   }
 
   function openPhase(phaseId: string) {
     setActivePhaseId(phaseId);
     setView('phase');
+    setSidebarOpen(false);
+  }
+
+  function goToDashboard() {
+    setView('dashboard');
+    setActiveProjectId(null);
+    setActivePhaseId(null);
+    setSidebarOpen(false);
+  }
+
+  function goToLibrary() {
+    setView('library');
+    setActiveProjectId(null);
+    setActivePhaseId(null);
+    setSidebarOpen(false);
+  }
+
+  function goToProject() {
+    setActivePhaseId(null);
+    setView('project');
+    setSidebarOpen(false);
   }
 
   const activeProject = projects.find(p => p.id === activeProjectId) ?? null;
   const activePhase = activeProject?.phases.find(ph => ph.id === activePhaseId) ?? null;
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#6b7280', fontSize: '0.9rem' }}>
-        Loading projects…
-      </div>
-    );
-  }
+  // ── Sidebar ───────────────────────────────────────────────────────────────
 
-  if (loadError) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#ef4444', fontSize: '0.9rem' }}>
-        {loadError}
-      </div>
-    );
-  }
+  const inProject = (view === 'project' || view === 'phase') && activeProject;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  function closeSidebar() { setSidebarOpen(false); }
 
   return (
-    <div className="app-wrapper">
-      {view === 'dashboard' && (
-        <Dashboard
-          projects={projects}
-          onOpenProject={openProject}
-          onAddProject={addProject}
-        />
-      )}
-      {view === 'project' && activeProject && (
-        <ProjectView
-          project={activeProject}
-          onBack={() => { setView('dashboard'); setActiveProjectId(null); }}
-          onOpenPhase={openPhase}
-          onEditProject={(changes) => editProject(activeProject.id, changes)}
-          onDeleteProject={() => deleteProject(activeProject.id)}
-          onUpdatePhase={(phaseId, changes) => updatePhase(activeProject.id, phaseId, changes)}
-          onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
-        />
-      )}
-      {view === 'phase' && activeProject && activePhase && (
-        <PhaseView
-          project={activeProject}
-          phase={activePhase}
-          prompts={prompts}
-          onBack={() => { setView('project'); setActivePhaseId(null); }}
-          onUpdatePhase={(changes) => updatePhase(activeProject.id, activePhase.id, changes)}
-          onUpdateActivity={(defId, changes) => updateActivity(activeProject.id, activePhase.id, defId, changes)}
-          onAddCheckpoint={(data) => addCheckpoint(activeProject.id, activePhase.id, data)}
-          onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
-          onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
-          onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}
-          onAddCustomActivity={(data) => addCustomActivity(activeProject.id, activePhase.id, data)}
-          onDeleteCustomActivity={(caId) => deleteCustomActivity(activeProject.id, activePhase.id, caId)}
-          onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
-        />
-      )}
+    <>
+      {/* ── Mobile overlay — outside app-shell to avoid overflow:hidden clipping ── */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar} />}
+
+    <div className="app-shell">
+
+      {/* ── Sidebar ── */}
+      <aside className={`app-sidebar${sidebarOpen ? ' sidebar-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <div className="sidebar-brand-content">
+              <img src={logoUrl} alt="Slalom" className="sidebar-logo" />
+              <div className="sidebar-brand-sub">Your AI-enabled CX project assistant</div>
+            </div>
+            <button className="sidebar-close-btn" onClick={closeSidebar} aria-label="Close menu">✕</button>
+          </div>
+        </div>
+
+        <nav className="sidebar-nav">
+          {inProject ? (
+            <>
+              <button className="sidebar-back-btn" onClick={goToDashboard}>
+                ← All projects
+              </button>
+              <div className="sidebar-project-name-block">
+                <button
+                  className={`sidebar-project-name-btn ${view === 'project' ? 'sidebar-project-name-btn-active' : ''}`}
+                  onClick={goToProject}
+                >
+                  {activeProject.name}
+                </button>
+                {activeProject.client && (
+                  <div className="sidebar-project-client">{activeProject.client}</div>
+                )}
+              </div>
+              <div className="sidebar-section-label">Phases</div>
+              {activeProject.phases.map(phase => {
+                const isActive = phase.id === activePhaseId && view === 'phase';
+                const color = PHASE_COLORS[phase.code];
+                return (
+                  <button
+                    key={phase.id}
+                    className={`sidebar-nav-item ${isActive ? 'sidebar-nav-item-active' : ''}`}
+                    onClick={() => { setActivePhaseId(phase.id); setView('phase'); setSidebarOpen(false); }}
+                  >
+                    <span className="sidebar-phase-code" style={{ background: color.bg, color: color.text }}>
+                      {`0${phase.code}`}
+                    </span>
+                    <span className="sidebar-nav-label">{phase.label}</span>
+                    {phase.status === 'completed' && <span className="sidebar-phase-done">✓</span>}
+                    {phase.status === 'in-progress' && <span className="sidebar-phase-progress">◑</span>}
+                  </button>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              <div className="sidebar-section-label">Workspace</div>
+              <button
+                className={`sidebar-nav-item ${view === 'dashboard' ? 'sidebar-nav-item-active' : ''}`}
+                onClick={goToDashboard}
+              >
+                <span className="sidebar-nav-icon">⬡</span>
+                <span className="sidebar-nav-label">Projects</span>
+                <span className="sidebar-nav-count">{projects.length}</span>
+              </button>
+              <button
+                className={`sidebar-nav-item ${view === 'library' ? 'sidebar-nav-item-active' : ''}`}
+                onClick={goToLibrary}
+              >
+                <span className="sidebar-nav-icon">◈</span>
+                <span className="sidebar-nav-label">Prompt Library</span>
+                <span className="sidebar-nav-count">{prompts.length}</span>
+              </button>
+            </>
+          )}
+        </nav>
+      </aside>
+
+      {/* ── Content ── */}
+      <main className="app-content">
+        {/* Mobile top bar */}
+        <div className="mobile-header">
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(o => !o)} aria-label="Open menu">
+            <span /><span /><span />
+          </button>
+          <img src={logoUrl} alt="Slalom" className="mobile-header-logo" />
+        </div>
+        {loading && (
+          <div className="app-loading">Loading projects…</div>
+        )}
+        {!loading && loadError && (
+          <div className="app-error">{loadError}</div>
+        )}
+        {!loading && !loadError && (
+          <div className="app-wrapper">
+            {view === 'library' && (
+              <PromptLibrary prompts={prompts} />
+            )}
+            {view === 'dashboard' && (
+              <Dashboard
+                projects={projects}
+                onOpenProject={openProject}
+                onAddProject={addProject}
+              />
+            )}
+            {view === 'project' && activeProject && (
+              <ProjectView
+                project={activeProject}
+                onBack={goToDashboard}
+                onOpenPhase={openPhase}
+                onEditProject={(changes) => editProject(activeProject.id, changes)}
+                onDeleteProject={() => deleteProject(activeProject.id)}
+                onUpdatePhase={(phaseId, changes) => updatePhase(activeProject.id, phaseId, changes)}
+                onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
+              />
+            )}
+            {view === 'phase' && activeProject && activePhase && (
+              <PhaseView
+                project={activeProject}
+                phase={activePhase}
+                prompts={prompts}
+                onBack={goToProject}
+                onUpdatePhase={(changes) => updatePhase(activeProject.id, activePhase.id, changes)}
+                onUpdateActivity={(defId, changes) => updateActivity(activeProject.id, activePhase.id, defId, changes)}
+                onAddCheckpoint={(data) => addCheckpoint(activeProject.id, activePhase.id, data)}
+                onDeleteCheckpoint={(id) => deleteCheckpoint(activeProject.id, activePhase.id, id)}
+                onAddDeliverable={(data) => addDeliverable(activeProject.id, activePhase.id, data)}
+                onDeleteDeliverable={(id) => deleteDeliverable(activeProject.id, activePhase.id, id)}
+                onAddCustomActivity={(data) => addCustomActivity(activeProject.id, activePhase.id, data)}
+                onDeleteCustomActivity={(caId) => deleteCustomActivity(activeProject.id, activePhase.id, caId)}
+                onLogAlignment={(ruleId, note) => logAlignment(activeProject.id, ruleId, note)}
+              />
+            )}
+          </div>
+        )}
+      </main>
     </div>
+    </>
   );
 }

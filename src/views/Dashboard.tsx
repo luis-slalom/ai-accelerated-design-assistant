@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import faviconUrl from '../../assets/main-favicon.svg';
 import type { Project, ProjectStatus } from '../types';
 import { PHASE_COLORS } from '../data';
 import { formatDate } from '../storage';
@@ -9,6 +10,12 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
   active: 'Active',
   'on-hold': 'On Hold',
   completed: 'Completed',
+};
+
+const STATUS_DOT_COLOR: Record<ProjectStatus, string> = {
+  active:     '#16a34a',
+  'on-hold':  '#d97706',
+  completed:  '#0c62fb',
 };
 
 interface Props {
@@ -23,6 +30,7 @@ export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
+  const [showOnboarding, setShowOnboarding] = useState(true);
 
   const filtered = filter === 'all' ? projects : projects.filter(p => p.status === filter);
 
@@ -49,18 +57,70 @@ export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
 
   return (
     <div className="dashboard">
-      {/* Header */}
-      <div className="dashboard-header">
-        <div>
-          <h1 className="app-title">Slalom Design Delivery</h1>
-          <p className="app-subtitle">CX & XD project tracker for client engagements</p>
+      {/* Toolbar */}
+      <div className="dashboard-toolbar">
+        <h2 className="dashboard-view-title">Projects</h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => setShowOnboarding(v => !v)}>
+            {showOnboarding ? 'Hide guide' : 'Show guide'}
+          </button>
+          <button className="btn-primary" onClick={() => { setDraft(EMPTY_DRAFT); setShowForm(true); }}>
+            New project
+          </button>
         </div>
-        <button className="btn-primary" onClick={() => { setDraft(EMPTY_DRAFT); setShowForm(true); }}>
-          + New Project
-        </button>
       </div>
 
-      {/* New / Edit project form */}
+      {/* Onboarding banner */}
+      {showOnboarding && (
+        <div className="onboarding-banner">
+          <button className="onboarding-dismiss" onClick={() => setShowOnboarding(false)} aria-label="Hide guide">✕</button>
+          <div className="onboarding-intro">
+            <img src={faviconUrl} alt="" className="onboarding-icon" />
+            <p className="onboarding-headline">Welcome to Slalom mosAIc</p>
+            <p className="onboarding-body">
+              Track every design engagement end-to-end — from first stakeholder conversation to live UX review.
+              Each project follows a structured 7-stage process with built-in AI prompts to accelerate your work.
+            </p>
+          </div>
+          <div className="onboarding-steps">
+            <div className="onboarding-step">
+              <span className="onboarding-step-icon">⬡</span>
+              <div>
+                <div className="onboarding-step-title">Create a project</div>
+                <div className="onboarding-step-body">Set up a client engagement and track progress across all design phases.</div>
+              </div>
+            </div>
+            <div className="onboarding-step">
+              <span className="onboarding-step-icon">◈</span>
+              <div>
+                <div className="onboarding-step-title">Use the Prompt Library</div>
+                <div className="onboarding-step-body">Browse 37 ready-made AI prompts organised by stage — copy and paste into any AI tool.</div>
+              </div>
+            </div>
+            <div className="onboarding-step">
+              <span className="onboarding-step-icon">◑</span>
+              <div>
+                <div className="onboarding-step-title">Capture context checkpoints</div>
+                <div className="onboarding-step-body">Log key decisions, research insights, and AI outputs as reusable context for your team.</div>
+              </div>
+            </div>
+            <div className="onboarding-step">
+              <span className="onboarding-step-icon">↗</span>
+              <div>
+                <div className="onboarding-step-title">Stay aligned</div>
+                <div className="onboarding-step-body">Get nudges when stakeholder or engineering alignment is needed before moving forward.</div>
+              </div>
+            </div>
+          </div>
+          <div className="onboarding-actions">
+            <button className="btn-primary" onClick={() => { setShowOnboarding(false); setShowForm(true); }}>
+              Create your first project
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* New project form */}
       {showForm && (
         <form className="project-form" onSubmit={handleSubmit}>
           <h3 className="form-title">New project</h3>
@@ -126,23 +186,27 @@ export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
         ))}
       </div>
 
-      {/* Projects grid */}
-      {filtered.length === 0 ? (
+      {/* Project list */}
+      {projects.length === 0 ? (
         <div className="empty-state">
-          {projects.length === 0 ? (
-            <>
-              <p className="empty-state-title">No projects yet</p>
-              <p className="empty-state-body">Create your first project to start tracking design context and deliverables.</p>
-              <button className="btn-primary" onClick={() => setShowForm(true)}>+ New Project</button>
-            </>
-          ) : (
-            <p className="empty-state-title">No {filter} projects</p>
-          )}
+          <p className="empty-state-title">No projects yet</p>
+          <p className="empty-state-body">Create your first project to start tracking design context and deliverables.</p>
+          <button className="btn-primary" onClick={() => setShowForm(true)}>New project</button>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="empty-state">
+          <p className="empty-state-title">No {filter} projects</p>
         </div>
       ) : (
-        <div className="project-grid">
+        <div className="project-list">
+          <div className="project-list-header">
+            <span />
+            <span className="project-list-header-cell">Project</span>
+            <span className="project-list-header-cell">Progress</span>
+            <span className="project-list-header-cell" style={{ textAlign: 'right' }}>Updated</span>
+          </div>
           {filtered.map(project => (
-            <ProjectCard
+            <ProjectRow
               key={project.id}
               project={project}
               onOpen={() => onOpenProject(project.id)}
@@ -154,32 +218,35 @@ export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
   );
 }
 
-function ProjectCard({ project, onOpen }: {
+function ProjectRow({ project, onOpen }: {
   project: Project;
   onOpen: () => void;
 }) {
-  const completedPhases = project.phases.filter(p => p.status === 'completed').length;
-  const totalCheckpoints = project.phases.reduce((n, p) => n + p.checkpoints.length, 0);
-  const totalDeliverables = project.phases.reduce((n, p) => n + p.deliverables.length, 0);
-
   return (
-    <div className="project-card" onClick={onOpen} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && onOpen()}>
-      <div className="project-card-header">
-        <div className="project-card-meta">
-          <h3 className="project-card-name">{project.name}</h3>
-          {project.client && <span className="project-card-client">{project.client}</span>}
-        </div>
-        <div className="project-card-actions">
-          <span className={`status-badge status-${project.status}`}>{STATUS_LABELS[project.status]}</span>
-        </div>
+    <div
+      className="project-row"
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onOpen()}
+    >
+      {/* Status dot */}
+      <span
+        className="project-row-dot"
+        title={STATUS_LABELS[project.status]}
+        style={{ background: STATUS_DOT_COLOR[project.status] }}
+      />
+
+      {/* Name + client */}
+      <div className="project-row-main">
+        <span className="project-row-name">{project.name}</span>
+        {project.client && (
+          <span className="project-row-client">{project.client}</span>
+        )}
       </div>
 
-      {project.description && (
-        <p className="project-card-description">{project.description}</p>
-      )}
-
       {/* Phase progress dots */}
-      <div className="phase-progress">
+      <div className="project-row-phases">
         {project.phases.map(phase => {
           const color = PHASE_COLORS[phase.code];
           const isDone = phase.status === 'completed';
@@ -187,35 +254,19 @@ function ProjectCard({ project, onOpen }: {
           return (
             <div
               key={phase.id}
-              className="phase-dot"
-              title={`${phase.code === 'U' ? 'Utility' : `0${phase.code}`} ${phase.label}: ${phase.status}`}
+              className="project-row-phase-dot"
+              title={`${phase.label}: ${phase.status}`}
               style={{
                 background: isDone ? color.text : isActive ? color.bg : '#e5e7eb',
-                border: isActive ? `2px solid ${color.text}` : isDone ? 'none' : '2px solid #e5e7eb',
+                border: isActive ? `1.5px solid ${color.text}` : 'none',
               }}
             />
           );
         })}
-        <span className="phase-progress-label">{completedPhases}/{project.phases.length} phases</span>
       </div>
 
-      {/* Stats */}
-      <div className="project-card-stats">
-        <span>{totalCheckpoints} checkpoint{totalCheckpoints !== 1 ? 's' : ''}</span>
-        <span className="stat-dot">·</span>
-        <span>{totalDeliverables} deliverable{totalDeliverables !== 1 ? 's' : ''}</span>
-      </div>
-
-      {project.tags.length > 0 && (
-        <div className="tag-list">
-          {project.tags.map(tag => <span key={tag} className="tag">{tag}</span>)}
-        </div>
-      )}
-
-      <div className="project-card-footer">
-        <span className="project-card-date">Updated {formatDate(project.updatedAt)}</span>
-        <span className="project-card-arrow">Open →</span>
-      </div>
+      {/* Updated date */}
+      <span className="project-row-date">{formatDate(project.updatedAt)}</span>
     </div>
   );
 }
