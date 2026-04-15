@@ -2,7 +2,7 @@
 
 > Define what users need to be able to do — in outcomes, not features.
 
-**Deliverables:** Capability map · Out-of-scope log · Personas · As-is service blueprint · HMW statements · Design principles
+**Deliverables:** Capability map · Out-of-scope log · Personas · As-is service blueprint · HMW statements · Future state journey narratives · Front stage interaction map · Design principles
 
 ---
 
@@ -195,6 +195,103 @@ Select the 5–8 most promising HMW statements to take into ideation:
 Do these HMW statements reflect the real user problems — not our preferred solutions?
 Have we picked HMWs that challenge assumptions rather than confirm existing plans?
 Reply YES to confirm, or refine before we move into ideation.
+```
+
+---
+
+## 02-G — Future State Journey Narratives
+
+**Activity:** Generate 6 distinct to-be journey scenarios from service opportunities — making the future experience tangible before designing solutions.  
+**Tags:** future state · service design · journey narratives · opportunities
+
+```
+Generate future state journey narratives that bring service opportunities to life as concrete experience scenarios — before any solution is designed.
+
+Service opportunities to build from: [FILL — paste prioritised opportunities from 02-E HMW statements or opportunity themes]
+User archetypes in scope: [FILL — from 02-C; note which archetype each narrative will follow]
+Phase A scope: [FILL — e.g. awareness, discovery, consideration, pre-arrival]
+Phase B scope: [FILL — e.g. onboarding, active service experience, exit, offboarding]
+
+Generate exactly 6 future state journey narratives. Each must be distinct — no repeated themes, primary touchpoints, or resolution paths across any narrative.
+
+- 3 narratives covering Phase A
+- 3 narratives covering Phase B
+
+FORMAT FOR EACH NARRATIVE
+
+**[Narrative title]**
+*Framing:* [One sentence — who this user is and what they are trying to achieve]
+
+- [Trigger — what initiates this journey]
+- [First touchpoint or action]
+- [Key interaction or decision point]
+- [Moment of truth — where trust, satisfaction, or commitment is at stake]
+- [Pivotal action or transition]
+- [Outcome — what the user feels, achieves, or decides]
+
+Keep each narrative to 6–8 bullets following the flow: trigger → touchpoints → moments of truth → outcome.
+
+CONSTRAINTS
+- Each narrative must address a different service opportunity from the input list
+- No touchpoint may appear as the primary moment of truth in more than one narrative
+- Write from the user's perspective — in their words, not the system's language
+- Do not propose solutions — describe the experience, not the mechanism behind it
+
+---
+⛔ CHECKPOINT 02-G
+Do all 6 narratives reflect genuine user needs drawn from research — not design preferences?
+Does each narrative address a distinct opportunity with no overlapping moments of truth?
+Reply YES to confirm, or revise before moving to front stage mapping or concept development.
+```
+
+---
+
+## 02-H — Front Stage Interaction Mapping
+
+**Activity:** Map each user action to its front stage touchpoint(s) and the data captured or actioned — revealing coverage gaps in the service layer.  
+**Tags:** front stage · service blueprint · touchpoints · data flows · gaps
+
+```
+Map each user action to its front stage interaction and the data it generates or consumes. This reveals where the service layer has gaps before moving into interaction design.
+
+User actions to map: [FILL — paste from the as-is service blueprint (02-D) or future state journey narratives (02-G)]
+Service context: [FILL — e.g. "B2B client onboarding", "patient self-check-in", "loyalty programme redemption"]
+Channels in scope: [FILL — list all available front stage touchpoints: website, app, email, SMS, human agent, kiosk, etc.]
+
+For each action, identify:
+1. The front stage interaction(s) — what the user sees, hears, or interacts with
+2. The data being captured or actioned — be specific about fields and what is done with them
+
+Complete the table below. If a single action spans multiple front stage interactions, list each as a separate row under the same action.
+
+| User Action | Front Stage Interaction | Data Captured or Actioned |
+|-------------|-------------------------|---------------------------|
+
+FLAGGING CONVENTIONS
+- ⚠️ Gap — no current touchpoint identified: use this flag for any action where no clear front stage interaction exists
+- Data entries must be specific: "preference saved to user profile" not "data captured"
+- If data passes between systems, note the handoff: e.g. "booking reference passed to CRM on confirmation"
+- If the same touchpoint handles multiple actions, that is a signal of potential overload — flag it
+
+After completing the table:
+
+## Coverage summary
+- Total actions mapped: [n]
+- Actions with confirmed front stage coverage: [n]
+- Actions flagged as gaps (⚠️): [n]
+- Touchpoints carrying the highest data load: [list top 2–3]
+
+## Gap analysis
+For each ⚠️ gap identified:
+- What is the user's expectation at this moment?
+- What is the business or service risk if this action has no touchpoint?
+- Recommended resolution: new touchpoint / extend existing / accept as backstage
+
+---
+⛔ CHECKPOINT 02-H
+Have all flagged gaps been reviewed with the service owner or product team?
+Is data specificity sufficient for engineering to understand what fields need to be captured or passed?
+Reply YES to confirm, or resolve remaining gaps before moving to interaction design.
 ```
 
 ---
