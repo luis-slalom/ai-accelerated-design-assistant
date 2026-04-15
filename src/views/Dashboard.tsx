@@ -94,7 +94,7 @@ export function Dashboard({ projects, onOpenProject, onAddProject }: Props) {
               <span className="onboarding-step-icon">◈</span>
               <div>
                 <div className="onboarding-step-title">Use the Prompt Library</div>
-                <div className="onboarding-step-body">Browse 37 ready-made AI prompts organised by stage — copy and paste into any AI tool.</div>
+                <div className="onboarding-step-body">Browse 39 ready-made AI prompts organised by stage — copy and paste into any AI tool.</div>
               </div>
             </div>
             <div className="onboarding-step">
