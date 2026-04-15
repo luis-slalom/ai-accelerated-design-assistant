@@ -29,7 +29,7 @@ The tool follows a six-stage Human-Centred Design (HCD) process, plus a cross-cu
 | Stage | Purpose | Deliverables |
 |---|---|---|
 | **01 Context** | Understand the project, users, and constraints | Project brief · Assumption register · Heuristic audit · Competitive review · Assumptions map |
-| **02 Capabilities** | Define what users need to do — in outcomes, not features | Capability map · Personas · As-is service blueprint · HMW statements · Design principles |
+| **02 Capabilities** | Define what users need to do — in outcomes, not features | Capability map · Personas · As-is service blueprint · HMW statements · Future state journey narratives · Front stage interaction map · Design principles |
 | **03 Objects** | Name and model the core entities the product acts on | Object model · Domain glossary · Content inventory · Mental model diagram |
 | **04 Interactions** | Map flows, states, and edge cases end-to-end | Flow diagrams · State inventory · Wireframes · Accessibility audit · Usability report · Ideation outputs · Concept test report |
 | **05 Alignment** | Agree data contracts and API shapes before build | Screen data manifest · Contract spec · Design tokens · Prototype sign-off notes |
@@ -38,7 +38,7 @@ The tool follows a six-stage Human-Centred Design (HCD) process, plus a cross-cu
 
 ## Activity catalogue
 
-30 pre-built activities across all stages:
+32 pre-built activities across all stages:
 
 | Code | Activity |
 |---|---|
@@ -52,6 +52,8 @@ The tool follows a six-stage Human-Centred Design (HCD) process, plus a cross-cu
 | 02-C | Persona & segment definition |
 | 02-D | Service blueprint (as-is) |
 | 02-E | How Might We framing |
+| 02-G | Future state journey narratives |
+| 02-H | Front stage interaction mapping |
 | 02-F | Design principles |
 | 03-A | Entity discovery workshop |
 | 03-B | Relationship mapping |
@@ -102,7 +104,7 @@ The `prompts/` directory contains the full AI prompt library as plain Markdown f
 |---|---|
 | [prompts/guide.md](prompts/guide.md) | How the library works — start here |
 | [prompts/01-context.md](prompts/01-context.md) | 01-A through 01-E |
-| [prompts/02-capabilities.md](prompts/02-capabilities.md) | 02-A through 02-F |
+| [prompts/02-capabilities.md](prompts/02-capabilities.md) | 02-A through 02-H |
 | [prompts/03-objects.md](prompts/03-objects.md) | 03-A through 03-D |
 | [prompts/04-interactions.md](prompts/04-interactions.md) | 04-A through 04-G |
 | [prompts/05-alignment.md](prompts/05-alignment.md) | 05-A through 05-D |
